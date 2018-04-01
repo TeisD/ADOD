@@ -34,6 +34,10 @@ git checkout hdf5-1.10
 luarocks make hdf5-0-0.rockspec LIBHDF5_LIBDIR="/usr/lib/x86_64-linux-gnu/"
 cd ~
 
+# converting dependencies
+luarocks install https://raw.githubusercontent.com/bshillingford/fbdebugger-minimal/master/fbdebugger-standalone-1.rockspec
+sudo apt-get install libedit-dev -y
+
 # test data
 git clone https://github.com/karpathy/neuraltalk2
 cd neuraltalk2
