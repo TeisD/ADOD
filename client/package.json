@@ -1,0 +1,23 @@
+{
+  "name": "z33milan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Teis S.A. De Greve",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^1.6.9",
+    "lcdi2c": "^1.0.6",
+    "lodash": "^4.17.5",
+    "node-raspistill": "0.0.14",
+    "opencv": "^6.0.0",
+    "request": "^2.83.0",
+    "tesseract.js": "^1.0.10",
+  },
+  "devDependencies": {
+    "eslint": "^4.18.0"
+  }
+}
