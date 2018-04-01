@@ -16,7 +16,7 @@ do
 	th train.lua -input_h5 data/salone-2/cocotalk.h5 -input_json data/salone-2/cocotalk.json -checkpoint_path checkpoints -id 2fine -finetune_cnn_after 0 -start_from checkpoints/model_id2.t7 -max_iters 10 -batch_size 10
 
 	# convert checkpoint to CPU
-	th convert_checkpoint_gpu_to_cpu.lua checkpoins/model_id2fine.t7
+	th convert_checkpoint_gpu_to_cpu.lua checkpoints/model_id2fine.t7
 
 	# copy to the other server
 	scp -i "shared/config/keys/ec2-20180302.pem" checkpoints/model_id2fine.t7 ubuntu@ec2-18-197-19-124.eu-central-1.compute.amazonaws.com:~/neuraltalk2-data/salone.t7-new
