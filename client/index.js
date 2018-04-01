@@ -1,8 +1,10 @@
-const LCD = require('modules/LCD');
-const PageDetector = require('modules/PageDetector');
+const LCD = require('./modules/LCD');
+const PageDetector = require('./modules/PageDetector');
 
 var lcd = new LCD();
 var pagedetector = new PageDetector();
+
+pagedetector.start();
 
 pagedetector.on('change', (e) => {
 	console.log('[EVENT] ' + e);

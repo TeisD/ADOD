@@ -6,7 +6,7 @@ const path = require('path');
 const cv = require('opencv');
 const fs = require('fs');
 const Raspistill = require('node-raspistill').Raspistill;
-const events = require('events');
+const EventEmitter = require('events');
 
 const STATUS = {
 	NO_PAGE: {
@@ -47,8 +47,9 @@ const PAGENUMBERS = [169, 185, 245, 249];
 class PageDetector extends EventEmitter {
 
 	constructor() {
+		super();
 		this.tesseract = Tesseract.create({
-			langPath: path.join(__dirname, '../../assets/languages/'),
+			langPath: path.join(__dirname, '../../shared/assets/languages/'),
 			corePath: path.join(__dirname, '../../node_modules/tesseract.js/src/index.js'),
 		});
 		this.camera = new Raspistill({
@@ -66,7 +67,7 @@ class PageDetector extends EventEmitter {
 	 */
 	start() {
 		this.running = true;
-		capture();
+		this.capture();
 	}
 
 	/*
@@ -94,12 +95,12 @@ class PageDetector extends EventEmitter {
 		this.camera.takePhoto()
 		.then((photo) => {
 			return new Promise((resolve, reject) => {
-				cv.readImage(photo, function (err, im) {
+				cv.readImage(photo, (err, im) => {
 					if (err) return reject(err);
 					if (im.width() < 1 || im.height() < 1) return reject('Captured image has no size');
 					console.log('[OK] Captured image');
 
-					im = findPagenumber(im);
+					im = this.findPagenumber(im);
 
 					resolve(im);
 				});
@@ -128,7 +129,7 @@ class PageDetector extends EventEmitter {
 				this.emit('new', this.pagenumber);
 			}
 
-			capture();
+			this.capture();
 		})
 		.catch((err) => {
 			if(!this.running) return;
@@ -154,7 +155,7 @@ class PageDetector extends EventEmitter {
 
 			this.STATUS = status;
 			this.pagenumber = 0;
-			capture();
+			this.capture();
 		});
 	}
 
