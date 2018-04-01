@@ -5,7 +5,6 @@ const Tesseract = require('tesseract.js')
 const path = require('path');
 const cv = require('opencv');
 const fs = require('fs');
-const LCD = require('../modules/LCD');
 const Raspistill = require('node-raspistill').Raspistill;
 const events = require('events');
 
@@ -65,7 +64,7 @@ class PageDetector extends EventEmitter {
 	/*
 	 * Start detecting pages
 	 */
-	function start() {
+	start() {
 		this.running = true;
 		capture();
 	}
@@ -73,12 +72,22 @@ class PageDetector extends EventEmitter {
 	/*
 	 * Stop detecting pages
 	 */
-	function stop() {
+	stop() {
 		this.running = false;
+	}
+
+	/*
+	 * Reset the memory
+	 */
+	reset() {
+		this.pagenumber = 0;
 		this.status = STATUS.NO_PAGE;
 	}
 
-	function capture() {
+	/*
+	 * Capture and process the page
+	 */
+	capture() {
 		if(!this.running) return;
 
 		console.log('Capturing image...');
@@ -149,7 +158,12 @@ class PageDetector extends EventEmitter {
 		});
 	}
 
-	function findPagenumber(im) {
+	/**
+	 * Find the area containing the pagenumber on an capture
+	 * @param im An image
+	 * @return The cropped image
+	 */
+	findPagenumber(im) {
 		im.convertGrayscale();
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		im = im.threshold(100, 255);
