@@ -2,11 +2,12 @@
 
 #
 # Run this file automatically on boot in a tmux session
-# tmux new-session -d -s "neuraltalk" ~/mdw-2018/server/apps/instagram.sh
+# add to /etc/rc.local
+# sudo -u ubuntu tmux new-session -d -s "neuraltalk" sh /home/ubuntu/mdw-2018/server/apps/salone.sh
 #
 
 # start from the right folder
-cd ~/neuraltalk2
+cd /home/ubuntu/neuraltalk2
 
 # loop
 while true
