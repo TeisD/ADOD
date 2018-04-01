@@ -19,9 +19,9 @@ do
 	th convert_checkpoint_gpu_to_cpu.lua checkpoins/model_id2fine.t7
 
 	# copy to the other server
-	scp -i "shared/config/keys/ec2-20180302.pem" checkpoints/model_id2fine.t7 ubuntu@ec2-18-197-19-124.eu-central-1.compute.amazonaws.com:~/neuraltalk2/checkpoints/model_id2fine.t7-new
+	scp -i "shared/config/keys/ec2-20180302.pem" checkpoints/model_id2fine.t7 ubuntu@ec2-18-197-19-124.eu-central-1.compute.amazonaws.com:~/neuraltalk2-data/salone.t7-new
 
 	# replace the old file on server with new one
-	ssh -i "shared/config/keys/ec2-20180302.pem" ubuntu@ec2-18-197-19-124.eu-central-1.compute.amazonaws.com cd ~/neuraltalk2/checkpoints | mv model_id2fine.t7 model_id2fine.t7-old | mv model_id2fine.t7-new model_id2fine.t7 | rm model_id2fine.t7-old
+	ssh -i "shared/config/keys/ec2-20180302.pem" ubuntu@ec2-18-197-19-124.eu-central-1.compute.amazonaws.com cd ~/neuraltalk2-data | mv model.t7 model.t7-old | mv model.t7-new model.t7 | rm model.t7-old
 
 done
