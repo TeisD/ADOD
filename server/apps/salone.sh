@@ -17,7 +17,7 @@ while true
 do
 
 	# train 2500 iterations with finetuning turned on
-	/home/ubuntu/torch/install/bin/th train.lua -input_h5 ../neuraltalk2-data/dataset/salone-2/cocotalk.h5 -input_json ../neuraltalk2-data/dataset/salone-2/cocotalk.json -checkpoint_path ../neuraltalk2-data/checkpoints -id 2fine -finetune_cnn_after 0 -start_from ../neuraltalk2-data/checkpoints/model_id2fine.t7 -max_iters 2501 -save_checkpoint_every 2500 -batch_size 8
+	/home/ubuntu/torch/install/bin/th train.lua -input_h5 ../neuraltalk2-data/dataset/salone-2/cocotalk.h5 -input_json ../neuraltalk2-data/dataset/salone-2/cocotalk.json -checkpoint_path ../neuraltalk2-data/checkpoints -id 2fine -finetune_cnn_after 0 -start_from ../neuraltalk2-data/checkpoints/model_id2fine.t7 -max_iters 2501 -save_checkpoint_every 2500 -batch_size 10
 
 	# convert checkpoint to CPU
 	/home/ubuntu/torch/install/bin/th convert_checkpoint_gpu_to_cpu.lua ../neuraltalk2-data/checkpoints/model_id2fine.t7
