@@ -4,8 +4,8 @@ const moment = require('moment');
 
 const DB = 'mdw_2018';
 const TABLE = 'twitter';
-const AUTH = require('../../config/keys/mysql.json');
-const CLIENTS = require('../../config/keys/twitter-clients.json');
+const AUTH = require('../../shared/config/keys/mysql.json');
+const CLIENTS = require('../../shared/config/keys/twitter-clients.json');
 const QUERIES = [
   {
     "type": "hashtag",
