@@ -287,9 +287,9 @@ function exportJson() {
                 name = name.split(''); // split into characters
                 name = name.map(c => c.toLowerCase()+c.toUpperCase());
                 name = '[' + name.join('][') + ']';
-                let project = new RegExp(name + "(\\s*[A-Z0-9]+[\\w]*)*", "g");
-                let producer = new RegExp(product.producer, "gi");
-                let designer = new RegExp(product.designer, "g");
+                let project = new RegExp("\\b" + name + "\\b(\\s*[A-Z0-9]+[\\w]*)*\\b", "g");
+                let producer = new RegExp("\\b" + product.producer + "\\b", "gi");
+                let designer = new RegExp("\\b" + product.designer + "\\b", "gi");
                 captions = captions.map(s => {
                   s = s.replace(/[^\w\s-:;,/'"]/g, '').trim();
                   s = s.replace(project, '%PROJECT%');
