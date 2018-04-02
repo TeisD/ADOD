@@ -12,8 +12,8 @@ const { URL } = require('url');
 var MongoClient = require('mongodb').MongoClient;
 
 const DB = "mongodb://localhost:27017";
-const IMAGES = path.join(__dirname, '../../data/salone/images');
-const OUTPUT = path.join(__dirname, '../../data/salone');
+const IMAGES = path.join(__dirname, '../../../mdw-2018-data/salone/images');
+const OUTPUT = path.join(__dirname, '../../../mdw-2018-data/salone');
 const HOSTNAME = "http://www.salonemilano.it";
 const ENDPOINTS = {
 	"producers": "/en/site-salone/tools/catalogo-prodotti/platform/promos/0?ajax=true&currentPage=1",
@@ -304,7 +304,7 @@ function exportJson() {
               if(captions.length == 0) return resolve();
 							console.log('Writing caption '+(j+1)+'/'+product.images.length+' from product '+(i+1)+'/'+result.length);
 							transformStream.write({
-								file_path: 'images/' + filename,
+								file_path: filename,
 								captions: captions
 							});
 							resolve();
