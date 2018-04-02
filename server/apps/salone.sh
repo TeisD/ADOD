@@ -9,6 +9,9 @@
 # start from the right folder
 cd /home/ubuntu/neuraltalk2
 
+# export paths
+export CUDNN_PATH="/usr/local/cuda/lib64/libcudnn.so"
+
 # loop
 while true
 do
