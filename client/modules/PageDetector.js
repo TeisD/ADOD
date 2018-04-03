@@ -13,20 +13,12 @@ const STATUS = {
 		id: 0,
 		msg: "No page detected"
 	},
-	FOUND_PAGE:  {
+	NEW_PAGE:  {
 		id: 1,
 		msg: "Page detected"
 	},
-	UNKNOWN_PAGE:  {
-		id: 2,
-		msg: "The detected page is unknown"
-	},
-	KNOWN_PAGE:  {
-		id: 3,
-		msg: "The detected page is known"
-	},
 	ERROR: {
-		id: 4,
+		id: 2,
 		msg: "An error occured"
 	}
 }
@@ -39,16 +31,13 @@ const CROP = {
 }
 const AREA = 15000;
 
-const PAGENUMBERS = [169, 185, 245, 249];
-
 const LANGPATH = path.join(__dirname, '../../shared/assets/languages/');
 const COREPATH = path.join(__dirname, '../node_modules/tesseract.js-core/index.js');
 
 /*
  * Continously scans for pages
- * @emit 'new' When a new page is detected
- * @emit 'change' When a status change occurs
- * @emit 'ready' When a page has sucessfully been detected
+ * @emit 'change' When a status change is detected (new / none)
+ * @emit 'ready' When the pagenumber has been read
  * @emit 'error' When an error occurs
  */
 class PageDetector extends EventEmitter {
@@ -126,13 +115,8 @@ class PageDetector extends EventEmitter {
 
 			if(!n || isNaN(n) || n < 0 || n > 300) {
 				return Promise.reject(STATUS.NO_PAGE)
-			} else if(PAGENUMBERS.indexOf(n) < 0) {
-				return Promise.reject(STATUS.UNKNOWN_PAGE)
-			} else if(n == this.pagenumber) {
-				// do nothing
-			} else {
+			} else if(n != this.pagenumber) {
 				this.pagenumber = n;
-				this.status = STATUS.KNOWN_PAGE;
 				this.emit('ready', this.pagenumber);
 			}
 
@@ -145,7 +129,7 @@ class PageDetector extends EventEmitter {
 				return this.capture();
 			};
 
-			if(err === STATUS.NO_PAGE || err === STATUS.UNKNOWN_PAGE) {
+			if(err === STATUS.NO_PAGE) {
 				this.status = err
 				this.emit('change', STATUS.NO_PAGE);
 			} else {
@@ -192,11 +176,10 @@ class PageDetector extends EventEmitter {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
-		if(this.status === STATUS.NO_PAGE) {
-			this.emit('new');
+		if(this.status !== STATUS.NEW_PAGE) {
+			this.status = STATUS.NEW_PAGE;
+			this.emit('change', STATUS.NEW_PAGE);
 		}
-
-		this.status = STATUS.FOUND_PAGE;
 
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x, bbox.y, bbox.width, bbox.height)
