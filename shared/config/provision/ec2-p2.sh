@@ -12,7 +12,7 @@ export TORCH_NVCC_FLAGS="-D__CUDA_NO_HALF_OPERATORS__"
 ./install.sh
 source ~/.bashrc
 
-# update torch
+# update cudnn (gpu only)
 git clone https://github.com/soumith/cudnn.torch.git -b R7 && cd cudnn.torch && luarocks make cudnn-scm-1.rockspec
 
 # caption dependencies
@@ -20,12 +20,7 @@ luarocks install nn
 luarocks install nngraph
 luarocks install image
 luarocks install lua-cjson
-luarocks install cutorch
-luarocks install cunn
-export CUDNN_PATH="/usr/local/cuda/lib64/libcudnn.so"
-pip install SimpleHTTPServer
-
-# training dependencies
+sudo apt-get install libprotobuf-dev protobuf-compiler -y
 luarocks install loadcaffe
 sudo apt-get install libhdf5-serial-dev hdf5-tools -y
 git clone https://github.com/anibali/torch-hdf5.git
@@ -33,6 +28,10 @@ cd torch-hdf5
 git checkout hdf5-1.10
 luarocks make hdf5-0-0.rockspec LIBHDF5_LIBDIR="/usr/lib/x86_64-linux-gnu/"
 cd ~
+# for gpu only
+luarocks install cutorch
+luarocks install cunn
+export CUDNN_PATH="/usr/local/cuda/lib64/libcudnn.so"
 
 # converting dependencies
 luarocks install https://raw.githubusercontent.com/bshillingford/fbdebugger-minimal/master/fbdebugger-standalone-1.rockspec
