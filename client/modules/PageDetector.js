@@ -25,6 +25,10 @@ const STATUS = {
 		id: 3,
 		msg: "The detected page is known"
 	},
+	ERROR: {
+		id: 4,
+		msg: "An error occured"
+	}
 }
 
 const CROP = {
@@ -36,6 +40,9 @@ const CROP = {
 const AREA = 15000;
 
 const PAGENUMBERS = [169, 185, 245, 249];
+
+const LANGPATH = path.join(__dirname, '../../shared/assets/languages/');
+const COREPATH = path.join(__dirname, '../node_modules/tesseract.js-core/index.js');
 
 /*
  * Continously scans for pages
@@ -49,17 +56,17 @@ class PageDetector extends EventEmitter {
 	constructor() {
 		super();
 		this.tesseract = Tesseract.create({
-			langPath: path.join(__dirname, '../../shared/assets/languages/'),
-			corePath: path.join(__dirname, '../../node_modules/tesseract.js/src/index.js'),
+			langPath: LANGPATH,
+			corePath: COREPATH,
 		});
 		this.camera = new Raspistill({
 			noFileSave: true,
 			width: 2000,
-			time: 0,
+			time: 1,
 		});
 		this.pagenumber = 0;
 		this.running = false;
-		this.status = STATUS.NO_PAGE;
+		this.status = null;
 	}
 
 	/*
@@ -82,7 +89,7 @@ class PageDetector extends EventEmitter {
 	 */
 	reset() {
 		this.pagenumber = 0;
-		this.status = STATUS.NO_PAGE;
+		this.status = null;
 	}
 
 	/*
@@ -91,14 +98,14 @@ class PageDetector extends EventEmitter {
 	capture() {
 		if(!this.running) return;
 
-		console.log('Capturing image...');
+		//console.log('Capturing image...');
 		this.camera.takePhoto()
 		.then((photo) => {
 			return new Promise((resolve, reject) => {
 				cv.readImage(photo, (err, im) => {
 					if (err) return reject(err);
 					if (im.width() < 1 || im.height() < 1) return reject('Captured image has no size');
-					console.log('[OK] Captured image');
+					//console.log('[OK] Captured image');
 
 					im = this.findPagenumber(im);
 
@@ -125,8 +132,8 @@ class PageDetector extends EventEmitter {
 				// do nothing
 			} else {
 				this.pagenumber = n;
-				this.status = STATUS.FOUND_PAGE;
-				this.emit('new', this.pagenumber);
+				this.status = STATUS.KNOWN_PAGE;
+				this.emit('ready', this.pagenumber);
 			}
 
 			this.capture();
@@ -134,26 +141,18 @@ class PageDetector extends EventEmitter {
 		.catch((err) => {
 			if(!this.running) return;
 
-			if(err === this.status) return;
+			if(err === this.status) {
+				return this.capture();
+			};
 
-			let status = STATUS.NO_PAGE;
-
-			switch(err) {
-				case STATUS.NO_PAGE:
-					this.emit('change', STATUS.NO_PAGE);
-					break;
-				case STATUS.FOUND_PAGE:
-					this.emit('change', STATUS.FOUND_PAGE);
-					break;
-				case STATUS.UNKNOWN_PAGE:
-					this.emit('change', STATUS.UNKNOWN_PAGE);
-					break;
-				default:
-					this.emit('error', err);
-					break;
+			if(err === STATUS.NO_PAGE || err === STATUS.UNKNOWN_PAGE) {
+				this.status = err
+				this.emit('change', STATUS.NO_PAGE);
+			} else {
+				this.status = STATUS.ERROR;
+				this.emit('error', err);
 			}
 
-			this.STATUS = status;
 			this.pagenumber = 0;
 			this.capture();
 		});
@@ -193,9 +192,11 @@ class PageDetector extends EventEmitter {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
-		if(this.status !== STATUS.FOUND_PAGE || this.status !== STATUS.KNOWN_PAGE) {
+		if(this.status === STATUS.NO_PAGE) {
 			this.emit('new');
 		}
+
+		this.status = STATUS.FOUND_PAGE;
 
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x, bbox.y, bbox.width, bbox.height)

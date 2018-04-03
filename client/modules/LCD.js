@@ -3,6 +3,7 @@ const LCDi2C = require('lcdi2c');
 const MESSAGE = {
 	INSERT_PAGE: "Place page in paper tray",
 	UNKNOWN_PAGE: "Unknown page",
+	PAGE_DETECTED: "Detected page!\nRecognizing...",
 }
 
 class LCD {
