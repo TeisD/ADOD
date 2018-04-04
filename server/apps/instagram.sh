@@ -5,7 +5,7 @@
 #
 
 # exit if the lock file is present
-if [ ! -f /home/ubuntu/mdw-2018-data/instagram/lock ]; then
+if [ -f /home/ubuntu/mdw-2018-data/instagram/lock ]; then
     echo "Process already running!"
 		exit 0
 fi
