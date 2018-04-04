@@ -4,3 +4,4 @@ temp/
 npm-debug.log
 shared/config/keys
 !.gitkeep
+.env
