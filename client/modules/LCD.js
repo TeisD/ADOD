@@ -1,9 +1,22 @@
-const LCDi2C = require('lcdi2c');
+// ugly require to not break on systems without i2c bus
+const LCDi2C = class {
+	println(s, n) {
+		console.log('[LCD] ' + s);
+	}
+	clear(){
+	}
+}
+
+try {
+	const LCDi2C = require('lcdi2c');
+} catch(e) {}
 
 const MESSAGE = {
 	INSERT_PAGE: "Place page in paper tray",
 	UNKNOWN_PAGE: "Unknown page",
 	PAGE_DETECTED: "Detected page!\nRecognizing...",
+	ERROR_RETRY: "Error :(\nRetrying in 5s...",
+	DONE: "Done!\n"
 }
 
 class LCD {

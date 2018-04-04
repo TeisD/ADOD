@@ -71,12 +71,6 @@ class PageDetector extends EventEmitter {
 	 */
 	stop() {
 		this.running = false;
-	}
-
-	/*
-	 * Reset the memory
-	 */
-	reset() {
 		this.pagenumber = 0;
 		this.status = null;
 	}
@@ -95,7 +89,7 @@ class PageDetector extends EventEmitter {
 					if (err) return reject(err);
 					if (im.width() < 1 || im.height() < 1) return reject('Captured image has no size');
 					//console.log('[OK] Captured image');
-
+					if(!this.running) return Promise.reject();
 					im = this.findPagenumber(im);
 
 					resolve(im);
