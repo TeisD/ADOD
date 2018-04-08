@@ -35,6 +35,8 @@ const server = http.createServer((request, response) => {
 
 			let data,
 					r;
+			console.log(body);
+			console.log('key: ' + body.key);
 
 			if(body.key != KEY) {
 				r = Promise.reject('401')
