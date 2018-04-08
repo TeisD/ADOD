@@ -12,8 +12,6 @@ const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/')
 
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
 
-console.log("api key: " + KEY);
-
 const server = http.createServer((request, response) => {
 	request.on('error', (err) => {
     console.error('[ERROR] ' + err);
@@ -25,6 +23,8 @@ const server = http.createServer((request, response) => {
     console.error('[ERROR] ' + err);
   });
 
+	console.log('Client connected');
+
 	if(request.method === 'POST') {
 		let body = '';
 
@@ -35,24 +35,21 @@ const server = http.createServer((request, response) => {
 
 			let data,
 					r;
-			console.log(body);
-			console.log('key: ' + body.key);
-			console.log(typeof KEY);
-			console.log(typeof body.key);
 
 			if(body.key.trim() !== KEY) {
 				r = Promise.reject('401')
 			} else {
-				console.log('client connected');
 				switch(request.url){
 					case '/instagram':
 						console.log('/instagram');
 						r = instagram(body.page);
 						break;
 					case '/search':
+						console.log('/search');
 						r = search(body.page);
 						break;
 					case '/salone':
+						console('/salone');
 						r = salone(body.page);
 						break;
 					default:
