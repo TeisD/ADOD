@@ -37,6 +37,8 @@ const server = http.createServer((request, response) => {
 					r;
 			console.log(body);
 			console.log('key: ' + body.key);
+			console.log(typeof KEY);
+			console.log(typeof body.key);
 
 			if(body.key != KEY) {
 				r = Promise.reject('401')
