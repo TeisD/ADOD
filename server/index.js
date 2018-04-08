@@ -12,6 +12,8 @@ const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/')
 
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
 
+console.log("api key: " + KEY);
+
 const server = http.createServer((request, response) => {
 	request.on('error', (err) => {
     console.error('[ERROR] ' + err);
@@ -62,8 +64,10 @@ const server = http.createServer((request, response) => {
 				console.error('[ERROR] ' + err);
 				if(err == '401') {
 					response.statusCode = 401;
+					response.end();
 				} else if(err == '404') {
 					response.statusCode = 404;
+					response.end();
 				} else {
 					response.statusCode = 400;
 					response.end(JSON.stringify(err));
