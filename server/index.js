@@ -7,7 +7,7 @@ const Page = require('../shared/modules/Page');
 const moment = require('moment');
 
 const PORT = 3000;
-const KEY = fs.readFileSync(path.join(__dirname, '../shared/config/keys/api-key'), 'utf8');
+const KEY = fs.readFileSync(path.join(__dirname, '../shared/config/keys/api-key'), 'utf8').trim();
 const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/')
 
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
@@ -40,7 +40,7 @@ const server = http.createServer((request, response) => {
 			console.log(typeof KEY);
 			console.log(typeof body.key);
 
-			if(body.key != KEY) {
+			if(body.key.trim() !== KEY) {
 				r = Promise.reject('401')
 			} else {
 				console.log('client connected');
