@@ -39,8 +39,10 @@ const server = http.createServer((request, response) => {
 			if(body.key != KEY) {
 				r = Promise.reject('401')
 			} else {
+				console.log('client connected');
 				switch(request.url){
 					case '/instagram':
+						console.log('/instagram');
 						r = instagram(body.page);
 						break;
 					case '/search':
