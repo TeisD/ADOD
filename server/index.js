@@ -162,7 +162,8 @@ function instagram(page) {
 		// sort the "all" results internally
 		response.forEach((keyword) => {
 			if(keyword.hasOwnProperty('all') && keyword.all) {
-				keyword.images.sort((a, b) => sort)
+				keyword.images.sort((a, b) => sort);
+				keyword.images = keyword.images.slice(0, 50);
 			}
 		});
 
