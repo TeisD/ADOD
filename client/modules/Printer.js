@@ -50,6 +50,19 @@ class Printer {
 		this.print(data);
 	}
 
+	/*
+	 * Save the data to a file
+	 * Useful while debugging
+	 */
+	save(data, filename) {
+		return new Promise((resolve, reject) => {
+			fs.writeFile(filename, data,  "binary", function(err) {
+				if(err) return reject(err);
+				resolve();
+			});
+		});
+	}
+
 }
 
 module.exports = Printer;
