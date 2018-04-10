@@ -1,4 +1,5 @@
 const ipp = require('ipp');
+const fs = require('fs');
 
 class Printer {
 

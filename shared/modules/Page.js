@@ -14,6 +14,23 @@ class Page {
 	}
 
 	/*
+	 * Find whitespace on a page
+	 * To have some variation, this function randomly starts from one of the corners of the page
+	 * @return false if no whitespace has been found
+	 * @return {x, y, with, height} a whitespace area
+	 */
+	findWhitespace() {
+
+	}
+
+	/*
+	 * Mark a whitespace area as filled
+	 */
+	unWhitespace() {
+
+	}
+
+	/*
 	 * Construct a new Page from a json file
 	 * @param file The file to load
 	 * @return The Page instance
