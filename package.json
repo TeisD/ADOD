@@ -13,7 +13,8 @@
 		"connect:p2": "ssh -t teis@teis.me ssh pi@localhost -p 60222",
 		"connect:p3": "ssh -t teis@teis.me ssh pi@localhost -p 60322",
 		"connect:p4": "ssh -t teis@teis.me ssh pi@localhost -p 60422",
-		"connect:p5": "ssh -t teis@teis.me ssh pi@localhost -p 60522"
+		"connect:p5": "ssh -t teis@teis.me ssh pi@localhost -p 60522",
+		"connect:cups": "sh shared/config/scripts/cups.sh"
   },
   "author": "Teis S.A. De Greve",
   "license": "ISC",
