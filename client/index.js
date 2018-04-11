@@ -31,6 +31,10 @@ switch(process.env.CONTROLLER){
 		break;
 }
 
+var retry = 0;
+
+lcd.print("Initializing...");
+
 /**
  * Listen to status changes and display information to the user
  */
@@ -54,13 +58,24 @@ pagedetector.on('ready', function(n) {
 		console.log('The new page is: ' + n);
 		// stop the pagedetector
 		pagedetector.stop();
+		// reset the retry counter
+		retry = 0;
 		// make a request to the server for data
+		lcd.print(LCD.MESSAGE.SEARCHING);
 		getData(n)
 		.then((data) => { // draw the data
-			controller.load(page, data);
-			return controller.draw(data);
+			if(typeof data === 'undefined') {
+				lcd.print(LCD.MESSAGE.NO_DATA);
+				controller.load(page, data);
+				return new Promise((res, rej) => setTimeout(res, 3000));
+			} else {
+				lcd.print(LCD.MESSAGE.DRAWING);
+				controller.load(page, data);
+				return controller.draw(data);
+			}
 		})
 		.then(() => { // print page & wait for print to finish
+			lcd.print(LCD.MESSAGE.PRINTING)
 			if(!process.env.DEBUGGING) {
 				return printer.printAndFinish(controller.getBuffer());
 			} else {
@@ -72,9 +87,14 @@ pagedetector.on('ready', function(n) {
 			pagedetector.start();
 		})
 		.catch((err) => { // catch the error & resume after timeout
-			console.error('[ERROR] ' + err);
-			lcd.print(LCD.MESSAGE.ERROR_RETRY);
-			setTimeout(pagedetector.start, 5000);
+			if(process.env.DEBUGGING) {
+				console.log(err);
+				console.error(err.stack);
+			} else {
+				console.error('[ERROR] ' + err);
+				lcd.print(LCD.MESSAGE.ERROR_RETRY);
+				setTimeout(pagedetector.start, 5000);
+			}
 		})
 	} else {
 		lcd.print(LCD.MESSAGE.UNKNOWN_PAGE);
@@ -110,19 +130,46 @@ function getData(pagenumber) {
 
 		data.key = process.env.API_KEY;
 
-		/*request.post({
+		///*
+		request.post({
 			url: url,
-			form: data
+			form: data,
+			timeout: 30000
 		}, (err, response, body) => {
-			if(err) return reject(err);
-			if(response.statusCode != 200) return reject('Server responded with statuscode: ' + response.statusCode);
-
-			resolve(body);
-		});*/
+			if(err) {
+				if(retry < parseInt(process.env.MAX_RETRY)) {
+					if(err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+						lcd.printVar(LCD.MESSAGE.TIMEOUT_RETRY, retry + 1);
+					} else {
+						lcd.printVar(LCD.MESSAGE.SERVER_RETRY, retry + 1);
+					}
+					retry++;
+					return getData(pagenumber);
+				} else {
+					if(err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+						lcd.print(LCD.MESSAGE.TIMEOUT_PROCEED);
+					} else {
+						lcd.print(LCD.MESSAGE.SERVER_PROCEED);
+					}
+					return resolve();
+				}
+			}
+			switch(response.statusCode) {
+				case 200:
+					resolve(body);
+					break;
+				case 404:
+					resolve();
+					break;
+				default:
+					reject('Server responded with statuscode: ' + response.statusCode);
+			}
+		});
+		//*/
 
 		// DEBUGGING
-		resolve(JSON.parse(fs.readFileSync('../../mdw-2018-data/responses/instagram/' + pagenumber + '.json')));
-
+		//resolve(JSON.parse(fs.readFileSync('../../mdw-2018-data/responses/instagram/' + pagenumber + '.json')));
+		//resolve({});
 	});
 }
 
@@ -132,5 +179,5 @@ function getData(pagenumber) {
 if(!process.env.DEBUGGING) {
 	pagedetector.start();
 } else {
-	pagedetector.emit('ready', 155);
+	pagedetector.emit('ready', 75);
 }

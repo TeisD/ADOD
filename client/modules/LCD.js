@@ -16,7 +16,15 @@ const MESSAGE = {
 	UNKNOWN_PAGE: "Unknown page",
 	PAGE_DETECTED: "Detected page!\nRecognizing...",
 	ERROR_RETRY: "Error :(\nRetrying in 5s...",
-	DONE: "Done!\n"
+	DONE: "Done!\n",
+	TIMEOUT_RETRY: "Server too slow\nRetrying... ($)",
+	TIMEOUT_PROCEED: "Server too slow\nPrinting empty",
+	SERVER_RETRY: "Server error\nRetrying... ($)",
+	SERVER_PROCESS: "Server error\nPrinting empty",
+	NO_DATA: "No links found",
+	SEARCHING: "Searching for\nlinks",
+	DRAWING: "Preparing to\nprint",
+	PRINTING: "Printing page"
 }
 
 class LCD {
@@ -24,6 +32,10 @@ class LCD {
 		this.lcd = new LCDi2C(1, 0x27, 16, 2);
 		this.text = null;
 		this.clear();
+	}
+
+	printVar(msg, v) {
+		this.print(msg.replace('$', v));
 	}
 
 	print(text) {
