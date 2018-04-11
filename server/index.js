@@ -15,8 +15,8 @@ const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
 
 // start with a first rx-text-search
 console.log('Initializing...');
-return TextSearch.findAsPromise(query, '*.txt', {
-	cwd: path.join(DATA_DIR, 'instagram/#salone18')
+return TextSearch.findAsPromise('test', '*.txt', {
+	cwd: path.join(DATA_DIR, 'instagram/#salone2018')
 }).then((data) => {
 	console.log('[OK] Server ready');
 	start();
@@ -134,7 +134,7 @@ function instagram(page) {
 	let startTime = process.uptime();
 
 	return TextSearch.findAsPromise(query, '*.txt', {
-		cwd: path.join(DATA_DIR, 'instagram/#salone18')
+		cwd: path.join(DATA_DIR, 'instagram/#salone2018')
 	}).then((data) => {
 
 		console.log("-> " + data.length + " results in " + (process.uptime() - startTime) + 's');
