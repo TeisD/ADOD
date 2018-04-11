@@ -11,6 +11,7 @@ const Printer = require('./modules/Printer');
 const Controller = require('./controllers/Controller');
 const Instagram = require('./controllers/Instagram');
 const Salone = require('./controllers/Salone');
+const Piezo = require('./modules/Piezo');
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ var lcd = new LCD();
 var pagedetector = new PageDetector();
 var pages = Page.loadFolder(path.join(process.env.DATA_DIR, 'pages'));
 var printer = new Printer(process.env.PRINTER);
+var piezo = new Piezo(12);
 var controller;
 switch(process.env.CONTROLLER){
 	case 'instagram':
@@ -42,7 +44,7 @@ pagedetector.on('change', (e) => {
 	if(e === PageDetector.STATUS.NO_PAGE) {
 		lcd.print(LCD.MESSAGE.INSERT_PAGE)
 	} else if (e === PageDetector.STATUS.NEW_PAGE) {
-		// beep
+		piezo.beep(Piezo.BEEPS.OK);
 		lcd.print(LCD.MESSAGE.PAGE_DETECTED);
 	}
 	console.log('[EVENT] ' + e.msg);
@@ -91,8 +93,8 @@ pagedetector.on('ready', function(n) {
 	})
 	.then((data) => { // resume the pageDetector
 		lcd.print(LCD.MESSAGE.DONE);
-		//pagedetector.start();
-		test();
+		pagedetector.start();
+		//test();
 	})
 	.catch((err) => { // catch the error & resume after timeout
 		if(process.env.DEBUGGING) {
@@ -100,6 +102,7 @@ pagedetector.on('ready', function(n) {
 			console.error(err.stack);
 		} else {
 			console.error('[ERROR] ' + err);
+			piezo.beep(Piezo.BEEPS.ERROR);
 			lcd.print(LCD.MESSAGE.ERROR_RETRY);
 			setTimeout(pagedetector.start, 5000);
 		}

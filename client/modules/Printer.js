@@ -52,12 +52,13 @@ class Printer {
 				"job-name": "MDW-2018 Job",
 				"document-format": "application/pdf"
 			},
+			"data": data
 		}
 
 		return new Promise((resolve, reject) => {
 			this.printer.execute("Print-Job", msg, function(err, res){
 				if(err) return reject(err)
-				resolve();
+				resolve(res);
 			});
 		})
 	}

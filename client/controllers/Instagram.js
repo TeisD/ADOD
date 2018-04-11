@@ -13,6 +13,8 @@ class Instagram extends Controller {
 
 	draw(data) {
 
+		if(typeof data === 'undefined') return Promise.resolve();
+
 		let areas;
 
 		if(typeof _.get(this.page, 'layout.fixed.images') !== 'undefined') {
