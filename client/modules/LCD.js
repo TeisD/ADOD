@@ -16,7 +16,7 @@ const MESSAGE = {
 	UNKNOWN_PAGE: "Unknown page",
 	PAGE_DETECTED: "Detected page!\nRecognizing...",
 	ERROR_RETRY: "Error :(\nRetrying in 5s...",
-	DONE: "Done!\n",
+	DONE: "Done!",
 	TIMEOUT_RETRY: "Server too slow\nRetrying... ($)",
 	TIMEOUT_PROCEED: "Server too slow\nPrinting empty",
 	SERVER_RETRY: "Server error\nRetrying... ($)",
