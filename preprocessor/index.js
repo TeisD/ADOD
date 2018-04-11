@@ -72,10 +72,10 @@ function process(page) {
 	var blocks = document.getElementsByTagName('block');
 	Array.from(blocks).forEach((block) => {
 		let text = block.textContent.replace(/\s+/g, ' ').trim();
-		let x0 = block.getAttribute('xMin');
-		let y0 = block.getAttribute('yMin');
-		let x1 = block.getAttribute('xMax');
-		let y1 = block.getAttribute('yMax');
+		let x0 = parseInt(block.getAttribute('xMin'));
+		let y0 = parseInt(block.getAttribute('yMin'));
+		let x1 = parseInt(block.getAttribute('xMax'));
+		let y1 = parseInt(block.getAttribute('yMax'));
 		data.blocks.push({
 			text: text,
 			bbox: {
@@ -113,10 +113,10 @@ function process(page) {
 			let _line = {
 				text: line.textContent.replace(/\s+/g, ' ').trim(),
 				bbox: {
-					x0: line.getAttribute('xMin'),
-					y0: line.getAttribute('yMin'),
-					x1: line.getAttribute('xMax'),
-					y1: line.getAttribute('yMax'),
+					x0: parseInt(line.getAttribute('xMin')),
+					y0: parseInt(line.getAttribute('yMin')),
+					x1: parseInt(line.getAttribute('xMax')),
+					y1: parseInt(line.getAttribute('yMax')),
 				},
 				words: []
 			}
@@ -125,10 +125,10 @@ function process(page) {
 				let _word = {
 					text: word.textContent.replace(/\s+/g, ' ').trim(),
 					bbox: {
-						x0: word.getAttribute('xMin'),
-						y0: word.getAttribute('yMin'),
-						x1: word.getAttribute('xMax'),
-						y1: word.getAttribute('yMax'),
+						x0: parseInt(word.getAttribute('xMin')),
+						y0: parseInt(word.getAttribute('yMin')),
+						x1: parseInt(word.getAttribute('xMax')),
+						y1: parseInt(word.getAttribute('yMax')),
 					}
 				}
 				_line.words.push(_word);
