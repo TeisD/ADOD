@@ -20,8 +20,8 @@ doc.pipe(concat(function(pdf){
 	};
 	printer.execute("Print-Job", msg, function(err, res){
 		console.log(res);
-	});
-	/*printer.execute("Get-Printer-Attributes", {
+	});*/
+	printer.execute("Get-Printer-Attributes", {
 		"operation-attributes-tag": {
 			"requesting-user-name": "Teis",
 			"job-name": "Test Job",
@@ -30,8 +30,8 @@ doc.pipe(concat(function(pdf){
 	},
 	function(err, res) {
 		console.error(err);
-		console.log(res["printer-attributes-tag"]["media-size-supported"]);
-	});*/
+		console.log(res);
+	});
 
 
 	var msg = {
