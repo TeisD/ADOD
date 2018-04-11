@@ -5,13 +5,13 @@ const BEEPS = {
 		frequency: 3000,
 		length: 100,
 		delay: 50,
-		times: 2
+		times: 1
 	},
 	ERROR: {
 		frequency: 500,
 		length: 500,
 		delay: 1000,
-		times: 1
+		times: 2
 	}
 }
 

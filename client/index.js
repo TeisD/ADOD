@@ -94,8 +94,8 @@ pagedetector.on('ready', function(n) {
 		}
 	})
 	.then((data) => { // resume the pageDetector
-		lcd.print(LCD.MESSAGE.DONE);
 		setTimeout(function(){
+			lcd.print(LCD.MESSAGE.DONE);
 			pagedetector.start()
 		}, 10000);
 		//test();
