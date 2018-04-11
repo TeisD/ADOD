@@ -95,7 +95,7 @@ pagedetector.on('ready', function(n) {
 	})
 	.then((data) => { // resume the pageDetector
 		lcd.print(LCD.MESSAGE.DONE);
-		pagedetector.start();
+		setTimeout(pagedetector.start, 10000);
 		//test();
 	})
 	.catch((err) => { // catch the error & resume after timeout
@@ -154,6 +154,7 @@ function getData(pagenumber) {
 						lcd.printVar(LCD.MESSAGE.SERVER_RETRY, retry + 1);
 					}
 					retry++;
+					console.log('<Index> Server error, retrying');
 					return resolve(getData(pagenumber));
 
 				} else {
@@ -162,6 +163,7 @@ function getData(pagenumber) {
 					} else {
 						lcd.print(LCD.MESSAGE.SERVER_PROCEED);
 					}
+					console.log('<Index> Server error, proceeding');
 					return resolve();
 				}
 			}
