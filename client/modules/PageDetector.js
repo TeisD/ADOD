@@ -1,12 +1,15 @@
 // add a stop method to not check the page during processing
 // add a start method to resume the checking
 
-const Tesseract = require('tesseract.js')
+const Tesseract = require('tesseract.js');
+const dotenv = require('dotenv');
 const path = require('path');
 const cv = require('opencv');
 const fs = require('fs');
 const Raspistill = require('node-raspistill').Raspistill;
 const EventEmitter = require('events');
+
+dotenv.config();
 
 const STATUS = {
 	NO_PAGE: {
@@ -24,10 +27,10 @@ const STATUS = {
 }
 
 const CROP = {
-	top: process.env.CAM_CROP_TOP,
-	left: process.env.CAM_CROP_LEFT,
-	width: process.env.CAM_CROP_WIDTH,
-	height: process.env.CAM_CROP_HEIGHT,
+	top: parseInt(process.env.CAM_CROP_TOP),
+	left: parseInt(process.env.CAM_CROP_LEFT),
+	width: parseInt(process.env.CAM_CROP_WIDTH),
+	height: parseInt(process.env.CAM_CROP_HEIGHT),
 }
 const AREA = 15000;
 
