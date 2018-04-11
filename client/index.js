@@ -76,7 +76,9 @@ pagedetector.on('ready', function(n) {
 		if(typeof data === 'undefined') {
 			lcd.print(LCD.MESSAGE.NO_DATA);
 			controller.load(page);
-			return new Promise((res, rej) => setTimeout(res, 3000));
+			return new Promise((res, rej) => {
+				setTimeout(res, 3000)
+			});
 		} else {
 			lcd.print(LCD.MESSAGE.DRAWING);
 			controller.load(page);
@@ -152,7 +154,8 @@ function getData(pagenumber) {
 						lcd.printVar(LCD.MESSAGE.SERVER_RETRY, retry + 1);
 					}
 					retry++;
-					return getData(pagenumber);
+					return resolve(getData(pagenumber));
+
 				} else {
 					if(err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
 						lcd.print(LCD.MESSAGE.TIMEOUT_PROCEED);

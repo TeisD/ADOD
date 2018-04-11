@@ -46,6 +46,7 @@ class Printer {
 	 * - Rejects when an error occurs before printing
 	 */
 	printAndFinish(data) {
+		console.log('<Printer> Starting print');
 		var msg = {
 			"operation-attributes-tag": {
 				"requesting-user-name": "mdw-2018",

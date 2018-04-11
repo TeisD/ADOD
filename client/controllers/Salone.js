@@ -9,8 +9,6 @@ class Salone extends Controller {
 
 	draw(data) {
 
-		if(typeof data === 'undefined') return Promise.resolve();
-
 		if(typeof _.get(this.page, 'layout.fixed.text') === 'undefined') Promise.resolve();
 
 		let box = this.page.layout.fixed.text[0];
