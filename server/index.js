@@ -13,96 +13,109 @@ const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/')
 
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
 
-const server = http.createServer((request, response) => {
-	request.on('error', (err) => {
-    console.error('[ERROR] ' + err);
-    response.statusCode = 400;
-    response.end();
-  });
+// start with a first rx-text-search
+console.log('Initializing...');
+return TextSearch.findAsPromise("test", '**/*.txt', {
+	cwd: path.join(DATA_DIR, 'instagram')
+}).then((data) => {
+	console.log('[OK] Server ready');
+	start();
+}).catch((err) => {
+	console.error(err);
+})
 
-	response.on('error', (err) => {
-    console.error('[ERROR] ' + err);
-  });
-
-	console.log('Client connected');
-
-	if(request.method === 'POST') {
-		let body = '';
-
-		request.on('data', (chunk) => {
-			body += chunk;
-		}).on('end', () => {
-			body = querystring.parse(body);
-
-			let data,
-					r;
-
-			if(body.key.trim() !== KEY) {
-				r = Promise.reject('401')
-			} else {
-				switch(request.url){
-					case '/instagram':
-						console.log('-> /instagram');
-						try {
-							r = instagram(body.page);
-						} catch (e) {
-							r = Promise.reject(e);
-						}
-						break;
-					case '/search':
-						console.log('-> /search');
-						try {
-							r = search(body.page);
-						} catch (e) {
-							r = Promise.reject(e);
-						}
-						break;
-					case '/salone':
-						console.log('-> /salone');
-						try {
-							r = salone(body.page);
-						} catch (e) {
-							r = Promise.reject(e);
-						}
-						break;
-					default:
-						r = Promise.reject('404');
-						break;
-				}
-			}
-
-			if(typeof r === 'undefined') r = Promise.reject("Routine returned undefined");
-
-			r.then((data) => {
-				response.statusCode = 200;
-				response.setHeader('Content-Type', 'application/json');
-				response.end(JSON.stringify(data));
-				console.log("[OK] Sent response to client");
-			})
-			.catch((err) => {
-				console.error('[ERROR] ' + err);
-				if(err == '401') {
-					response.statusCode = 401;
-					response.end();
-				} else if(err == '404') {
-					response.statusCode = 404;
-					response.end();
-				} else {
-					response.statusCode = 400;
-					response.end(JSON.stringify(err));
-				}
-			});
+function start() {
+	const server = http.createServer((request, response) => {
+		request.on('error', (err) => {
+			console.error('[ERROR] ' + err);
+			response.statusCode = 400;
+			response.end();
 		});
-	} else {
-		response.statusCode = 404;
-		response.end();
-	}
 
-}).listen(PORT);
+		response.on('error', (err) => {
+			console.error('[ERROR] ' + err);
+		});
 
-server.on('error', function (err) {
-  console.error('[ERROR] ' + err);
-});
+		console.log('Client connected');
+
+		if(request.method === 'POST') {
+			let body = '';
+
+			request.on('data', (chunk) => {
+				body += chunk;
+			}).on('end', () => {
+				body = querystring.parse(body);
+
+				let data,
+						r;
+
+				if(body.key.trim() !== KEY) {
+					r = Promise.reject('401')
+				} else {
+					switch(request.url){
+						case '/instagram':
+							console.log('-> /instagram');
+							try {
+								r = instagram(body.page);
+							} catch (e) {
+								r = Promise.reject(e);
+							}
+							break;
+						case '/search':
+							console.log('-> /search');
+							try {
+								r = search(body.page);
+							} catch (e) {
+								r = Promise.reject(e);
+							}
+							break;
+						case '/salone':
+							console.log('-> /salone');
+							try {
+								r = salone(body.page);
+							} catch (e) {
+								r = Promise.reject(e);
+							}
+							break;
+						default:
+							r = Promise.reject('404');
+							break;
+					}
+				}
+
+				if(typeof r === 'undefined') r = Promise.reject("Routine returned undefined");
+
+				r.then((data) => {
+					response.statusCode = 200;
+					response.setHeader('Content-Type', 'application/json');
+					response.end(JSON.stringify(data));
+					console.log("[OK] Sent response to client");
+				})
+				.catch((err) => {
+					console.error('[ERROR] ' + err);
+					if(err == '401') {
+						response.statusCode = 401;
+						response.end();
+					} else if(err == '404') {
+						response.statusCode = 404;
+						response.end();
+					} else {
+						response.statusCode = 400;
+						response.end(JSON.stringify(err));
+					}
+				});
+			});
+		} else {
+			response.statusCode = 404;
+			response.end();
+		}
+
+	}).listen(PORT);
+
+	server.on('error', function (err) {
+		console.error('[ERROR] ' + err);
+	});
+}
 
 function instagram(page) {
 	var p = Page.find(pages, page);

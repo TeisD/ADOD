@@ -13,7 +13,14 @@ class Instagram extends Controller {
 
 	draw(data) {
 
-		let areas = (typeof _.get(this.page, 'layout.fixed.images') !== 'undefined') ? this.page.layout.fixed.images : this.page.findWhitespaceAreas();
+		let areas;
+
+		if(typeof _.get(this.page, 'layout.fixed.images') !== 'undefined') {
+			areas = this.page.layout.fixed.images
+		} else {
+			this.page.layoutGrid();
+			areas = this.page.findWhitespaceAreas();
+		}
 
 		const GRID_SIZE = 100;
 

@@ -53,52 +53,57 @@ pagedetector.on('change', (e) => {
  */
 pagedetector.on('ready', function(n) {
 	let page = Page.find(pages, n);
-	if(typeof page !== "undefined") {
-		lcd.print('Page ' + n);
-		console.log('The new page is: ' + n);
-		// stop the pagedetector
-		pagedetector.stop();
-		// reset the retry counter
-		retry = 0;
-		// make a request to the server for data
-		lcd.print(LCD.MESSAGE.SEARCHING);
-		getData(n)
-		.then((data) => { // draw the data
-			if(typeof data === 'undefined') {
-				lcd.print(LCD.MESSAGE.NO_DATA);
-				controller.load(page, data);
-				return new Promise((res, rej) => setTimeout(res, 3000));
-			} else {
-				lcd.print(LCD.MESSAGE.DRAWING);
-				controller.load(page, data);
-				return controller.draw(data);
-			}
-		})
-		.then(() => { // print page & wait for print to finish
-			lcd.print(LCD.MESSAGE.PRINTING)
-			if(!process.env.DEBUGGING) {
-				return printer.printAndFinish(controller.getBuffer());
-			} else {
-				return printer.save(controller.getBuffer(), '../../mdw-2018-data/responses/output.pdf');
-			}
-		})
-		.then((data) => { // resume the pageDetector
-			lcd.print(LCD.MESSAGE.DONE);
-			pagedetector.start();
-		})
-		.catch((err) => { // catch the error & resume after timeout
-			if(process.env.DEBUGGING) {
-				console.log(err);
-				console.error(err.stack);
-			} else {
-				console.error('[ERROR] ' + err);
-				lcd.print(LCD.MESSAGE.ERROR_RETRY);
-				setTimeout(pagedetector.start, 5000);
-			}
-		})
-	} else {
+
+	if(typeof page === "undefined") {
 		lcd.print(LCD.MESSAGE.UNKNOWN_PAGE);
-	}
+		return;
+	};
+
+	lcd.print('Page ' + n);
+
+	// stop the pagedetector
+	pagedetector.stop();
+
+	// reset the retry counter
+	retry = 0;
+
+	// make a request to the server for data
+	lcd.print(LCD.MESSAGE.SEARCHING);
+	getData(n)
+	.then((data) => { // draw the data
+		if(typeof data === 'undefined') {
+			lcd.print(LCD.MESSAGE.NO_DATA);
+			controller.load(page);
+			return new Promise((res, rej) => setTimeout(res, 3000));
+		} else {
+			lcd.print(LCD.MESSAGE.DRAWING);
+			controller.load(page);
+			return controller.draw(JSON.parse(data));
+		}
+	})
+	.then(() => { // print page & wait for print to finish
+		lcd.print(LCD.MESSAGE.PRINTING)
+		if(!process.env.DEBUGGING) {
+			return printer.printAndFinish(controller.getBuffer());
+		} else {
+			return printer.save(controller.getBuffer(), '../../mdw-2018-data/responses/'+page.number+'-'+Date.now()+'.pdf');
+		}
+	})
+	.then((data) => { // resume the pageDetector
+		lcd.print(LCD.MESSAGE.DONE);
+		//pagedetector.start();
+		test();
+	})
+	.catch((err) => { // catch the error & resume after timeout
+		if(process.env.DEBUGGING) {
+			console.log(err);
+			console.error(err.stack);
+		} else {
+			console.error('[ERROR] ' + err);
+			lcd.print(LCD.MESSAGE.ERROR_RETRY);
+			setTimeout(pagedetector.start, 5000);
+		}
+	})
 });
 
 /**
@@ -156,9 +161,11 @@ function getData(pagenumber) {
 			}
 			switch(response.statusCode) {
 				case 200:
+					console.log('Server: 200');
 					resolve(body);
 					break;
 				case 404:
+					console.log('Server: 404');
 					resolve();
 					break;
 				default:
@@ -173,11 +180,30 @@ function getData(pagenumber) {
 	});
 }
 
+
+let pageCount = 0,
+		iteration = 0;
+
+function test() {
+
+	if(pageCount < pages.length) {
+		let page = pages[pageCount];
+		console.log('-----------------------');
+		pagedetector.emit('ready', page.number);
+		iteration++;
+		if(iteration > 3) {
+			iteration = 0;
+			pageCount++
+		}
+	}
+}
+
 /*
  * Start!
  */
 if(!process.env.DEBUGGING) {
 	pagedetector.start();
 } else {
-	pagedetector.emit('ready', 75);
+	//pagedetector.emit('ready', 131);
+	test();
 }

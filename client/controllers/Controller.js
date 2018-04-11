@@ -14,9 +14,8 @@ class Controller {
 	 */
 	constructor() {
 		this.page,
-			this.data,
-			this.canvas,
-			this.ctx;
+		this.canvas,
+		this.ctx;
 	}
 
 	/**
@@ -24,7 +23,6 @@ class Controller {
 	 */
 	load(page, data) {
 		this.page = page;
-		this.data = data;
 		this.canvas = new Canvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
 

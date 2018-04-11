@@ -24,7 +24,6 @@ class Page {
 		this.blocks = blocks;
 		this.keywords = keywords;
 		this.layout = layout;
-		this.layoutGrid();
 	}
 
 	/*
