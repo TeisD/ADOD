@@ -87,6 +87,23 @@ function process(page) {
 		});
 	});
 
+	// add the extra blocks
+	if( data.hasOwnProperty('layout') && data.layout.hasOwnProperty('fixed') ) {
+		Object.keys(data.layout.fixed).forEach((type) => {
+			data.layout.fixed[type].forEach((block) => {
+				data.blocks.push({
+					text: '',
+					bbox: {
+						x0: block.x,
+						y0: block.y,
+						x1: block.x + block.width,
+						y1: block.y + block.height
+					}
+				})
+			})
+		})
+	}
+
 	// line data
 	data.content.lines = [];
 	var lblocks = document.getElementsByClassName('main');
