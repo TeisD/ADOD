@@ -57,7 +57,7 @@ class Instagram extends Controller {
 			if(typeof data[i] === 'undefined') return;
 			if(data[i].captions.length < 1) return;
 			let caption = data[i].captions[Math.floor(Math.random() * data[i].captions.length)]
-			let textSize = Math.max(0.2 / (caption.length/15) * a.width/1.3, 6);
+			let textSize = Math.max(Math.max(0.2 / (caption.length/15) * a.width/1.3, 6), 30);
 			this.drawText(
 				caption,
 				a.x + (5 - Math.floor(Math.random() * 10)),
