@@ -20,7 +20,7 @@ const MESSAGE = {
 	TIMEOUT_RETRY: "Server too slow\nRetrying... ($)",
 	TIMEOUT_PROCEED: "Server too slow\nPrinting empty",
 	SERVER_RETRY: "Server error\nRetrying... ($)",
-	SERVER_PROCESS: "Server error\nPrinting empty",
+	SERVER_PROCEED: "Server error\nPrinting empty",
 	NO_DATA: "No links found",
 	SEARCHING: "Searching for\nlinks",
 	DRAWING: "Preparing to\nprint",
