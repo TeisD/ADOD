@@ -95,7 +95,9 @@ pagedetector.on('ready', function(n) {
 	})
 	.then((data) => { // resume the pageDetector
 		lcd.print(LCD.MESSAGE.DONE);
-		setTimeout(pagedetector.start, 10000);
+		setTimeout(function(){
+			pagedetector.start()
+		}, 10000);
 		//test();
 	})
 	.catch((err) => { // catch the error & resume after timeout
@@ -106,7 +108,9 @@ pagedetector.on('ready', function(n) {
 			console.error('[ERROR] ' + err);
 			piezo.beep(Piezo.BEEPS.ERROR);
 			lcd.print(LCD.MESSAGE.ERROR_RETRY);
-			setTimeout(pagedetector.start, 5000);
+			setTimeout(function(){
+				pagedetector.start()
+			}, 5000);
 		}
 	})
 });
