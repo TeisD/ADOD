@@ -1,5 +1,5 @@
 // ugly require to not break on systems without i2c bus
-const LCDi2C = class {
+var LCDi2C = class {
 	println(s, n) {
 		console.log('[LCD] ' + s);
 	}
@@ -8,7 +8,7 @@ const LCDi2C = class {
 }
 
 try {
-	const LCDi2C = require('lcdi2c');
+	LCDi2C = require('lcdi2c');
 } catch(e) {}
 
 const MESSAGE = {
