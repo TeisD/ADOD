@@ -58,7 +58,7 @@ const server = http.createServer((request, response) => {
 						}
 						break;
 					case '/salone':
-						console('-> /salone');
+						console.log('-> /salone');
 						try {
 							r = salone(body.page);
 						} catch (e) {
@@ -194,7 +194,10 @@ function search() {
 function salone(page) {
 	return new Promise((resolve, reject) => {
 		fs.readFile(path.join(DATA_DIR, 'projects', page, 'vis.json'), (err, data) => {
-			if (err) return reject(err);
+			if (err) {
+				if(err.code === 'ENOENT') return reject(404)
+				else return reject(err);
+			}
 			if(typeof data === "undefined") return reject('404');
 			let response = '';
 
