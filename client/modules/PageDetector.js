@@ -24,10 +24,10 @@ const STATUS = {
 }
 
 const CROP = {
-	top: 1000,
-	left: 800,
-	width: 700,
-	height: 700,
+	top: process.env.CAM_CROP_TOP,
+	left: process.env.CAM_CROP_LEFT,
+	width: process.env.CAM_CROP_WIDTH,
+	height: process.env.CAM_CROP_HEIGHT,
 }
 const AREA = 15000;
 
