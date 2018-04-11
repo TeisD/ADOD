@@ -46,9 +46,20 @@ class Printer {
 	 * - Rejects when an error occurs before printing
 	 */
 	printAndFinish(data) {
-		console.log('PRINTING');
-		console.log('---');
-		this.print(data);
+		var msg = {
+			"operation-attributes-tag": {
+				"requesting-user-name": "mdw-2018",
+				"job-name": "MDW-2018 Job",
+				"document-format": "application/pdf"
+			},
+		}
+
+		return new Promise((resolve, reject) => {
+			this.printer.execute("Print-Job", msg, function(err, res){
+				if(err) return reject(err)
+				resolve();
+			});
+		})
 	}
 
 	/*
