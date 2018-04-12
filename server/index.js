@@ -6,25 +6,22 @@ const TextSearch = require('rx-text-search');
 const Page = require('../shared/modules/Page');
 const moment = require('moment');
 const _ = require('lodash');
+const util = require('util');
+const { exec } = require('child_process');
 
 const PORT = 3000;
 const KEY = fs.readFileSync(path.join(__dirname, '../shared/config/keys/api-key'), 'utf8').trim();
-const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/')
+const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/');
+
+const INSTAGRAM_SEARCH = path.join(__dirname, 'apps/instagram-search.sh');
+const INSTAGRAM_SEARCH_PATH = path.join(DATA_DIR, 'instagram');
 
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
 
-// start with a first rx-text-search
-console.log('Initializing...');
-return TextSearch.findAsPromise('test', '*.txt', {
-	cwd: path.join(DATA_DIR, 'instagram/#salone2018')
-}).then((data) => {
-	console.log('[OK] Server ready');
-	start();
-}).catch((err) => {
-	console.error(err);
-})
+start();
 
 function start() {
+	console.log('[OK] Server ready');
 	const server = http.createServer((request, response) => {
 		request.on('error', (err) => {
 			console.error('[ERROR] ' + err);
@@ -52,8 +49,8 @@ function start() {
 				if(body.key.trim() !== KEY) {
 					r = Promise.reject('401')
 				} else {
-					switch(request.url){
-						case '/instagram':
+					switch(request.url.split('/')[1]){
+						case 'instagram':
 							console.log('-> /instagram');
 							try {
 								r = instagram(body.page);
@@ -61,7 +58,18 @@ function start() {
 								r = Promise.reject(e);
 							}
 							break;
-						case '/search':
+						case 'image':
+							console.log('-> image');
+							try {
+								r = image(body.image).then((data) => {
+									response.writeHead(200, {'Content-Type': 'image/jpg' });
+     							response.end(data, 'binary');
+								});
+							} catch (e) {
+								r = Promise.reject(e);
+							}
+							break;
+						case 'search':
 							console.log('-> /search');
 							try {
 								r = search(body.page);
@@ -69,7 +77,7 @@ function start() {
 								r = Promise.reject(e);
 							}
 							break;
-						case '/salone':
+						case 'salone':
 							console.log('-> /salone');
 							try {
 								r = salone(body.page);
@@ -86,6 +94,7 @@ function start() {
 				if(typeof r === 'undefined') r = Promise.reject("Routine returned undefined");
 
 				r.then((data) => {
+					if(response.finished) return;
 					response.statusCode = 200;
 					response.setHeader('Content-Type', 'application/json');
 					response.end(JSON.stringify(data));
@@ -122,72 +131,57 @@ function instagram(page) {
 
 	if(typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
-	var query = p.keywords.instagram.map((ig) => {
-		return ig.keywords;
-	});
+	var queries = []
 
-	query = _.flatten(query).map((keyword) => {
-		return keyword.replace(/\s/g, '.*');
-	});
+	p.keywords.instagram.forEach((ig) => {
+		queries.push(new Promise((resolve, reject) => {
+			let query = ig.keywords.map((k) => {
+				return `'` + k.replace(/\s/g, '.*') + `'`;
+			}).join(' ');
 
-	query = query.join('|');
-	let startTime = process.uptime();
+			let count = (ig.hasOwnProperty('all') && ig.all) ? 30 : 1;
 
-	return TextSearch.findAsPromise(query, '*.txt', {
-		cwd: path.join(DATA_DIR, 'instagram/#salone2018')
-	}).then((data) => {
-
-		console.log("-> " + data.length + " results in " + (process.uptime() - startTime) + 's');
-
-		// add the right result(s) to each keyword
-		p.keywords.instagram.forEach((keyword) => {
-			let q = new RegExp(keyword.keywords.join('|').replace(/\s/g, '.*'), 'i');
-			data.forEach((match) => {
-				if(q.test(match.text)) {
-					let filename = match.file.substr(0, match.file.lastIndexOf('_UTC') + 4) + '.jpg';
-
-					if(!keyword.hasOwnProperty('images')) {
-						keyword.images = [filename];
-						return;
-					}
-
-					if(keyword.hasOwnProperty('all') && keyword.all) {
-						keyword.images.push(filename);
-					} else {
-						let newTime = match.file;
-						let oldTime = keyword.images[0];
-						newTime = newTime.substring(newTime.lastIndexOf('/') + 1, newTime.lastIndexOf('_UTC'));
-						oldTime = oldTime.substring(oldTime.lastIndexOf('/') + 1, oldTime.lastIndexOf('_UTC'));
-						newTime = moment(newTime, 'YYYY-MM-DD_HH-mm-ss');
-						oldTime = moment(oldTime, 'YYYY-MM-DD_HH-mm-ss');
-						if(newTime > oldTime) keyword.images = [filename];
-					}
-
+			exec(`bash '${INSTAGRAM_SEARCH}' '${INSTAGRAM_SEARCH_PATH}' ${count} ${query}`, (err, stdout, stderr) => {
+  			let res = {
+					keywords: ig.keywords,
+					images: stdout.split('\n').filter((i) => {
+						return (i && i.length > 1);
+					}).map((i) => {
+						i = i.split('/');
+						i = i.slice(i.length - 2).join('/');
+						i = i.substr(0, i.lastIndexOf('_UTC') + 4) + '.jpg';
+						return i;
+					}),
+					captions: ig.captions
 				}
-			})
-		});
+				if(ig.hasOwnProperty('always') && ig.always) res.always = true;
+				resolve(res);
+  		})
+		}));
+	});
 
+	return Promise.all(queries).then((data) => {
 		// remove the empty results
-		let response = p.keywords.instagram.filter((keyword) => {
-			return (keyword.hasOwnProperty('images') || keyword.hasOwnProperty('always'));
+		let response = data.filter((keyword) => {
+			return (keyword.images.length > 0 || keyword.hasOwnProperty('always'));
 		});
 
 		// sort the "all" results internally
 		response.forEach((keyword) => {
 			if(keyword.hasOwnProperty('all') && keyword.all) {
 				keyword.images.sort((a, b) => sort);
-				keyword.images = keyword.images.slice(0, 50);
 			}
 		});
 
 		// sort the results (put the "always" result on top)
 		response.sort((a, b) => {
-			if (a.hasOwnProperty('always') && a.always) return 1;
-			else return sort(a.images[0], b.images[0]);
+			if (a.hasOwnProperty('always') && a.always) return -1;
+			if (b.hasOwnProperty('always') && b.always) return 1;
+			return sort(a.images[0], b.images[0]);
 		});
 
 		return Promise.resolve(response);
-	})
+	});
 
 	/**
 	 * Sort filename by date
@@ -199,6 +193,21 @@ function instagram(page) {
 		b = moment(b, 'YYYY-MM-DD_HH-mm-ss');
 		return b - a;
 	}
+}
+
+function image(image) {
+	if(typeof image === 'undefined') return Promise.reject(404);
+
+	return new Promise((resolve, reject) => {
+		fs.readFile(path.join(DATA_DIR, 'instagram', image), (err, data) => {
+			if (err) {
+				if(err.code === 'ENOENT') return reject('404');
+				return reject(err);
+			}
+			resolve(data);
+		});
+	});
+
 }
 
 function search() {
