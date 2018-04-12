@@ -13,6 +13,7 @@
     "dotenv": "^5.0.1",
     "ipp": "^2.0.1",
     "lcdi2c": "^1.0.6",
+    "mkdirp": "^0.5.1",
     "node-raspistill": "0.0.14",
     "opencv": "^6.0.0",
     "request": "^2.83.0",

@@ -21,7 +21,7 @@ class Controller {
 	/**
 	 * Load the page
 	 */
-	load(page, data) {
+	load(page) {
 		this.page = page;
 		this.canvas = new Canvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
@@ -79,7 +79,10 @@ class Controller {
 	 * @param height The height of the image
 	 */
 	drawImage(src, x, y, width, height) {
-		if (!fs.existsSync(src)) return;
+		if (!fs.existsSync(src)) {
+			console.log('<Controller> File does not exist');
+			return;
+		}
 
 		var img = new Image();
 		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
