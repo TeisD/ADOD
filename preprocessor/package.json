@@ -12,7 +12,8 @@
     "jsdom": "^11.7.0",
     "lodash": "^4.17.5",
     "minimist": "^1.2.0",
-    "tesseract.js": "^1.0.10"
+    "tesseract.js": "^1.0.10",
+    "wordpos": "^1.1.6"
   },
   "devDependencies": {
     "eslint": "^4.18.0"
