@@ -80,9 +80,11 @@ pagedetector.on('ready', function(n) {
 				setTimeout(res, 3000)
 			});
 		} else {
+			data = JSON.parse(data);
+			console.log('<Index> Received ' + data.length + ' links');
 			lcd.print(LCD.MESSAGE.DRAWING);
 			controller.load(page);
-			return controller.draw(JSON.parse(data));
+			return controller.draw(data);
 		}
 	})
 	.then(() => { // print page & wait for print to finish
@@ -148,7 +150,7 @@ function getData(pagenumber) {
 		request.post({
 			url: url,
 			form: data,
-			timeout: 30000
+			timeout: 40000
 		}, (err, response, body) => {
 			if(err) {
 				if(retry < parseInt(process.env.MAX_RETRY)) {
@@ -173,11 +175,11 @@ function getData(pagenumber) {
 			}
 			switch(response.statusCode) {
 				case 200:
-					console.log('Server: 200');
+					console.log('<Index> Server responded 200');
 					resolve(body);
 					break;
 				case 404:
-					console.log('Server: 404');
+					console.log('<Index> Server responded 404');
 					resolve();
 					break;
 				default:
@@ -216,6 +218,6 @@ function test() {
 if(!process.env.DEBUGGING) {
 	pagedetector.start();
 } else {
-	//pagedetector.emit('ready', 131);
-	test();
+	pagedetector.emit('ready', 131);
+	//test();
 }
