@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const _ = require('lodash');
 
 // hardcode the region of interest (based on average for all page)
 const ROI = {
@@ -72,6 +73,55 @@ class Page {
 			}
 			this.layout.computed.push(row);
 		}
+	}
+
+	/**
+	 * Return the layoutbox around the coordinates x, y
+	 */
+	getLayoutBox(x, y) {
+		return _.flatten(this.layout.computed).find((b) => {
+			return (
+				x >= b.x &&
+				x < b.x + b.size &&
+				y >= b.y &&
+				y < b.y + b.size
+			);
+		});
+	}
+
+	/**
+	 * Return the layoutbox right to box
+	 */
+	getLayoutBoxRight(box) {
+		return this.getLayoutBox(box.x + 50, box.y);
+	}
+
+	/**
+	 * Return the layoutbox right to box
+	 */
+	getLayoutBoxLeft(box) {
+		return this.getLayoutBox(box.x - 50, box.y);
+	}
+
+	/**
+	 * Return the layoutbox right to box
+	 */
+	getLayoutBoxAbove(box) {
+		return this.getLayoutBox(box.x, box.y - 50);
+	}
+
+	/**
+	 * Return the layoutbox right to box
+	 */
+	getLayoutBoxBelow(box) {
+		return this.getLayoutBox(box.x, box.y + 50);
+	}
+
+	/**
+	 * Mark a box as free
+	 */
+	setBoxState(box, free) {
+		this.layout.computed[box.row][box.col].free = free;
 	}
 
 	/*
