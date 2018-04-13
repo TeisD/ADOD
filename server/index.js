@@ -280,7 +280,7 @@ function twitter(page) {
 		// remove via
 		text = text.replace(/via @\w*/g, '');
 
-		return text;
+		return text.trim();
 	}
 }
 
