@@ -25,6 +25,9 @@
     "unicodeCodePointEscapes": true,
     "globalReturn": true
   },
+	"parserOptions": {
+		"ecmaVersion": 8
+	},
   "rules": {
   }
 }

@@ -9,8 +9,9 @@
   "author": "Teis S.A. De Greve",
   "license": "ISC",
   "dependencies": {
-    "canvas": "^1.6.9",
+    "canvas": "^2.0.0-alpha.12",
     "dotenv": "^5.0.1",
+    "he": "^1.1.1",
     "ipp": "^2.0.1",
     "lcdi2c": "^1.0.6",
     "mkdirp": "^0.5.1",
