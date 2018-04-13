@@ -13,6 +13,7 @@ const Controller = require('./controllers/Controller');
 const Instagram = require('./controllers/Instagram');
 const Salone = require('./controllers/Salone');
 const Twitter = require('./controllers/Twitter');
+const Fuorisalone = require('./controllers/Fuorisalone');
 
 dotenv.config();
 
@@ -31,6 +32,9 @@ switch(process.env.CONTROLLER){
 		break;
 	case 'twitter':
 		controller = new Twitter();
+		break;
+	case 'fuorisalone':
+		controller = new Fuorisalone();
 		break;
 	default:
 		controller = new Controller();
@@ -145,6 +149,10 @@ function getData(pagenumber) {
 				break;
 			case 'twitter':
 				url = process.env.HOSTNAME + '/twitter';
+				data = {page: pagenumber};
+				break;
+			case 'fuorisalone':
+				url = process.env.HOSTNAME + '/fuorisalone';
 				data = {page: pagenumber};
 				break;
 			default:

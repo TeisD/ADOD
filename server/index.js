@@ -102,6 +102,14 @@ function start() {
 								r = Promise.reject(e);
 							}
 							break;
+						case 'fuorisalone':
+							console.log('-> /fuorisalone');
+							try {
+								r = fuorisalone(body.page);
+							} catch (e) {
+								r = Promise.reject(e);
+							}
+							break;
 						default:
 							r = Promise.reject('404');
 							break;
@@ -304,4 +312,8 @@ function salone(page) {
 			resolve(response.trim());
 		});
 	});
+}
+
+function fuorisalone(page) {
+	return Promise.resolve({});
 }
