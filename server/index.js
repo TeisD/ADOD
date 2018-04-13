@@ -8,6 +8,7 @@ const moment = require('moment');
 const _ = require('lodash');
 const util = require('util');
 const { exec } = require('child_process');
+const mysql = require('mysql');
 
 const PORT = 3000;
 const KEY = fs.readFileSync(path.join(__dirname, '../shared/config/keys/api-key'), 'utf8').trim();
@@ -16,7 +17,23 @@ const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/');
 const INSTAGRAM_SEARCH = path.join(__dirname, 'apps/instagram-search.sh');
 const INSTAGRAM_SEARCH_PATH = path.join(DATA_DIR, 'instagram');
 
+const DB = 'mdw_2018';
+const TWITTER_TABLE = 'twitter';
+const DB_AUTH = require('../shared/config/keys/mysql.json');
+
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
+
+const db = mysql.createPool({
+	connectionLimit: 100,
+  host: DB_AUTH.host,
+  user: DB_AUTH.user,
+  password: DB_AUTH.password,
+	database: DB,
+  charset : 'utf8mb4',
+  //debug: true
+});
+
+console.log('Initializing...');
 
 start();
 
@@ -69,10 +86,10 @@ function start() {
 								r = Promise.reject(e);
 							}
 							break;
-						case 'search':
-							console.log('-> /search');
+						case 'twitter':
+							console.log('-> /twitter');
 							try {
-								r = search(body.page);
+								r = twitter(body.page);
 							} catch (e) {
 								r = Promise.reject(e);
 							}
@@ -207,11 +224,66 @@ function image(image) {
 			resolve(data);
 		});
 	});
-
 }
 
-function search() {
+
+function twitter(page) {
+	var p = Page.find(pages, page);
+
+	if(typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
+
+	let queries = p.keywords.twitter.map((keyword) => {
+		return twitterQuery(keyword);
+	})
+
+	return Promise.all(queries);
+
+	/**
+	 * Execute query as a promise
+	 */
+	function twitterQuery(keyword) {
+		return new Promise((resolve, reject) => {
+			db.query(`SELECT COUNT(*) FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%'`, [], function(err, count) {
+				if (err) return reject(err);
+				// make an additional query if the word is interesting
+				if(count[0]['COUNT(*)'] > 0 && keyword.length > 7) {
+					db.query(`SELECT DISTINCT text FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' ORDER BY created_at LIMIT 1`, [], function(err, text) {
+						if (err) return reject(err);
+						resolve({
+							word: keyword,
+							count: count[0]['COUNT(*)'],
+							text: parseTweet(text[0].text)
+						});
+					});
+				} else {
+					resolve({
+						word: keyword,
+						count: count[0]['COUNT(*)'],
+					});
+				}
+			});
+		})
+	}
+
+	/**
+	 * Clean a tweet and return the main body only
+	 */
+	function parseTweet(text) {
+		// remove links
+		text = text.replace(/http\S*/g, '');
+		// remove subsequent hashtags
+		text = text.replace(/#\w*\s*(#\w*\s*)+/g, '');
+		// remove subsequent mentions
+		text = text.replace(/@\w*\s*(@\w*\s*)+/g, '');
+		// remove RT
+		text = text.replace(/RT @\w*:/g, '');
+		// remove via
+		text = text.replace(/via @\w*/g, '');
+
+		return text;
+	}
 }
+
 
 function salone(page) {
 	return new Promise((resolve, reject) => {
