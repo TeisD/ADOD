@@ -4,6 +4,7 @@ const path = require('path');
 const EventEmitter = require('events');
 const request = require('request');
 
+const Piezo = require('./modules/Piezo');
 const LCD = require('./modules/LCD');
 const Page = require('../shared/modules/Page');
 const PageDetector = require('./modules/PageDetector');
@@ -11,7 +12,7 @@ const Printer = require('./modules/Printer');
 const Controller = require('./controllers/Controller');
 const Instagram = require('./controllers/Instagram');
 const Salone = require('./controllers/Salone');
-const Piezo = require('./modules/Piezo');
+const Twitter = require('./controllers/Twitter');
 
 dotenv.config();
 
@@ -27,6 +28,9 @@ switch(process.env.CONTROLLER){
 		break;
 	case 'salone':
 		controller = new Salone();
+		break;
+	case 'twitter':
+		controller = new Twitter();
 		break;
 	default:
 		controller = new Controller();
@@ -139,6 +143,10 @@ function getData(pagenumber) {
 				url = process.env.HOSTNAME + '/salone';
 				data = {page: pagenumber};
 				break;
+			case 'twitter':
+				url = process.env.HOSTNAME + '/twitter';
+				data = {page: pagenumber};
+				break;
 			default:
 				return reject('Unknown controller')
 				break;
@@ -218,6 +226,6 @@ function test() {
 if(!process.env.DEBUGGING) {
 	pagedetector.start();
 } else {
-	pagedetector.emit('ready', 131);
+	pagedetector.emit('ready', 153);
 	//test();
 }
