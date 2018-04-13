@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Canvas = require('canvas');
 const Image = Canvas.Image;
+const he = require('he');
 
 const DATA_DIR = '../../../mdw-2018-data/';
 
@@ -14,8 +15,9 @@ class Controller {
 	 */
 	constructor() {
 		this.page,
-		this.canvas,
-		this.ctx;
+			this.canvas,
+			this.ctx;
+		//Canvas.registerFont(path.join(__dirname, '../../shared/assets/fonts/Pecita.otf'), {family: 'Pecita', weight: 'book'});
 	}
 
 	/**
@@ -23,11 +25,11 @@ class Controller {
 	 */
 	load(page) {
 		this.page = page;
-		this.canvas = new Canvas(page.width, page.height, 'pdf');
+		this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
 
-		if(process.env.DEBUGGING) {
-			var bg = path.join(__dirname, DATA_DIR, 'pages-pre', this.page.number+'.png');
+		if (process.env.DEBUGGING) {
+			var bg = path.join(__dirname, DATA_DIR, 'pages-pre', this.page.number + '.png');
 			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
 	}
@@ -146,18 +148,18 @@ class Controller {
 		this.ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
 	}
 
-	drawText(text, x, y, size, width, font, lineheight) {
-		if(typeof font === 'undefined') {
+	drawText(text, x, y, size, width, font, lineheight, stroke) {
+		if (typeof font === 'undefined') {
 			this.ctx.font = `bold ${size}pt Arial`;
 		} else {
 			this.ctx.font = `${size}pt ${font}`;
 		}
-		if(typeof lineheight === 'undefined') lineheight = size;
+		if (typeof lineheight === 'undefined') lineheight = size;
 		let lines = [],
-				line = '';
-		text.split(' ').forEach((word) => {
-			let w = this.ctx.measureText(line + ' ' + word ).width;
-			if(w > width + 10) {
+			line = '';
+		he.decode(text).split(/\s/).forEach((word) => {
+			let w = this.ctx.measureText(line + ' ' + word).width;
+			if (w > width + 10) {
 				lines.push(line);
 				line = '';
 			}
@@ -165,9 +167,109 @@ class Controller {
 		});
 		lines.push(line);
 
+		if (typeof stroke !== 'undefined') {
+			this.ctx.strokeStyle = "#ffffff";
+			this.ctx.lineWidth = stroke;
+			this.ctx.lineJoin = 'round';
+			lines.forEach((line, i) => {
+				this.ctx.strokeText(line, x, y + i * lineheight);
+			});
+		}
+
+
 		lines.forEach((line, i) => {
-			this.ctx.fillText(line, x, y + i*lineheight);
+			this.ctx.fillText(line, x, y + i * lineheight);
 		});
+	}
+
+	drawArrow(fromx, fromy, tox, toy) {
+		this.ctx.strokeStyle = "#000000";
+		this.ctx.lineWidth = .5;
+		var headlen = 5; // length of head in pixels
+		var angle = Math.atan2(toy - fromy, tox - fromx);
+		this.ctx.moveTo(fromx, fromy);
+		this.ctx.quadraticCurveTo((fromx + tox) / 2, toy, tox, toy);
+		this.ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+		this.ctx.moveTo(tox, toy);
+		this.ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+		this.ctx.stroke();
+	}
+
+	drawHandCircle(cx, cy, rx, ry, rounds) {
+
+		rounds = rounds ? rounds : 3;
+
+		var x, y,
+			tol = Math.random() * 2 + 2, //Math.random() * 5 + 5,
+			dx = Math.random() * tol * 0.75,
+			dy = Math.random() * tol * 0.75,
+			ix = (Math.random() - 1) * 0.5,
+			iy = (Math.random() - 1) * 0.3,
+			rx = rx + Math.random() * tol,
+			ry = ry + Math.random() * tol,
+			a = 0,
+			ad = 3,
+			i = 0,
+			start = Math.random() + 50,
+			tot = 360 * rounds + Math.random() * 50 - 100,
+			deg2rad = Math.PI / 180,
+			points = [],
+			rotate = 0; //Math.random() * 0.5;
+
+		this.ctx.save();
+		this.ctx.translate(cx, cy);
+		this.ctx.rotate(-rotate);
+		this.ctx.translate(-cx, -cy);
+
+		for (; i < tot; i += ad) {
+			dx += ix;
+			dy += iy;
+
+			if (dx < -tol || dx > tol) ix = -ix;
+			if (dy < -tol || dy > tol) iy = -iy;
+
+			x = cx + (rx + dx * 2) * Math.cos(i * deg2rad + start);
+			y = cy + (ry + dy * 2) * Math.sin(i * deg2rad + start);
+
+			points.push(x, y);
+
+			ad = Math.random() * 4 + 2;
+		}
+
+		i = 2;
+
+		this.ctx.beginPath();
+		this.ctx.moveTo(points[0], points[1]);
+		while (i < points.length) {
+			this.ctx.lineTo(points[i], points[i + 1]);
+			this.ctx.stroke();
+			this.ctx.beginPath();
+			this.ctx.moveTo(points[i], points[i + 1]);
+			i += 2;
+		}
+		this.ctx.restore();
+	}
+
+	drawScribble(x0, y0, x1, y1, height) {
+		var x = x0,
+				y = y0 - height / 2,
+				dx = 1,
+				randx = 4,
+				randy = 1,
+				dir = 1;
+
+		this.ctx.lineJoin = 'round';
+		this.ctx.beginPath();
+		this.ctx.moveTo(x, y);
+
+		while(x < x1) {
+			x += dx + dx*dir + Math.floor((Math.random() * randx));
+			y = y0 + dir * height/2  -randy + Math.floor((Math.random() * 2 * randy));
+			this.ctx.lineTo(x, y);
+			// reverse the direction
+			dir = -dir;
+		}
+		this.ctx.stroke();
 	}
 
 }
