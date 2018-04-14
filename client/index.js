@@ -234,6 +234,6 @@ function test() {
 if(!process.env.DEBUGGING) {
 	pagedetector.start();
 } else {
-	pagedetector.emit('ready', 153);
+	pagedetector.emit('ready', 93);
 	//test();
 }

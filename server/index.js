@@ -7,7 +7,9 @@ const Page = require('../shared/modules/Page');
 const moment = require('moment');
 const _ = require('lodash');
 const util = require('util');
-const { exec } = require('child_process');
+const {
+	exec
+} = require('child_process');
 const mysql = require('mysql');
 
 const PORT = 3000;
@@ -19,18 +21,19 @@ const INSTAGRAM_SEARCH_PATH = path.join(DATA_DIR, 'instagram');
 
 const DB = 'mdw_2018';
 const TWITTER_TABLE = 'twitter';
+const FUORI_TABLE = 'fuorisalone';
 const DB_AUTH = require('../shared/config/keys/mysql.json');
 
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
 
 const db = mysql.createPool({
 	connectionLimit: 100,
-  host: DB_AUTH.host,
-  user: DB_AUTH.user,
-  password: DB_AUTH.password,
+	host: DB_AUTH.host,
+	user: DB_AUTH.user,
+	password: DB_AUTH.password,
 	database: DB,
-  charset : 'utf8mb4',
-  //debug: true
+	charset: 'utf8mb4',
+	//debug: true
 });
 
 console.log('Initializing...');
@@ -52,7 +55,7 @@ function start() {
 
 		console.log('Client connected');
 
-		if(request.method === 'POST') {
+		if (request.method === 'POST') {
 			let body = '';
 
 			request.on('data', (chunk) => {
@@ -61,12 +64,12 @@ function start() {
 				body = querystring.parse(body);
 
 				let data,
-						r;
+					r;
 
-				if(body.key.trim() !== KEY) {
+				if (body.key.trim() !== KEY) {
 					r = Promise.reject('401')
 				} else {
-					switch(request.url.split('/')[1]){
+					switch (request.url.split('/')[1]) {
 						case 'instagram':
 							console.log('-> /instagram');
 							try {
@@ -79,8 +82,10 @@ function start() {
 							console.log('-> image');
 							try {
 								r = image(body.image).then((data) => {
-									response.writeHead(200, {'Content-Type': 'image/jpg' });
-     							response.end(data, 'binary');
+									response.writeHead(200, {
+										'Content-Type': 'image/jpg'
+									});
+									response.end(data, 'binary');
 								});
 							} catch (e) {
 								r = Promise.reject(e);
@@ -116,28 +121,28 @@ function start() {
 					}
 				}
 
-				if(typeof r === 'undefined') r = Promise.reject("Routine returned undefined");
+				if (typeof r === 'undefined') r = Promise.reject("Routine returned undefined");
 
 				r.then((data) => {
-					if(response.finished) return;
-					response.statusCode = 200;
-					response.setHeader('Content-Type', 'application/json');
-					response.end(JSON.stringify(data));
-					console.log("[OK] Sent response to client");
-				})
-				.catch((err) => {
-					console.error('[ERROR] ' + err);
-					if(err == '401') {
-						response.statusCode = 401;
-						response.end();
-					} else if(err == '404') {
-						response.statusCode = 404;
-						response.end();
-					} else {
-						response.statusCode = 400;
-						response.end(JSON.stringify(err));
-					}
-				});
+						if (response.finished) return;
+						response.statusCode = 200;
+						response.setHeader('Content-Type', 'application/json');
+						response.end(JSON.stringify(data));
+						console.log("[OK] Sent response to client");
+					})
+					.catch((err) => {
+						console.error('[ERROR] ' + err);
+						if (err == '401') {
+							response.statusCode = 401;
+							response.end();
+						} else if (err == '404') {
+							response.statusCode = 404;
+							response.end();
+						} else {
+							response.statusCode = 400;
+							response.end(JSON.stringify(err));
+						}
+					});
 			});
 		} else {
 			response.statusCode = 404;
@@ -154,7 +159,7 @@ function start() {
 function instagram(page) {
 	var p = Page.find(pages, page);
 
-	if(typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
+	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
 	var queries = []
 
@@ -167,7 +172,7 @@ function instagram(page) {
 			let count = (ig.hasOwnProperty('all') && ig.all) ? 30 : 1;
 
 			exec(`bash '${INSTAGRAM_SEARCH}' '${INSTAGRAM_SEARCH_PATH}' ${count} ${query}`, (err, stdout, stderr) => {
-  			let res = {
+				let res = {
 					keywords: ig.keywords,
 					images: stdout.split('\n').filter((i) => {
 						return (i && i.length > 1);
@@ -179,9 +184,9 @@ function instagram(page) {
 					}),
 					captions: ig.captions
 				}
-				if(ig.hasOwnProperty('always') && ig.always) res.always = true;
+				if (ig.hasOwnProperty('always') && ig.always) res.always = true;
 				resolve(res);
-  		})
+			})
 		}));
 	});
 
@@ -193,7 +198,7 @@ function instagram(page) {
 
 		// sort the "all" results internally
 		response.forEach((keyword) => {
-			if(keyword.hasOwnProperty('all') && keyword.all) {
+			if (keyword.hasOwnProperty('all') && keyword.all) {
 				keyword.images.sort((a, b) => sort);
 			}
 		});
@@ -221,12 +226,12 @@ function instagram(page) {
 }
 
 function image(image) {
-	if(typeof image === 'undefined') return Promise.reject(404);
+	if (typeof image === 'undefined') return Promise.reject(404);
 
 	return new Promise((resolve, reject) => {
 		fs.readFile(path.join(DATA_DIR, 'instagram', image), (err, data) => {
 			if (err) {
-				if(err.code === 'ENOENT') return reject('404');
+				if (err.code === 'ENOENT') return reject('404');
 				return reject(err);
 			}
 			resolve(data);
@@ -238,7 +243,7 @@ function image(image) {
 function twitter(page) {
 	var p = Page.find(pages, page);
 
-	if(typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
+	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
 	let queries = p.keywords.twitter.map((keyword) => {
 		return twitterQuery(keyword);
@@ -251,11 +256,11 @@ function twitter(page) {
 	 */
 	function twitterQuery(keyword) {
 		return new Promise((resolve, reject) => {
-			db.query(`SELECT COUNT(*) FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%'`, [], function(err, count) {
+			db.query(`SELECT COUNT(*) FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%'`, [], function (err, count) {
 				if (err) return reject(err);
 				// make an additional query if the word is interesting
-				if(count[0]['COUNT(*)'] > 0 && keyword.length > 7) {
-					db.query(`SELECT DISTINCT text FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' ORDER BY created_at LIMIT 1`, [], function(err, text) {
+				if (count[0]['COUNT(*)'] > 0 && keyword.length > 7) {
+					db.query(`SELECT DISTINCT text FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' ORDER BY created_at LIMIT 1`, [], function (err, text) {
 						if (err) return reject(err);
 						resolve({
 							word: keyword,
@@ -297,14 +302,14 @@ function salone(page) {
 	return new Promise((resolve, reject) => {
 		fs.readFile(path.join(DATA_DIR, 'projects', page, 'vis.json'), (err, data) => {
 			if (err) {
-				if(err.code === 'ENOENT') return reject(404)
+				if (err.code === 'ENOENT') return reject(404)
 				else return reject(err);
 			}
-			if(typeof data === "undefined") return reject('404');
+			if (typeof data === "undefined") return reject('404');
 			let response = '';
 
 			JSON.parse(data).forEach(s => {
-				if(s.caption) {
+				if (s.caption) {
 					response += s.caption.charAt(0).toUpperCase() + s.caption.slice(1) + '. ';
 				}
 			});
@@ -315,5 +320,46 @@ function salone(page) {
 }
 
 function fuorisalone(page) {
-	return Promise.resolve({});
+	var p = Page.find(pages, page);
+
+	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
+
+	let today = moment().format('dddd').toLowerCase();
+	console.log(today);
+
+	let queries = p.keywords.time.map((keyword) => {
+		let k = keyword.keywords.replace(/,/g, '%');
+		return saloneQuery(k);
+	})
+
+	return Promise.all(queries).then((data) => {
+		data = data.filter(n => n);
+		if(data.length > 0) return Promise.resolve(data);
+		// if no keywords found, make an additional query based on the year
+		return Promise.all(p.keywords.time.map((keyword) => {
+			return saloneQuery(keyword.year);
+		}));
+	}).then((data) => {
+		data = data.filter(n => n);
+		return Promise.resolve([_.sample(data)]);
+	});
+
+	/**
+	 * Execute query as a promise
+	 */
+	function saloneQuery(keyword) {
+		return new Promise((resolve, reject) => {
+			db.query(`SELECT * FROM ${FUORI_TABLE} WHERE ${today} IS NOT NULL AND description IS NOT NULL AND description != '' AND extended LIKE '%${keyword}%'`, [], function (err, result) {
+				if (err) return reject(err);
+				if (result.length == 0) return resolve();
+				resolve({
+					title: result[0].title,
+					organiser: result[0].organiser,
+					address: result[0].address.replace(/\t.*/, ''),
+					description: result[0].description,
+					today: result[0][today]
+				});
+			});
+		})
+	}
 }
