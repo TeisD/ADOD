@@ -60,14 +60,14 @@ class Controller {
 
 	/**
 	 * Save the image
-	 * If no filename is defined it will be saved as author-pagenumber.png
+	 * If no filename is defined it will be saved as author-pagenumber.png in the current working dir
 	 */
 	saveImage(filename) {
 		if (typeof filename === 'undefined') {
 			filename = this.text.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page;
 		}
 		var img = this.getImage();
-		fs.writeFile(__dirname + '/../../assets/images/' + filename + '.png', new Buffer(img, 'base64'), (err) => {
+		fs.writeFileSync(filename, new Buffer(img, 'base64'), (err) => {
 			if (err) console.error('[ERROR] ' + err);
 		});
 	}
@@ -180,6 +180,8 @@ class Controller {
 		lines.forEach((line, i) => {
 			this.ctx.fillText(line, x, y + i * lineheight);
 		});
+
+		return lines.length*lineheight;
 	}
 
 	drawArrow(fromx, fromy, tox, toy) {

@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const Controller = require('./Controller');
+const fs = require('fs');
+const path = require('path');
 
 class Twitter extends Controller {
 
@@ -80,7 +82,6 @@ class Twitter extends Controller {
 				})
 			})
 		})
-		console.log(twitterwords);
 		// remove duplicates
 		twitterwords = _.uniqBy(twitterwords, 'tweet');
 		// shuffle the matches
@@ -163,21 +164,14 @@ class Twitter extends Controller {
 			if (typeof currentbox === 'undefined') return;
 			if(!currentbox.free) return;
 			// hoodary we have a place to put the text
-			// mark the boxes we're using as full (5)
-			let boxtomark = currentbox;
-			for(let i = 0; i < 5; i++) {
-				this.page.setBoxState(boxtomark, false);
-				if(direction > 0) boxtomark = this.page.getLayoutBoxRight(boxtomark);
-				else boxtomark = this.page.getLayoutBoxLeft(boxtomark);
-			}
 
 			this.ctx.save();
-			this.ctx.translate((direction > 0) ? currentbox.x + 20 : currentbox.x - 150, currentbox.y);
+			this.ctx.translate((direction > 0) ? currentbox.x + 20 : currentbox.x - 130, currentbox.y + 10);
 			let r = Math.floor(Math.random()*2) + 1;
 			r *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
 			this.ctx.rotate(r * Math.PI / 180);
 			this.ctx.fillStyle = "#000000";
-			this.drawText(w.tweet, 0, 0, 6, 150, 'Arial', 8, 10);
+			let textheight = this.drawText(w.tweet, 0, 0, 6, 150, 'Arial', 8, 10);
 			this.ctx.restore();
 			if(direction > 0) {
 				this.drawArrow(
@@ -194,6 +188,23 @@ class Twitter extends Controller {
 					currentbox.y
 				);
 			}
+
+			// mark the boxes we're using as full (5)
+			this.page.setBoxState(currentbox, false);
+			let boxtomark = currentbox;
+			let linestart = currentbox;
+			for(let j = 0; j < Math.ceil(textheight / 50); j++) {
+				for(let i = 0; i < 6; i++) {
+					this.page.setBoxState(boxtomark, false);
+					if(typeof boxtomark === 'undefined') break;
+					if(direction > 0) boxtomark = this.page.getLayoutBoxRight(boxtomark);
+					else boxtomark = this.page.getLayoutBoxLeft(boxtomark);
+				}
+				if(typeof boxtomark === 'undefined') break;
+				linestart = this.page.getLayoutBoxBelow(linestart);
+				boxtomark = linestart;
+			}
+
 			addedCount++;
 		});
 
