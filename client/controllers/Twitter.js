@@ -88,7 +88,6 @@ class Twitter extends Controller {
 		let lowmark = sorted.slice(sorted.length - Math.floor(Math.random() * 2));
 		let randomlines = _.shuffle(this.page.content.lines);
 		highmark.forEach((keyword) => {
-			console.log('highmark: ' + keyword);
 			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
 			let line = randomlines.find((line) => {
 				return regexp.test(line.text);
@@ -101,7 +100,6 @@ class Twitter extends Controller {
 			}
 		});
 		lowmark.forEach((keyword) => {
-			console.log('lowmark: ' + keyword);
 			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
 			let line = randomlines.find((line) => {
 				return regexp.test(line.text);
