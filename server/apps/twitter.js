@@ -20,7 +20,6 @@ const QUERIES = [
       'milan design',
       'milano design week',
       'salone del mobile',
-      'salone',
       'milan design',
       'mdw2018',
       'mdw18',
