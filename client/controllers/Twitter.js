@@ -166,50 +166,53 @@ class Twitter extends Controller {
 			// hoodary we have a place to put the text
 
 			this.ctx.save();
-			this.ctx.translate((direction > 0) ? currentbox.x + 20 : currentbox.x - 130, currentbox.y + 10);
-			let r = Math.floor(Math.random()*2) + 1;
+			this.ctx.translate((direction > 0) ? currentbox.x + 15 : currentbox.x - 145, currentbox.y + 10);
+			let r = Math.random()*2;
 			r *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
 			this.ctx.rotate(r * Math.PI / 180);
 			this.ctx.fillStyle = "#000000";
-			let textheight = this.drawText(w.tweet, 0, 0, 6, 150, 'Arial', 8, 10);
+			let textheight = this.drawText(w.tweet, 0, 0, 6, 170, 'Arial', 8, 10);
 			this.ctx.restore();
 			if(direction > 0) {
 				this.drawArrow(
 					w.linebox.x1,
 					(w.linebox.y0 + w.linebox.y1) / 2,
-					currentbox.x + 15,
-					currentbox.y
+					currentbox.x + 10,
+					currentbox.y + 10
 				);
 			} else {
 				this.drawArrow(
 					w.linebox.x0,
 					(w.linebox.y0 + w.linebox.y1) / 2,
-					currentbox.x + 5,
-					currentbox.y
+					currentbox.x + currentbox.size - 10,
+					currentbox.y + 10
 				);
 			}
 
 			// mark the boxes we're using as full (5)
 			this.page.setBoxState(currentbox, false);
-			let boxtomark = currentbox;
-			let linestart = currentbox;
+			let boxtomarkleft = currentbox,
+					boxtomarkright = currentbox,
+					linestart = currentbox;
+
 			for(let j = 0; j < Math.ceil(textheight / 50); j++) {
-				for(let i = 0; i < 6; i++) {
-					this.page.setBoxState(boxtomark, false);
-					if(typeof boxtomark === 'undefined') break;
-					if(direction > 0) boxtomark = this.page.getLayoutBoxRight(boxtomark);
-					else boxtomark = this.page.getLayoutBoxLeft(boxtomark);
+				// occupy 5 to each edge
+				for(let i = 0; i < 5; i++) {
+					boxtomarkright = this.page.getLayoutBoxRight(boxtomarkright);
+					boxtomarkleft = this.page.getLayoutBoxLeft(boxtomarkleft);
+					if(typeof boxtomarkleft !== 'undefined') this.page.setBoxState(boxtomarkleft, false);
+					if(typeof boxtomarkright !== 'undefined') this.page.setBoxState(boxtomarkright, false);
 				}
-				if(typeof boxtomark === 'undefined') break;
 				linestart = this.page.getLayoutBoxBelow(linestart);
-				boxtomark = linestart;
+				boxtomarkleft = linestart;
+				boxtomarkright = linestart;
 			}
 
 			addedCount++;
 		});
 
 		// draw the other things on top of the text
-		highmark.forEach((keyword) => {
+		/*highmark.forEach((keyword) => {
 			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
 			let line = randomlines.find((line) => {
 				return regexp.test(line.text);
@@ -232,7 +235,7 @@ class Twitter extends Controller {
 			} else {
 				this.drawText('???', line.bbox.x0 - 25, line.bbox.y1, 15, 100, 'Pecita');
 			}
-		});
+		});*/
 
 		midhigh.forEach((s) => {
 			for(let i = s.start.line; i <= s.end.line; i++) {

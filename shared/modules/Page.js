@@ -93,6 +93,7 @@ class Page {
 	 * Return the layoutbox right to box
 	 */
 	getLayoutBoxRight(box) {
+		if (typeof box === 'undefined') return;
 		return this.getLayoutBox(box.x + 50, box.y);
 	}
 
@@ -100,6 +101,7 @@ class Page {
 	 * Return the layoutbox right to box
 	 */
 	getLayoutBoxLeft(box) {
+		if (typeof box === 'undefined') return;
 		return this.getLayoutBox(box.x - 50, box.y);
 	}
 
@@ -107,6 +109,7 @@ class Page {
 	 * Return the layoutbox right to box
 	 */
 	getLayoutBoxAbove(box) {
+		if (typeof box === 'undefined') return;
 		return this.getLayoutBox(box.x, box.y - 50);
 	}
 
@@ -114,6 +117,7 @@ class Page {
 	 * Return the layoutbox right to box
 	 */
 	getLayoutBoxBelow(box) {
+		if (typeof box === 'undefined') return;
 		return this.getLayoutBox(box.x, box.y + 50);
 	}
 
@@ -121,6 +125,7 @@ class Page {
 	 * Mark a box as free
 	 */
 	setBoxState(box, free) {
+		if (typeof box === 'undefined') return;
 		this.layout.computed[box.row][box.col].free = free;
 	}
 
