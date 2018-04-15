@@ -151,6 +151,8 @@ function start() {
 
 	}).listen(PORT);
 
+	server.setTimeout(40000);
+
 	server.on('error', function (err) {
 		console.error('[ERROR] ' + err);
 	});
