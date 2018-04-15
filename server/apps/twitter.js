@@ -167,19 +167,3 @@ function parseLocation(tweet) {
   }
   return null
 }
-
-/**
- * Exit handler and events
- */
-function exitHandler(options, err) {
-  console.log('[INFO] Closing database connection');
-  db.end(function(err) {
-    if (err) throw err;
-    process.exit();
-  });
-}
-process.on('exit', exitHandler);
-process.on('SIGINT', exitHandler);
-process.on('SIGUSR1', exitHandler);
-process.on('SIGUSR2', exitHandler);
-process.on('uncaughtException', exitHandler);
