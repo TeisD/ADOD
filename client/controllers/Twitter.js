@@ -32,9 +32,11 @@ class Twitter extends Controller {
 			return b.score - a.score;
 		})
 
-		// take 2 - 4 highest/lowest
-		let high = sentences.slice(0, Math.min( (2 + Math.ceil(Math.random() * 2)), (sentences.length - 1) ));
-		let low = sentences.slice(Math.max( (-2 - Math.ceil(Math.random() * 2)), (-sentences.length + 1) ));
+		// take 1 - 3 highest/lowest
+		let highcount = 1 + Math.floor(Math.random() * 2),
+				lowcount = 1 + Math.floor(Math.random() * 2),
+				high = sentences.splice(0, highcount),
+				low = sentences.slice(sentences.length - 1 - highcount, highcount);
 
 		// circle the highest
 		high.forEach((s) => {
@@ -66,7 +68,7 @@ class Twitter extends Controller {
 		});
 
 		// find a few important and unimportant pieces (excluding the high and low sentences)
-		let midhigh = sentences.slice(high.length, high.length + Math.min( (2 + Math.floor(Math.random() * 2)), (sentences.length - 1) ));
+		let midhigh = sentences.splice(0, 1 + Math.floor(Math.random() * 2));
 		midhigh.forEach((s) => {
 			for(let i = s.start.line; i <= s.end.line; i++) {
 				let l = this.page.content.lines[i],
