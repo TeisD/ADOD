@@ -327,7 +327,6 @@ function fuorisalone(page) {
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
 	let today = moment().format('dddd').toLowerCase();
-	console.log(today);
 
 	let queries = p.keywords.time.map((keyword) => {
 		let k = keyword.keywords.replace(/,/g, '%');
@@ -353,10 +352,9 @@ function fuorisalone(page) {
 		return new Promise((resolve, reject) => {
 			db.query(`SELECT * FROM ${FUORI_TABLE} WHERE ${today} IS NOT NULL AND description IS NOT NULL AND description != '' AND extended LIKE '%${keyword}%'`, [], function (err, result) {
 				if (err) return reject(err);
-				if (result.length == 0) return resolve();
+				if (result.length == 0) return resolve([]);
 				let description = result[0].description;
 				if(description.length < 1) description = result[0].extended.split(' ').slice(0, 25).join(' ') + '...';
-				console.log(result);
 				resolve({
 					title: result[0].title,
 					organiser: result[0].organiser,
