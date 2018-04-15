@@ -27,7 +27,7 @@ const DB_AUTH = require('../shared/config/keys/mysql.json');
 const pages = Page.loadFolder(path.join(DATA_DIR, 'pages'));
 
 const db = mysql.createPool({
-	connectionLimit: 100,
+	connectionLimit: 75,
 	host: DB_AUTH.host,
 	user: DB_AUTH.user,
 	password: DB_AUTH.password,
