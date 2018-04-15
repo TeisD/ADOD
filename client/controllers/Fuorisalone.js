@@ -13,7 +13,7 @@ class Fuorisalone extends Controller {
 
 		this.drawTimeline(this.page.keywords.time);
 
-		if(data.length > 0 && data[0] != null) {
+		if(data.length > 0 && data[0] != null && data[0].hasOwnProperty('title')) {
 			this.drawEvent(data[0]);
 		} else {
 			this.ctx.font = 'bold 10pt Arial';
