@@ -36,7 +36,7 @@ class Twitter extends Controller {
 		let highcount = 1 + Math.floor(Math.random() * 2),
 				lowcount = 1 + Math.floor(Math.random() * 2),
 				high = sentences.splice(0, highcount),
-				low = sentences.slice(sentences.length - 1 - highcount, highcount);
+				low = sentences.splice(sentences.length - 1 - highcount, highcount);
 
 		// circle the highest
 		high.forEach((s) => {
@@ -67,8 +67,8 @@ class Twitter extends Controller {
 			}
 		});
 
-		// find a few important and unimportant pieces (excluding the high and low sentences)
-		let midhigh = sentences.splice(0, 1 + Math.floor(Math.random() * 2));
+		// mark a few leftover important pieces
+		let midhigh = sentences.splice(0, Math.floor(Math.random() * 2));
 		midhigh.forEach((s) => {
 			for(let i = s.start.line; i <= s.end.line; i++) {
 				let l = this.page.content.lines[i],
@@ -85,9 +85,10 @@ class Twitter extends Controller {
 		this.ctx.fillStyle = "#000000";
 		let sorted = data.sort((a, b) => {return b.count - a.count});
 		let highmark = sorted.slice(0, Math.floor(Math.random() * 2));
-		let lowmark = sorted.slice(-Math.floor(Math.random() * 2));
+		let lowmark = sorted.slice(sorted.length - Math.floor(Math.random() * 2));
 		let randomlines = _.shuffle(this.page.content.lines);
 		highmark.forEach((keyword) => {
+			console.log('highmark: ' + keyword);
 			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
 			let line = randomlines.find((line) => {
 				return regexp.test(line.text);
@@ -100,6 +101,7 @@ class Twitter extends Controller {
 			}
 		});
 		lowmark.forEach((keyword) => {
+			console.log('lowmark: ' + keyword);
 			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
 			let line = randomlines.find((line) => {
 				return regexp.test(line.text);
