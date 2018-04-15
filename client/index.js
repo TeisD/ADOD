@@ -110,7 +110,7 @@ pagedetector.on('ready', function(n) {
 				pagedetector.start()
 			}, 10000);
 		} else {
-			if(UNIT_TESTS) test();
+			if(process.env.UNIT_TESTS) test();
 		}
 	})
 	.catch((err) => { // catch the error & resume after timeout
@@ -231,15 +231,12 @@ function test() {
 	}
 }
 
-const UNIT_TESTS = false;
-const TEST_PAGE = 45;
-
 /*
  * Start!
  */
 if(!process.env.DEBUGGING) {
 	pagedetector.start();
 } else {
-	if(UNIT_TESTS) test();
-	else pagedetector.emit('ready', TEST_PAGE);
+	if(process.env.UNIT_TESTS) test();
+	else pagedetector.emit('ready', parseInt(process.env.TEST_PAGE));
 }
