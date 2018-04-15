@@ -47,7 +47,7 @@ function step2() {
 	let urls = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../mdw-2018-data/fuorisalone/pages.json')));
 	dataCount = urls.length;
 	Promise.all(urls.map((url) => {
-		return step2Worker(encodeURI(url))
+		return step2Worker(url)
 	})).then((data) => {
 		return Promise.all(data.map((d) => {
 			return new Promise((resolve, reject) => {
@@ -83,7 +83,7 @@ function step1Worker(page) {
 			const { document } = (new JSDOM(body)).window;
 			let events = document.querySelectorAll('.event-cnt');
 			let urls = [].map.call(events, (event) => {
-				return event.querySelector('a.ev-name').getAttribute('href');
+				return encodeURI(event.querySelector('a.ev-name').getAttribute('href'));
 			});
 			resolve(urls);
 		})
@@ -131,10 +131,10 @@ function step2Worker(url) {
 				extended.trim(),
 				dates[0],
 				dates[1],
+				dates[2],
 				dates[3],
 				dates[4],
 				dates[5],
-				dates[6],
 			]);
 		})
 	})
