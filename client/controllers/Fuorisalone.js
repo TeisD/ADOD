@@ -11,7 +11,7 @@ class Fuorisalone extends Controller {
 
 	draw(data) {
 
-		this.drawTimeline(this.page.keywords.time);
+		this.drawTimeline(this.page.keywords.time.slice());
 
 		if(data.length > 0 && data[0] != null && data[0].hasOwnProperty('title')) {
 			this.drawEvent(data[0]);
