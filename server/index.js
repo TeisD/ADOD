@@ -356,6 +356,7 @@ function fuorisalone(page) {
 				if (result.length == 0) return resolve();
 				let description = result[0].description;
 				if(description.length < 1) description = result[0].extended.split(' ').slice(0, 25).join(' ') + '...';
+				console.log(result);
 				resolve({
 					title: result[0].title,
 					organiser: result[0].organiser,
