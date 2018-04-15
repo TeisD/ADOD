@@ -38,48 +38,8 @@ class Twitter extends Controller {
 				high = sentences.splice(0, highcount),
 				low = sentences.splice(sentences.length - 1 - highcount, highcount);
 
-		// circle the highest
-		high.forEach((s) => {
-			this.drawHandCircle(
-				(s.bbox.x0 + s.bbox.x1) / 2,
-				(s.bbox.y0 + s.bbox.y1) / 2,
-				(s.bbox.x1 - s.bbox.x0) / 2 + 10,
-				(s.bbox.y1 - s.bbox.y0) / 2 + 10,
-				1 + Math.ceil(Math.random() * 2)
-			);
-		});
-
-		// scribble the lowest
-		low.forEach((s) => {
-			for(let i = s.start.line; i <= s.end.line; i++) {
-				let l = this.page.content.lines[i],
-						x0 = l.bbox.x0,
-						x1 = l.bbox.x1;
-				if(i == s.start.line) x0 = s.start.bbox.x0;
-				if(i == s.end.line) x1 = s.end.bbox.x1;
-				this.drawScribble(
-					x0,
-					(l.bbox.y0 + l.bbox.y1) / 2,
-					x1,
-					(l.bbox.y1 + l.bbox.y1) / 2,
-					l.bbox.y1 - l.bbox.y0
-				);
-			}
-		});
-
 		// mark a few leftover important pieces
 		let midhigh = sentences.splice(0, Math.floor(Math.random() * 2));
-		midhigh.forEach((s) => {
-			for(let i = s.start.line; i <= s.end.line; i++) {
-				let l = this.page.content.lines[i],
-						x0 = l.bbox.x0,
-						x1 = l.bbox.x1;
-				if(i == s.start.line) x0 = s.start.bbox.x0;
-				if(i == s.end.line) x1 = s.end.bbox.x1;
-				this.ctx.fillStyle = "rgba(0,0,0,0.3)";
-				this.ctx.fillRect(x0, l.bbox.y0, x1 - x0, l.bbox.y1 - l.bbox.y0);
-			}
-		})
 
 		// add 0 - 2 exclamation marks and ??? in the side
 		this.ctx.fillStyle = "#000000";
@@ -87,30 +47,6 @@ class Twitter extends Controller {
 		let highmark = sorted.slice(0, Math.floor(Math.random() * 2));
 		let lowmark = sorted.slice(sorted.length - Math.floor(Math.random() * 2));
 		let randomlines = _.shuffle(this.page.content.lines);
-		highmark.forEach((keyword) => {
-			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
-			let line = randomlines.find((line) => {
-				return regexp.test(line.text);
-			});
-			if(typeof line === 'undefined') return;
-			if(line.bbox.x0 > this.page.width / 2) {
-				this.drawText('!!!', line.bbox.x1, line.bbox.y1, 15, 100, 'Pecita');
-			} else {
-				this.drawText('!!!', line.bbox.x0 - 25, line.bbox.y1, 15, 100, 'Pecita');
-			}
-		});
-		lowmark.forEach((keyword) => {
-			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
-			let line = randomlines.find((line) => {
-				return regexp.test(line.text);
-			});
-			if(typeof line === 'undefined') return;
-			if(line.bbox.x0 > this.page.width / 2) {
-				this.drawText('???', line.bbox.x1, line.bbox.y1, 15, 100, 'Pecita');
-			} else {
-				this.drawText('???', line.bbox.x0 - 25, line.bbox.y1, 15, 100, 'Pecita');
-			}
-		})
 
 		// add some text too, to make it look cooler
 		// for each line, except the highest and the lowest, add the tweet matches
@@ -119,7 +55,7 @@ class Twitter extends Controller {
 				matchreg = new RegExp(matchmap.map((k) => {return k.word}).join('\|'), 'i');
 		this.page.content.lines.map((line) => {
 			// ignore the highest and lowest scored boxes
-			let intersect = ! high.concat(low).every((ignored) => {
+			/*let intersect = ! high.concat(low).every((ignored) => {
 				return (
 					line.bbox.x0 > ignored.bbox.x1 ||
 					line.bbox.x1 < ignored.bbox.x0 ||
@@ -127,7 +63,7 @@ class Twitter extends Controller {
 					line.bbox.y1 < ignored.bbox.y0
 				)
 			})
-			if (intersect) return;
+			if (intersect) return;*/
 			// do a quick match on the line
 			if (!matchreg.test(line.text)) return;
 			// push the word matches
@@ -144,6 +80,7 @@ class Twitter extends Controller {
 				})
 			})
 		})
+		console.log(twitterwords);
 		// remove duplicates
 		twitterwords = _.uniqBy(twitterwords, 'tweet');
 		// shuffle the matches
@@ -152,7 +89,7 @@ class Twitter extends Controller {
 		this.page.layoutGrid();
 		// and finally add some of them to the page
 		let addedCount = 0,
-				addedLimit = 3 + Math.round(Math.random() * 3);
+				addedLimit = 3 + Math.floor(Math.random() * 3);
 
 		twitterwords.forEach((w) => {
 			if(addedCount > addedLimit) return;
@@ -259,6 +196,74 @@ class Twitter extends Controller {
 			}
 			addedCount++;
 		});
+
+		// draw the other things on top of the text
+		highmark.forEach((keyword) => {
+			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
+			let line = randomlines.find((line) => {
+				return regexp.test(line.text);
+			});
+			if(typeof line === 'undefined') return;
+			if(line.bbox.x0 > this.page.width / 2) {
+				this.drawText('!!!', line.bbox.x1, line.bbox.y1, 15, 100, 'Pecita');
+			} else {
+				this.drawText('!!!', line.bbox.x0 - 25, line.bbox.y1, 15, 100, 'Pecita');
+			}
+		});
+		lowmark.forEach((keyword) => {
+			let regexp = new RegExp('\\b' + keyword.word + '\\b', 'i');
+			let line = randomlines.find((line) => {
+				return regexp.test(line.text);
+			});
+			if(typeof line === 'undefined') return;
+			if(line.bbox.x0 > this.page.width / 2) {
+				this.drawText('???', line.bbox.x1, line.bbox.y1, 15, 100, 'Pecita');
+			} else {
+				this.drawText('???', line.bbox.x0 - 25, line.bbox.y1, 15, 100, 'Pecita');
+			}
+		});
+
+		midhigh.forEach((s) => {
+			for(let i = s.start.line; i <= s.end.line; i++) {
+				let l = this.page.content.lines[i],
+						x0 = l.bbox.x0,
+						x1 = l.bbox.x1;
+				if(i == s.start.line) x0 = s.start.bbox.x0;
+				if(i == s.end.line) x1 = s.end.bbox.x1;
+				this.ctx.fillStyle = "rgba(0,0,0,0.3)";
+				this.ctx.fillRect(x0, l.bbox.y0, x1 - x0, l.bbox.y1 - l.bbox.y0);
+			}
+		});
+
+		// circle the highest
+		high.forEach((s) => {
+			this.drawHandCircle(
+				(s.bbox.x0 + s.bbox.x1) / 2,
+				(s.bbox.y0 + s.bbox.y1) / 2,
+				(s.bbox.x1 - s.bbox.x0) / 2 + 10,
+				(s.bbox.y1 - s.bbox.y0) / 2 + 10,
+				1 + Math.ceil(Math.random() * 2)
+			);
+		});
+
+		// scribble the lowest
+		low.forEach((s) => {
+			for(let i = s.start.line; i <= s.end.line; i++) {
+				let l = this.page.content.lines[i],
+						x0 = l.bbox.x0,
+						x1 = l.bbox.x1;
+				if(i == s.start.line) x0 = s.start.bbox.x0;
+				if(i == s.end.line) x1 = s.end.bbox.x1;
+				this.drawScribble(
+					x0,
+					(l.bbox.y0 + l.bbox.y1) / 2,
+					x1,
+					(l.bbox.y1 + l.bbox.y1) / 2,
+					l.bbox.y1 - l.bbox.y0
+				);
+			}
+		});
+
 	}
 
 	/**
