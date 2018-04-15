@@ -47,9 +47,10 @@ function step2() {
 	let urls = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../mdw-2018-data/fuorisalone/pages.json')));
 	dataCount = urls.length;
 	Promise.all(urls.map((url) => {
-		return step2Worker(url)
+		return step2Worker(encodeURI(url))
 	})).then((data) => {
 		return Promise.all(data.map((d) => {
+			if(d.length != 11) return Promise.resolve();
 			return new Promise((resolve, reject) => {
 				db.query('INSERT INTO fuorisalone (title, organiser, address, description, extended, tuesday, wednesday, thursday, friday, saturday, sunday) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', d, (err, results) => {
 					if (err) reject(err);
@@ -83,7 +84,7 @@ function step1Worker(page) {
 			const { document } = (new JSDOM(body)).window;
 			let events = document.querySelectorAll('.event-cnt');
 			let urls = [].map.call(events, (event) => {
-				return encodeURI(event.querySelector('a.ev-name').getAttribute('href'));
+				return event.querySelector('a.ev-name').getAttribute('href');
 			});
 			resolve(urls);
 		})
@@ -93,8 +94,14 @@ function step1Worker(page) {
 function step2Worker(url) {
 	return new Promise((resolve, reject) => {
 		throttledRequest(url, (err, response, body) => {
-			if(err) return reject(err);
-			if(response.statusCode != 200) return reject(response);
+			if(err) {
+				console.log(err);
+				return resolve();
+			}
+			if(response.statusCode != 200) {
+				console.log("error: " + response.statusCode);
+				return resolve();
+			}
 
 			reqCount++;
 			console.log(`${reqCount}/${dataCount}`);
