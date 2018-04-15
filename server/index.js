@@ -341,7 +341,9 @@ function fuorisalone(page) {
 			return saloneQuery(keyword.year);
 		}));
 	}).then((data) => {
-		data = data.filter(n => n);
+		data = data.filter((n) => {
+			return (n != null && n.hasOwnProperty('title'));
+		});
 		return Promise.resolve([_.sample(data)]);
 	});
 
