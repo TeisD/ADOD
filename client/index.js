@@ -104,16 +104,19 @@ pagedetector.on('ready', function(n) {
 		}
 	})
 	.then((data) => { // resume the pageDetector
-		setTimeout(function(){
-			lcd.print(LCD.MESSAGE.DONE);
-			pagedetector.start()
-		}, 10000);
-		//test();
+		if(!process.env.DEBUGGING) {
+			setTimeout(function(){
+				lcd.print(LCD.MESSAGE.DONE);
+				pagedetector.start()
+			}, 10000);
+		} else {
+			if(UNIT_TESTS) test();
+		}
 	})
 	.catch((err) => { // catch the error & resume after timeout
 		if(process.env.DEBUGGING) {
-			console.log(err);
-			console.error(err.stack);
+			console.log('[ERROR]' + err);
+			console.error('Stack trace: ' + err.stack);
 		} else {
 			console.error('[ERROR] ' + err);
 			piezo.beep(Piezo.BEEPS.ERROR);
@@ -215,18 +218,21 @@ let pageCount = 0,
 		iteration = 0;
 
 function test() {
-
 	if(pageCount < pages.length) {
 		let page = pages[pageCount];
 		console.log('-----------------------');
+		console.log('[TEST] Page ' + page.number + ' / Iteration ' + (iteration + 1));
 		pagedetector.emit('ready', page.number);
 		iteration++;
-		if(iteration > 3) {
+		if(iteration > 2) {
 			iteration = 0;
 			pageCount++
 		}
 	}
 }
+
+const UNIT_TESTS = false;
+const TEST_PAGE = 45;
 
 /*
  * Start!
@@ -234,6 +240,6 @@ function test() {
 if(!process.env.DEBUGGING) {
 	pagedetector.start();
 } else {
-	pagedetector.emit('ready', 93);
-	//test();
+	if(UNIT_TESTS) test();
+	else pagedetector.emit('ready', TEST_PAGE);
 }
