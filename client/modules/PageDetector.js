@@ -148,7 +148,7 @@ class PageDetector extends EventEmitter {
 		im.convertGrayscale();
 		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		im.save('post.jpg');
+		im.save('mid.jpg');
 		im = im.threshold(150, 255);
 
 		var _im = im.copy();
@@ -182,6 +182,7 @@ class PageDetector extends EventEmitter {
 
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x, bbox.y, bbox.width, bbox.height)
+		_im.save('post.jpg');
 
 		return _im.toBuffer();
 	}
