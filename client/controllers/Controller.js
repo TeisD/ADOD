@@ -88,7 +88,7 @@ class Controller {
 
 		var img = new Image();
 		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
-		img.src = src;
+		img.src = fs.readFileSync(src);
 
 		this.drawImageProp(img, x, y, width, height);
 	}
