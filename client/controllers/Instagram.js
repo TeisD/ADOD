@@ -126,6 +126,7 @@ class Instagram extends Controller {
 					resolve();
 				} else {
 					console.log('<Instagram> Found local copy');
+					console.log('drawing the local one: ' + filename)
 					this.drawImage(filename, x, y, width, height);
 					resolve();
 				}
