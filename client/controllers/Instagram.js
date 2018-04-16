@@ -9,7 +9,7 @@ const mkdirp = require('mkdirp');
 
 dotenv.config();
 
-const DATA_DIR = '../../../mdw-2018-data/instagram-2/';
+const DATA_DIR = '../../../mdw-2018-data/instagram/';
 
 class Instagram extends Controller {
 
