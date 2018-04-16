@@ -111,8 +111,12 @@ class Instagram extends Controller {
 						if(!error && response.statusCode === 200) {
 							mkdirp(path.dirname(filename), (err) => {
 								if(err) return reject(err);
+								console.log('created directory');
 								fs.writeFile(filename, body, 'binary', (err) => {
-									if(!err) this.drawImage(filename, x, y, width, height);
+									if(!err) {
+										console.log('<Instagram> Image saved');
+										this.drawImage(filename, x, y, width, height);
+									}
 									resolve();
 								});
 							});
