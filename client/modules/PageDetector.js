@@ -149,7 +149,7 @@ class PageDetector extends EventEmitter {
 		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		im.save('mid.jpg');
-		im = im.adaptiveThreshold(255, 1, 0, 201, 2);
+		im = im.adaptiveThreshold(255, 1, 0, 201, 3);
 		var _im = im.copy();
 		im.save('mid-thresh.jpg');
 
@@ -175,7 +175,7 @@ class PageDetector extends EventEmitter {
 			}
 		}
 
-		if(contours.area(id) > AREA + 5000 || contours.area(id) < AREA - 5000) {
+		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
