@@ -147,7 +147,7 @@ class PageDetector extends EventEmitter {
 	findPagenumber(im) {
 		im.convertGrayscale();
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		im = im.threshold(100, 255);
+		im = im.threshold(150, 255);
 
 		var _im = im.copy();
 
