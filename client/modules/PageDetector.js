@@ -55,6 +55,7 @@ class PageDetector extends EventEmitter {
 			noFileSave: true,
 			width: 2000,
 			time: 1,
+			contrast: 50,
 		});
 		this.pagenumber = 0;
 		this.running = false;
@@ -149,13 +150,13 @@ class PageDetector extends EventEmitter {
 		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		im.save('mid.jpg');
-		im = im.threshold(180, 255);
+		im = im.threshold(150, 255);
 		im.save('mid-thresh.jpg');
 
 		var _im = im.copy();
 
 		// remove noise
-		im.dilate(10);
+		im.dilate(2);
 		im.erode(35);
 
 		im.save('mid-erode.jpg');
