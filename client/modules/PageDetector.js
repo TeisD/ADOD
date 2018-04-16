@@ -149,12 +149,16 @@ class PageDetector extends EventEmitter {
 		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		im.save('mid.jpg');
-		im = im.threshold(100, 255);
+		im = im.threshold(180, 255);
 		im.save('mid-thresh.jpg');
 
 		var _im = im.copy();
 
+		// remove noise
+		im.dilate(10);
 		im.erode(35);
+
+		im.save('mid-erode.jpg');
 
 		var contours = im.findContours();
 		var id = 0;
