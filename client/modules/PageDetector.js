@@ -151,7 +151,7 @@ class PageDetector extends EventEmitter {
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		var _im = im.copy();
 		im.save('mid.jpg');
-		im = im.adaptiveThreshold(255, 1, 0, 10);
+		im = im.adaptiveThreshold(255, 1, 0, 11, 2);
 		im.save('mid-thresh.jpg');
 
 		// remove noise
