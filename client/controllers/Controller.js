@@ -25,7 +25,8 @@ class Controller {
 	 */
 	load(page) {
 		this.page = page;
-		this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
+		//this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
+		this.canvas = new Canvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
 
 		if (process.env.DEBUGGING) {
