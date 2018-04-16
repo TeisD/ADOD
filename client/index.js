@@ -109,11 +109,13 @@ pagedetector.on('ready', function(n) {
 	})
 	.then((data) => { // resume the pageDetector
 		if(!process.env.DEBUGGING) {
+			let timeout = 15000;
+			if(process.env.CONTROLLER == 'twitter') timeout = 30000
 			setTimeout(function(){
 				lcd.print(LCD.MESSAGE.DONE);
 				piezo.beep(Piezo.BEEPS.OK);
 				pagedetector.start()
-			}, 20000);
+			}, timeout);
 		} else {
 			if(process.env.UNIT_TESTS) test();
 		}
