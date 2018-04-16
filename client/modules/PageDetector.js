@@ -156,7 +156,7 @@ class PageDetector extends EventEmitter {
 		var _im = im.copy();
 
 		// remove noise
-		im.dilate(2);
+		im.dilate(2.5);
 		im.erode(35);
 
 		im.save('mid-erode.jpg');
@@ -188,6 +188,7 @@ class PageDetector extends EventEmitter {
 
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x, bbox.y, bbox.width, bbox.height)
+		_im = _im.threshold(180, 255);
 		_im.save('post.jpg');
 
 		return _im.toBuffer();
