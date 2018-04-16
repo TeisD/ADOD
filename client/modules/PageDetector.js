@@ -146,7 +146,9 @@ class PageDetector extends EventEmitter {
 	 */
 	findPagenumber(im) {
 		im.convertGrayscale();
+		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
+		im.save('post.jpg');
 		im = im.threshold(150, 255);
 
 		var _im = im.copy();
