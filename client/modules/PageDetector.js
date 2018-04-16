@@ -155,7 +155,7 @@ class PageDetector extends EventEmitter {
 
 		// remove noise
 		im.dilate(1.5);
-		im.erode(35);
+		im.erode(32);
 
 		im.save('mid-erode.jpg');
 
