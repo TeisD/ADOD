@@ -111,7 +111,7 @@ pagedetector.on('ready', function(n) {
 				lcd.print(LCD.MESSAGE.DONE);
 				piezo.beep(Piezo.BEEPS.OK);
 				pagedetector.start()
-			}, 10000);
+			}, 20000);
 		} else {
 			if(process.env.UNIT_TESTS) test();
 		}
