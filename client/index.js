@@ -124,6 +124,7 @@ pagedetector.on('ready', function(n) {
 			console.error('Stack trace: ' + err.stack);
 		} else {
 			console.error('[ERROR] ' + err);
+			console.error('Stack trace: ' + err.stack);
 			piezo.beep(Piezo.BEEPS.ERROR);
 			lcd.print(LCD.MESSAGE.ERROR_RETRY);
 			setTimeout(function(){

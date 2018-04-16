@@ -110,6 +110,7 @@ class Instagram extends Controller {
 					}, (error, response, body) => {
 						if(!error && response.statusCode === 200) {
 							mkdirp(path.dirname(filename), (err) => {
+								if(err) return reject(err);
 								fs.writeFile(filename, body, 'binary', (err) => {
 									if(!err) this.drawImage(filename, x, y, width, height);
 									resolve();
