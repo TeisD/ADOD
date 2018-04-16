@@ -82,6 +82,7 @@ pagedetector.on('ready', function(n) {
 	getData(n)
 	.then((data) => { // draw the data
 		if(typeof data === 'undefined') {
+			piezo.beep(Piezo.BEEPS.OK);
 			lcd.print(LCD.MESSAGE.NO_DATA);
 			controller.load(page);
 			return new Promise((res, rej) => {
@@ -97,6 +98,7 @@ pagedetector.on('ready', function(n) {
 	})
 	.then(() => { // print page & wait for print to finish
 		lcd.print(LCD.MESSAGE.PRINTING)
+		piezo.beep(Piezo.BEEPS.OK);
 		if(!process.env.DEBUGGING) {
 			return printer.printAndFinish(controller.getBuffer());
 		} else {
@@ -107,6 +109,7 @@ pagedetector.on('ready', function(n) {
 		if(!process.env.DEBUGGING) {
 			setTimeout(function(){
 				lcd.print(LCD.MESSAGE.DONE);
+				piezo.beep(Piezo.BEEPS.OK);
 				pagedetector.start()
 			}, 10000);
 		} else {
