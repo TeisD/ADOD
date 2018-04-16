@@ -3,9 +3,9 @@ const rpio = require('rpio');
 const BEEPS = {
 	OK: {
 		frequency: 3000,
-		length: 50,
+		length: 100,
 		delay: 50,
-		times: 1
+		times: 2
 	},
 	ERROR: {
 		frequency: 500,
