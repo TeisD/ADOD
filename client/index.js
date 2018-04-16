@@ -83,8 +83,8 @@ pagedetector.on('ready', function(n) {
 	lcd.print(LCD.MESSAGE.SEARCHING);
 	getData(n)
 	.then((data) => { // draw the data
+		piezo.beep(Piezo.BEEPS.OK);
 		if(typeof data === 'undefined') {
-			piezo.beep(Piezo.BEEPS.OK);
 			lcd.print(LCD.MESSAGE.NO_DATA);
 			controller.load(page);
 			return new Promise((res, rej) => {
