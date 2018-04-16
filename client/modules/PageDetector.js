@@ -32,7 +32,7 @@ const CROP = {
 	width: parseInt(process.env.CAM_CROP_WIDTH),
 	height: parseInt(process.env.CAM_CROP_HEIGHT),
 }
-const AREA = 15000;
+const AREA = 20000;
 
 const LANGPATH = path.join(__dirname, '../../shared/assets/languages/');
 const COREPATH = path.join(__dirname, '../node_modules/tesseract.js-core/index.js');
@@ -55,7 +55,6 @@ class PageDetector extends EventEmitter {
 			noFileSave: true,
 			width: 2000,
 			time: 1,
-			contrast: 50,
 		});
 		this.pagenumber = 0;
 		this.running = false;
@@ -149,13 +148,13 @@ class PageDetector extends EventEmitter {
 		im.convertGrayscale();
 		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		var _im = im.copy();
 		im.save('mid.jpg');
-		im = im.adaptiveThreshold(255, 1, 0, 11, 2);
+		im = im.adaptiveThreshold(255, 1, 0, 201, 2);
+		var _im = im.copy();
 		im.save('mid-thresh.jpg');
 
 		// remove noise
-		im.dilate(2.5);
+		im.dilate(1.5);
 		im.erode(35);
 
 		im.save('mid-erode.jpg');
@@ -187,7 +186,6 @@ class PageDetector extends EventEmitter {
 
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x, bbox.y, bbox.width, bbox.height)
-		_im = _im.threshold(190, 255);
 		_im.save('post.jpg');
 
 		return _im.toBuffer();
