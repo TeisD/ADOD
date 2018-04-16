@@ -150,7 +150,7 @@ class PageDetector extends EventEmitter {
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		im.save('mid.jpg');
 		im = im.threshold(100, 255);
-		_im.save('mid-thresh.jpg');
+		im.save('mid-thresh.jpg');
 
 		var _im = im.copy();
 
