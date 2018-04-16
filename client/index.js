@@ -70,6 +70,8 @@ pagedetector.on('ready', function(n) {
 	};
 
 	lcd.print('Page ' + n);
+	console.log('<Index> Page ' + n);
+
 
 	// stop the pagedetector
 	pagedetector.stop();
