@@ -3,9 +3,7 @@ const { Image } = require('canvas');
 const path = require('path');
 const _ = require('lodash');
 const dotenv = require('dotenv');
-const request = require('request');
 const fs = require('fs');
-const mkdirp = require('mkdirp');
 
 dotenv.config();
 
@@ -44,7 +42,8 @@ class Instagram extends Controller {
 									x + 10,
 									y + 10,
 									GRID_SIZE - 20,
-									GRID_SIZE - 20
+									GRID_SIZE - 20,
+									path.join(__dirname, DATA_DIR)
 								)
 							);
 							j++;
@@ -58,7 +57,8 @@ class Instagram extends Controller {
 						a.x + 10,
 						a.y + 10,
 						a.width - 20,
-						a.height - 20
+						a.height - 20,
+						path.join(__dirname, DATA_DIR)
 					)
 				);
 			}
@@ -82,57 +82,6 @@ class Instagram extends Controller {
 		}).catch((err) => {
 			return Promise.resolve();
 		})
-	}
-
-	/**
-	 * Draw an image from a url on the page
-	 * @param img The url to the file
-	 * @param x The left coordinate of the image
-	 * @param y The top coordinate of the image
-	 * @param width The width of the image
-	 * @param height The height of the image
-	 */
-	drawImageFromUrl(img, x, y, width, height) {
-		console.log('<Instagram> ' + img);
-		var filename = path.join(__dirname, DATA_DIR, img);
-		return new Promise((resolve, reject) => {
-			// check if the file exists already
-			fs.readFile(filename, (err, data) => {
-				if (err && err.code === 'ENOENT') {
-					console.log('<Instagram> Downloading from server');
-					request.post({
-						url: process.env.HOSTNAME + '/image',
-						form: {
-							key: process.env.API_KEY,
-							image: img,
-						},
-						encoding: null
-					}, (error, response, body) => {
-						if(!error && response.statusCode === 200) {
-							mkdirp(path.dirname(filename), (err) => {
-								if(err) return reject(err);
-								console.log('created directory');
-								fs.writeFile(filename, body, 'binary', (err) => {
-									if(!err) {
-										console.log('<Instagram> Image saved');
-										this.drawImage(filename, x, y, width, height);
-									}
-									resolve();
-								});
-							});
-						}
-					});
-				} else if (err) {
-					resolve();
-				} else {
-					console.log('<Instagram> Found local copy');
-					console.log('drawing the local one: ' + filename)
-					this.drawImage(filename, x, y, width, height);
-					resolve();
-				}
-			});
-			// if not, download it
-		});
 	}
 
 }

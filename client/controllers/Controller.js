@@ -4,6 +4,8 @@ const Canvas = require('canvas');
 const Image = Canvas.Image;
 const he = require('he');
 const dotenv = require('dotenv');
+const request = require('request');
+const mkdirp = require('mkdirp');
 
 dotenv.config();
 
@@ -18,7 +20,7 @@ class Controller {
 		this.page,
 		this.canvas,
 		this.ctx;
-		//Canvas.registerFont(path.join(__dirname, '../../shared/assets/fonts/Pecita.otf'), {family: 'Pecita', weight: 'book'});
+		//Canvas.registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'Space Mono'});
 	}
 
 	/**
@@ -98,6 +100,70 @@ class Controller {
 	}
 
 	/**
+	 * Draw an image from a url on the page
+	 * @param img The url to the file
+	 * @param x The left coordinate of the image
+	 * @param y The top coordinate of the image
+	 * @param width The width of the image
+	 * @param height The height of the image
+	 * @param dirname The dirname where the file could be found
+	 * @param hostname The hostname of the server where the image can be downloaded (optional, leave empty to download from ADOD server)
+	 */
+	drawImageFromUrl(img, x, y, width, height, dirname, hostname) {
+		console.log('<Controller> Drawing ' + img);
+		var filename = path.join(dirname, img);
+		return new Promise((resolve, reject) => {
+			// check if the file exists already
+			fs.readFile(filename, (err, data) => {
+				if (err && err.code === 'ENOENT') {
+					console.log('<Controller> Downloading from server');
+
+					let callback = (error, response, body) => {
+						if(!error && response.statusCode === 200) {
+							mkdirp(path.dirname(filename), (err) => {
+								if(err) return reject(err);
+								fs.writeFile(filename, body, 'binary', (err) => {
+									if(!err) {
+										console.log('<Controller> Image saved');
+										this.drawImage(filename, x, y, width, height);
+									}
+									return resolve();
+								});
+							});
+						}
+					}
+
+					if(typeof hostname === 'undefined') {
+						request.post({
+							url: process.env.HOSTNAME + '/image',
+							form: {
+								key: process.env.API_KEY,
+								image: img,
+							},
+							encoding: null
+						}, callback);
+					} else {
+						console.log(hostname + img);
+						request.get({
+							url: hostname + img,
+							encoding: 'binary'
+						}, callback);
+					}
+
+				} else if (err) {
+					resolve();
+				} else {
+					console.log('<Controller> Found local copy');
+					console.log('drawing the local one: ' + filename)
+					this.drawImage(filename, x, y, width, height);
+					resolve();
+				}
+			});
+			// if not, download it
+		});
+	}
+
+	/**
 	 * By Ken Fyrstenberg Nilsen
 	 *
 	 * drawImageProp(context, image [, x, y, width, height [,offsetX, offsetY]])
@@ -156,7 +222,7 @@ class Controller {
 		if (typeof font === 'undefined') {
 			this.ctx.font = `bold ${size}pt Arial`;
 		} else {
-			this.ctx.font = `${size}pt ${font}`;
+			this.ctx._setFont('normal', 'normal', size, 'px', font);
 		}
 		if (typeof lineheight === 'undefined') lineheight = size;
 		let lines = [],
