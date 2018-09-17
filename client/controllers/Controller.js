@@ -34,6 +34,8 @@ class Controller {
 			var bg = path.join(process.env.DATA_DIR, 'pages-pre', this.page.number + '.png');
 			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
+
+		this.ctx.translate(this.page.offset.x, this.page.offset.y);
 	}
 
 	/**

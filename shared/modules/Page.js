@@ -15,9 +15,10 @@ const MAX_ITERATIONS = 100;
 
 class Page {
 
-	constructor(width, height, title, author, number, content, blocks, keywords, layout) {
+	constructor(width, height, offset, title, author, number, content, blocks, keywords, layout) {
 		this.width = width;
 		this.height = height;
+		this.offset = offset;
 		this.title = title;
 		this.author = author;
 		this.number = parseInt(number);
@@ -232,6 +233,10 @@ class Page {
 		var page = JSON.parse(fs.readFileSync(file));
 		var width = page.width;
 		var height = page.height;
+		var offset = {
+			x: page.hasOwnProperty('offsetX') ? page.offsetX : 0,
+			y: page.hasOwnProperty('offsetY') ? page.offsetY : 0,
+		}
 		var title = page.title;
 		var author = page.author;
 		var number = page.number;
@@ -240,7 +245,7 @@ class Page {
 		var keywords = page.keywords;
 		var layout = page.hasOwnProperty('layout') ? page.layout : {};
 
-		return new Page(width, height, title, author, number, content, blocks, keywords, layout);
+		return new Page(width, height, offset, title, author, number, content, blocks, keywords, layout);
 	}
 
 	/*
