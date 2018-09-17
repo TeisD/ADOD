@@ -3,8 +3,9 @@ const path = require('path');
 const Canvas = require('canvas');
 const Image = Canvas.Image;
 const he = require('he');
+const dotenv = require('dotenv');
 
-const DATA_DIR = '../../../mdw-2018-data/';
+dotenv.config();
 
 class Controller {
 
@@ -15,8 +16,8 @@ class Controller {
 	 */
 	constructor() {
 		this.page,
-			this.canvas,
-			this.ctx;
+		this.canvas,
+		this.ctx;
 		//Canvas.registerFont(path.join(__dirname, '../../shared/assets/fonts/Pecita.otf'), {family: 'Pecita', weight: 'book'});
 	}
 
@@ -30,7 +31,7 @@ class Controller {
 		this.ctx = this.canvas.getContext('2d');
 
 		if (process.env.DEBUGGING) {
-			var bg = path.join(__dirname, DATA_DIR, 'pages-pre', this.page.number + '.png');
+			var bg = path.join(process.env.DATA_DIR, 'pages-pre', this.page.number + '.png');
 			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
 	}
@@ -61,11 +62,11 @@ class Controller {
 
 	/**
 	 * Save the image
-	 * If no filename is defined it will be saved as author-pagenumber.png in the current working dir
+	 * If no filename is defined it will be saved as author-pagenumber.pdf in the current working dir
 	 */
 	saveImage(filename) {
 		if (typeof filename === 'undefined') {
-			filename = this.text.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page;
+			filename = this.page.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page.number + '.pdf';
 		}
 		var img = this.getImage();
 		fs.writeFileSync(filename, new Buffer(img, 'base64'), (err) => {
@@ -158,15 +159,19 @@ class Controller {
 		if (typeof lineheight === 'undefined') lineheight = size;
 		let lines = [],
 			line = '';
-		he.decode(text).split(/\s/).forEach((word) => {
-			let w = this.ctx.measureText(line + ' ' + word).width;
-			if (w > width + 10) {
-				lines.push(line);
-				line = '';
-			}
-			line += ' ' + word;
-		});
-		lines.push(line);
+		if(typeof width !== 'undefined'){
+			he.decode(text).split(/\s/).forEach((word) => {
+				let w = this.ctx.measureText(line + ' ' + word).width;
+				if (w > width + 10) {
+					lines.push(line);
+					line = '';
+				}
+				line += ' ' + word;
+			});
+			lines.push(line);
+		} else {
+			lines.push(text);
+		}
 
 		if (typeof stroke !== 'undefined') {
 			this.ctx.strokeStyle = "#ffffff";
