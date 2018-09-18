@@ -256,7 +256,7 @@ class Page {
 	 * @return An array of Page object
 	 */
 	static loadFolder(dir) {
-		if (!fs.existsSync(dir)) throw 'The folder does not exist';
+		if (!fs.existsSync(dir)) throw 'The folder ' + dir + ' does not exist';
 
 		var pages = [];
 
