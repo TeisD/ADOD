@@ -42,7 +42,7 @@ pages.forEach(page => {
 });
 
 function amazonSearch(title) {
-    let command = `sleep ${TIMEOUT} && source ${process.env.AMAZON_ENV}/bin/activate && amzsear '${title}' --dont-open --output json`
+    let command = `sleep ${TIMEOUT} && amzsear '${title}' --dont-open --output json`
     let stdout = execSync(command);
     return stdout;
 }
