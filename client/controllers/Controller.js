@@ -29,14 +29,15 @@ class Controller {
 	load(page) {
 		this.page = page;
 		//this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
-		this.canvas = new Canvas(page.width, page.height, 'pdf');
+		this.canvas = new Canvas(page.width * page.scale, page.height * page.scale, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
 
 		if (process.env.DEBUGGING) {
 			var bg = path.join(process.env.DATA_DIR, 'pages-pre', this.page.number + '.png');
-			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
+			this.drawImage(bg, 0, 0, this.page.width * this.page.scale, this.page.height * this.page.scale);
 		}
 
+		this.ctx.scale(page.scale, page.scale);
 		this.ctx.translate(this.page.offset.x, this.page.offset.y);
 	}
 
@@ -96,7 +97,43 @@ class Controller {
 		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
 		img.src = fs.readFileSync(src);
 
-		this.drawImageProp(img, x, y, width, height);
+		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
+		this.drawImageProp(img, x * this.page.scale, y * this.page.scale, width * this.page.scale, height * this.page.scale);
+		this.ctx.scale(this.page.scale, this.page.scale);
+	}
+
+	/**
+	 * Draw an image on the page
+	 * @param src The path to the file
+	 * @param x The left coordinate of the image
+	 * @param y The top coordinate of the image
+	 * @param width The width of the container fit
+	 * @param height The height of the container to fit
+	 */
+	drawImageInContainer(src, x, y, width, height) {
+		if (!fs.existsSync(src)) {
+			console.log('<Controller> File does not exist');
+			return;
+		}
+
+		var img = new Image();
+		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
+		img.src = fs.readFileSync(src);
+
+		if(img.width / img.height > width / height) {
+			let ch = height;
+			height = img.height * (width / img.width);
+			y += (ch - height) / 2;
+		} else {
+			let cw = width;
+			width = img.width * (height / img.height);
+			x += (cw - width) / 2;
+		}
+
+		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
+		this.drawImageProp(img, x * this.page.scale, y * this.page.scale, width * this.page.scale, height * this.page.scale);
+		this.ctx.scale(this.page.scale, this.page.scale);
+
 	}
 
 	/**
@@ -108,8 +145,9 @@ class Controller {
 	 * @param height The height of the image
 	 * @param dirname The dirname where the file could be found
 	 * @param hostname The hostname of the server where the image can be downloaded (optional, leave empty to download from ADOD server)
+	 * @param inContainer Draw the image in a container, rather than by exact dimensions
 	 */
-	drawImageFromUrl(img, x, y, width, height, dirname, hostname) {
+	drawImageFromUrl(img, x, y, width, height, dirname, hostname, inContainer) {
 		console.log('<Controller> Drawing ' + img);
 		var filename = path.join(dirname, img);
 		return new Promise((resolve, reject) => {
@@ -125,7 +163,8 @@ class Controller {
 								fs.writeFile(filename, body, 'binary', (err) => {
 									if(!err) {
 										console.log('<Controller> Image saved');
-										this.drawImage(filename, x, y, width, height);
+										if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
+										else this.drawImage(filename, x, y, width, height);
 									}
 									return resolve();
 								});
@@ -155,7 +194,8 @@ class Controller {
 				} else {
 					console.log('<Controller> Found local copy');
 					console.log('drawing the local one: ' + filename)
-					this.drawImage(filename, x, y, width, height);
+					if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
+					else this.drawImage(filename, x, y, width, height);
 					resolve();
 				}
 			});

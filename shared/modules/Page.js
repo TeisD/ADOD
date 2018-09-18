@@ -15,10 +15,11 @@ const MAX_ITERATIONS = 100;
 
 class Page {
 
-	constructor(width, height, offset, title, author, number, content, blocks, keywords, layout) {
+	constructor(width, height, offset, scale, title, author, number, content, blocks, keywords, layout) {
 		this.width = width;
 		this.height = height;
 		this.offset = offset;
+		this.scale = scale;
 		this.title = title;
 		this.author = author;
 		this.number = parseInt(number);
@@ -237,6 +238,7 @@ class Page {
 			x: page.hasOwnProperty('offsetX') ? page.offsetX : 0,
 			y: page.hasOwnProperty('offsetY') ? page.offsetY : 0,
 		}
+		var scale = page.hasOwnProperty('scale') ? page.scale : 1;
 		var title = page.title;
 		var author = page.author;
 		var number = page.number;
@@ -245,7 +247,7 @@ class Page {
 		var keywords = page.keywords;
 		var layout = page.hasOwnProperty('layout') ? page.layout : {};
 
-		return new Page(width, height, offset, title, author, number, content, blocks, keywords, layout);
+		return new Page(width, height, offset, scale, title, author, number, content, blocks, keywords, layout);
 	}
 
 	/*
