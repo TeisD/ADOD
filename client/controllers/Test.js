@@ -9,20 +9,22 @@ class Test extends Controller {
 	}
 
 	draw() {
-        this.page.content.lines.forEach(line => {
-            this.ctx.rect(line.bbox.x0, line.bbox.y0, line.bbox.w, line.bbox.h);
-            let textX = line.bbox.x0;
-            let textY = line.bbox.y0 + line.bbox.h;
-            if(line.bbox.hasOwnProperty('group_y1')) {
-                textY = line.bbox.group_y1;
-                let first = this.page.content.lines.find(l => l._id == line._id);
-                if(typeof first !== 'undefined') {
-                    textX = first.bbox.x0;
+        this.page.blocks.forEach(block => {
+            block.lines.forEach(line => {
+                this.ctx.rect(line.bbox.x0, line.bbox.y0, line.bbox.w, line.bbox.h);
+                let textX = line.bbox.x0;
+                let textY = line.bbox.y0 + line.bbox.h;
+                if(line.bbox.hasOwnProperty('group_y1')) {
+                    textY = line.bbox.group_y1;
+                    let first = block.lines.find(l => l._id == line._id);
+                    if(typeof first !== 'undefined') {
+                        textX = first.bbox.x0;
+                    }
                 }
-            }
 
-            this.drawText(line._id, textX, textY + 10, 7);
-            this.ctx.stroke();
+                this.drawText(line._id, textX, textY + 10, 7);
+                this.ctx.stroke();
+            })
         })
     }
 }
