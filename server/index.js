@@ -11,10 +11,13 @@ const {
 	exec
 } = require('child_process');
 const mysql = require('mysql');
+const dotenv = require('dotenv');
 
-const PORT = 3000;
+dotenv.config();
+
+const PORT = process.env.PORT;
 const KEY = fs.readFileSync(path.join(__dirname, '../shared/config/keys/api-key'), 'utf8').trim();
-const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/');
+const DATA_DIR = process.env.DATA_DIR;
 
 const INSTAGRAM_SEARCH = path.join(__dirname, 'apps/instagram-search.sh');
 const INSTAGRAM_SEARCH_PATH = path.join(DATA_DIR, 'instagram');
@@ -115,6 +118,14 @@ function start() {
 								r = Promise.reject(e);
 							}
 							break;
+						case 'amazon':
+							console.log('-> /amazon');
+							try {
+								r = amazon(body.page);
+							} catch (e) {
+								r = Promise.reject(e);
+							}
+							break;
 						default:
 							r = Promise.reject('404');
 							break;
@@ -146,6 +157,7 @@ function start() {
 			});
 		} else {
 			response.statusCode = 404;
+			console.log('404');
 			response.end();
 		}
 
@@ -367,4 +379,18 @@ function fuorisalone(page) {
 			});
 		})
 	}
+}
+
+function amazon(page) {
+	if (typeof page === 'undefined') return Promise.reject(404);
+
+	return new Promise((resolve, reject) => {
+		fs.readFile(path.join(process.env.DATA_DIR, 'amazon', page + '.json'), (err, data) => {
+			if (err) {
+				if (err.code === 'ENOENT') return reject('404');
+				return reject(err);
+			}
+			resolve(JSON.parse(data));
+		});
+	});
 }
