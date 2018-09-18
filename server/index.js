@@ -44,7 +44,7 @@ console.log('Initializing...');
 start();
 
 function start() {
-	console.log('[OK] Server ready');
+	console.log('[OK] Server ready. Listening on port ' + PORT);
 	const server = http.createServer((request, response) => {
 		request.on('error', (err) => {
 			console.error('[ERROR] ' + err);
