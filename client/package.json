@@ -19,7 +19,7 @@
     "opencv": "^6.0.0",
     "request": "^2.83.0",
     "rpio": "^0.9.21",
-    "tesseract.js": "git://github.com/naptha/tesseract.js.git#master"
+    "tesseract.js": "git+https://github.com/naptha/tesseract.js.git#master"
   },
   "devDependencies": {
     "eslint": "^4.18.0"
