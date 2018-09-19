@@ -20,7 +20,7 @@ class Controller {
 		this.page,
 		this.canvas,
 		this.ctx;
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'Space Mono'});
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
 		registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
 	}
 
