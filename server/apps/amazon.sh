@@ -1,5 +1,5 @@
 #!/bin/bash
 
-source ~/python/adot/bin/activate
-cd ~/adot/server
+source /home/ubuntu/python/adot/bin/activate
+cd /home/ubuntu/adot/server
 node apps/amazon.sh
