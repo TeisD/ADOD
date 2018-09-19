@@ -46,9 +46,9 @@ function extract() {
 
   keywords = _.uniq(keywords);
 
-  keywords = '"#' + keywords.join('" "#') + '"';
+  keywords = '"#' + keywords.join('"\n"#') + '"';
 
-  let out = path.join(process.env.DATA_DIR, 'instagram', 'hashtags.json');
+  let out = path.join(process.env.DATA_DIR, 'instagram', 'hashtags.txt');
 
   fs.writeFileSync(out, keywords);
   console.log('Saved hashtags to ' + out);
