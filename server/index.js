@@ -1,3 +1,8 @@
+/*
+ * About port mapping
+ * https://stackoverflow.com/questions/16573668/best-practices-when-running-node-js-with-port-80-ubuntu-linode
+ */
+
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
