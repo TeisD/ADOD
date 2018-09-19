@@ -32,7 +32,7 @@ const CROP = {
 	width: parseInt(process.env.CAM_CROP_WIDTH),
 	height: parseInt(process.env.CAM_CROP_HEIGHT),
 }
-const AREA = 20000;
+const AREA = 36100;
 
 const LANGPATH = path.join(__dirname, '../../shared/assets/languages/');
 const COREPATH = path.join(__dirname, '../node_modules/tesseract.js-core/index.js');
@@ -57,6 +57,7 @@ class PageDetector extends EventEmitter {
 			time: 1,
 		});
 		this.pagenumber = 0;
+		this.pagelanguage = 0;
 		this.running = false;
 		this.status = null;
 	}
@@ -75,6 +76,7 @@ class PageDetector extends EventEmitter {
 	stop() {
 		this.running = false;
 		this.pagenumber = 0;
+		this.pagelanguage = 0;
 		this.status = null;
 	}
 
@@ -114,7 +116,7 @@ class PageDetector extends EventEmitter {
 				return Promise.reject(STATUS.NO_PAGE)
 			} else if(n != this.pagenumber) {
 				this.pagenumber = n;
-				this.emit('ready', this.pagenumber);
+				this.emit('ready', this.pagenumber, this.pagelanguage);
 			}
 
 			this.capture();
@@ -135,6 +137,7 @@ class PageDetector extends EventEmitter {
 			}
 
 			this.pagenumber = 0;
+			this.pagelanguage = null;
 			this.capture();
 		});
 	}
@@ -149,15 +152,9 @@ class PageDetector extends EventEmitter {
 		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		im.save('mid.jpg');
-		im = im.adaptiveThreshold(255, 1, 0, 201, 3);
+		im = im.adaptiveThreshold(255, 1, 0, 1001, 20);
 		var _im = im.copy();
 		im.save('mid-thresh.jpg');
-
-		// remove noise
-		im.dilate(1.5);
-		im.erode(32);
-
-		im.save('mid-erode.jpg');
 
 		var contours = im.findContours();
 		var id = 0;
@@ -185,8 +182,27 @@ class PageDetector extends EventEmitter {
 		}
 
 		var bbox = contours.boundingRect(id);
-		_im = _im.crop(bbox.x, bbox.y, bbox.width, bbox.height)
+		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50)
 		_im.save('post.jpg');
+
+		let channels = _im.split();
+
+		let pixel = _im.pixelCol(0)[0];
+
+		let prevlanguage = this.pagelanguage;
+
+		if(pixel == 255) {
+			this.pagelanguage = 1;
+			if(prevlanguage != this.pagelanguage) {
+				this.pagenumber = 0;
+			}
+		} else {
+			// reset the page number in case the number is the same but the language is different
+			if(prevlanguage != this.pagelanguage) {
+				this.pagenumber = 0;
+			}
+			this.pagelanguage = 0;
+		}
 
 		return _im.toBuffer();
 	}
