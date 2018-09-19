@@ -46,7 +46,7 @@ function extract() {
 
   keywords = _.uniq(keywords);
 
-  keywords = '"#' + keywords.join('"\n"#') + '"';
+  keywords = '#' + keywords.join('\n#') + '';
 
   let out = path.join(process.env.DATA_DIR, 'instagram', 'hashtags.txt');
 

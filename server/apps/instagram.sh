@@ -5,4 +5,4 @@
 #
 
 # fetch images & remove the lock file
-#/usr/bin/tmux new -d -s instaloader /home/ubuntu/.local/bin/instaloader --fast-update --no-videos --metadata-json --dirname-pattern=/home/ubuntu/mdw-2018-data/instagram/{target} "#salonedelmobile" "#milandesignweek" "#milanodesignweek" "#milandesign" "#mdw2018" "#mdw18" "#fuorisalone" "#fuorisalone2018" "#fuorisalone18" "#designweek" "#salone2018" "#salone18"
+/usr/bin/tmux new -d -s instagram /home/ubuntu/.local/bin/instaloader --fast-update --count=1 --no-videos --no-video-thumbnails --post-filter="not is_video" --dirname-pattern=/home/ubuntu/idb-2018-data/instagram/{target} +"/home/ubuntu/idb-2018-data/instagram/hashtags.txt"
