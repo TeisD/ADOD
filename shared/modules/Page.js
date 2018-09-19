@@ -4,13 +4,13 @@ const _ = require('lodash');
 
 // hardcode the region of interest (based on average for all page)
 const ROI = {
-	x0: 40,
-	y0: 110,
-	x1: 800,
-	y1: 470
+	x0: 20,
+	y0: 20,
+	x1: 820,
+	y1: 575
 }
 
-const GRID_SIZE = 50;
+const GRID_SIZE = 20;
 const MAX_ITERATIONS = 100;
 
 class Page {
@@ -37,7 +37,7 @@ class Page {
 	layoutGrid() {
 		this.layout.computed = [];
 		// pick a random start position
-		var alg = LAYOUT_ALG[Math.floor(Math.random() * LAYOUT_ALG.length)]
+		var alg = LAYOUT_ALG[0];
 
 		for (let x = alg.start.x, i = 0; alg.test.x(x, alg.end.x); x += GRID_SIZE * alg.direction.x, i++) {
 			let row = [];
@@ -52,6 +52,12 @@ class Page {
 					important: false
 				}
 				// check if it intersects any content block
+				// addition for idb: map line structure to blocks
+				this.blocks.forEach(b => {
+					b.bbox.x1 = b.bbox.x0 + b.bbox.w;
+					b.bbox.y1 = b.bbox.y0 + b.bbox.h;
+				});
+
 				let intersections = this.blocks.map((block) => {
 					// set the important flag by exact measures
 					if (
@@ -145,13 +151,9 @@ class Page {
 				free = freeLayoutGridItems.call(this);
 
 		let cases = [
-			[4,4],
-			[3,3], // try to make 3x3 boxes
-			[4,2], // try to make 4x2 boxes
-			[3,2], // try to make 3x2 boxes
-			[2,4], // try to make 2x4 boxes
-			[2,3],
-			[2,2] // try to make 1x3 boxes
+			[10,10],
+			[8,8],
+			[6,6]
 		];
 
 		for (let c of cases) {

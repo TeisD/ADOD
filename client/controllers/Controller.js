@@ -171,6 +171,7 @@ class Controller {
 								});
 							});
 						}
+						return resolve();
 					}
 
 					if(typeof hostname === 'undefined') {
@@ -191,13 +192,13 @@ class Controller {
 					}
 
 				} else if (err) {
-					resolve();
+					return resolve();
 				} else {
 					console.log('<Controller> Found local copy');
 					console.log('drawing the local one: ' + filename)
 					if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
 					else this.drawImage(filename, x, y, width, height);
-					resolve();
+					return resolve();
 				}
 			});
 			// if not, download it
