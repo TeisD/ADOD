@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const Canvas = require('canvas');
-const Image = Canvas.Image;
+const { createCanvas, registerFont, Image } = require('canvas')
+//const Image = Canvas.Image;
 const he = require('he');
 const dotenv = require('dotenv');
 const request = require('request');
@@ -20,7 +20,8 @@ class Controller {
 		this.page,
 		this.canvas,
 		this.ctx;
-		//Canvas.registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'Space Mono'});
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'Space Mono'});
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
 	}
 
 	/**
@@ -29,7 +30,7 @@ class Controller {
 	load(page) {
 		this.page = page;
 		//this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
-		this.canvas = new Canvas(page.width * page.scale, page.height * page.scale, 'pdf');
+		this.canvas = createCanvas(page.width * page.scale, page.height * page.scale, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
 
 		if (process.env.DEBUGGING) {
