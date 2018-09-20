@@ -120,7 +120,7 @@ pagedetector.on('ready', function(n, language) {
 	})
 	.then((data) => { // resume the pageDetector
 		if(!process.env.DEBUGGING) {
-			let timeout = 15000;
+			let timeout = 25000;
 			if(process.env.CONTROLLER == 'instagram') timeout = 45000
 			setTimeout(function(){
 				lcd.print(LCD.MESSAGE.DONE);
