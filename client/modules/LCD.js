@@ -67,9 +67,7 @@ class LCD {
 		this.text = text;
 	}
 
-	println(text, line) {
-		this.clear();
-		
+	println(text, line) {		
 		if(text == this.text) return;
 		this.lcd.println(text, line);
 		this.text = text;
