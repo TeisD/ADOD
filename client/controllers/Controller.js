@@ -258,6 +258,7 @@ class Controller {
 
 		// fill image in dest. rectangle
 		this.ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
+		console.log('<Controller> Done drawing image');
 	}
 
 	drawText(text, x, y, size, width, font, lineheight, stroke) {
