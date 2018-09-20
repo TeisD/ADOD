@@ -95,7 +95,7 @@ class Controller {
 		}
 
 		var img = new Image();
-		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
+		img.dataMode = Image.MODE_MIME; // Both are tracked
 		img.src = fs.readFileSync(src);
 
 		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
@@ -118,7 +118,7 @@ class Controller {
 		}
 
 		var img = new Image();
-		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
+		img.dataMode = Image.MODE_MIME; // Both are tracked
 		img.src = fs.readFileSync(src);
 
 		if(img.width / img.height > width / height) {
