@@ -246,6 +246,7 @@ function instagram(page) {
 						}
 
 						resolve({
+							id: line._id,
 							keyword: line.text,
 							image: filename,
 							caption: caption
