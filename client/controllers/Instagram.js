@@ -16,7 +16,7 @@ class Instagram extends Controller {
 	}
 
 	draw(data) {
-
+		console.log("<Instagram> Images");
 		data = _.shuffle(data);
 
 		this.page.layoutGrid();
@@ -86,6 +86,7 @@ class Instagram extends Controller {
 
 		// first the images, then the captions
 		return Promise.all(queue).then(() => {
+			console.log("<Instagram> Captions")
 			for(let i = 0, j = 0; i < areas.length && j < selection.length; i++, j++) {
 				let a = areas[i];
 				let d = selection[j];
