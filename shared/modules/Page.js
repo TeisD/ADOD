@@ -153,7 +153,8 @@ class Page {
 		let cases = [
 			[10,10],
 			[8,8],
-			[6,6]
+			[6,6],
+			[5,5]
 		];
 
 		for (let c of cases) {

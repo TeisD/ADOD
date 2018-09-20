@@ -160,7 +160,10 @@ class Controller {
 					let callback = (error, response, body) => {
 						if(!error && response.statusCode === 200) {
 							mkdirp(path.dirname(filename), (err) => {
-								if(err) return reject(err);
+								if(err) {
+									console.log('[ERROR] ' + err);
+									return resolve();
+								}
 								fs.writeFile(filename, body, 'binary', (err) => {
 									if(!err) {
 										console.log('<Controller> Image saved');
@@ -171,7 +174,7 @@ class Controller {
 								});
 							});
 						}
-						return resolve();
+						if(error) return resolve();
 					}
 
 					if(typeof hostname === 'undefined') {
@@ -184,7 +187,6 @@ class Controller {
 							encoding: null
 						}, callback);
 					} else {
-						console.log(hostname + img);
 						request.get({
 							url: hostname + img,
 							encoding: 'binary'
@@ -194,8 +196,7 @@ class Controller {
 				} else if (err) {
 					return resolve();
 				} else {
-					console.log('<Controller> Found local copy');
-					console.log('drawing the local one: ' + filename)
+					console.log('<Controller> Found local copy ' + filename);
 					if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
 					else this.drawImage(filename, x, y, width, height);
 					return resolve();
