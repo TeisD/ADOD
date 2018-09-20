@@ -59,13 +59,13 @@ class Amazon extends Controller {
                 }
 
                 // the title
-                this.drawText(line.amazon.title, textX, textY + 3, 7, 200, 'SpaceMono', 7.5);
+                this.drawText(line.amazon.title, textX, textY + 3, 7, 200, 'Space Mono', 7.5);
                 // book icon
                 this.drawText('&', line.bbox.x0 + line.bbox.w - 7, line.bbox.y0 + 7.5, 10, 200, 'Wingdings');
                 // text marker
-                this.drawText('(' + (i+1) + ')', line.bbox.x0 + line.bbox.w + 14, line.bbox.y0 + 2, 5, 200, 'SpaceMono');
+                this.drawText('(' + (i+1) + ')', line.bbox.x0 + line.bbox.w + 14, line.bbox.y0 + 2, 5, 200, 'Space Mono');
                 // book marker
-                this.drawText('(' + (i+1) + ')', block.layout.amazon[i].bbox.x0 - 13, block.layout.amazon[i].bbox.y0 + 3, 5, 200, 'SpaceMono');
+                this.drawText('(' + (i+1) + ')', block.layout.amazon[i].bbox.x0 - 13, block.layout.amazon[i].bbox.y0 + 3, 5, 200, 'Space Mono');
 
                 let bbox = block.layout.amazon[i].bbox;
                 let parts = line.amazon.image_url.split('/');

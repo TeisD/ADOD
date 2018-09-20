@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { createCanvas, registerFont, Image } = require('canvas')
-//const Image = Canvas.Image;
+const Canvas = require('canvas')
+const Image = Canvas.Image;
+const Font = Canvas.Font;
 const he = require('he');
 const dotenv = require('dotenv');
 const request = require('request');
@@ -20,8 +21,12 @@ class Controller {
 		this.page,
 		this.canvas,
 		this.ctx;
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
+		this.fonts = [
+			new Font('Space Mono', path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf')),
+			new Font('Wingdings', path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'))
+		]
+		//registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
+		//registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
 	}
 
 	/**
@@ -30,8 +35,11 @@ class Controller {
 	load(page) {
 		this.page = page;
 		//this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
-		this.canvas = createCanvas(page.width * page.scale, page.height * page.scale, 'pdf');
+		this.canvas = new Canvas(page.width * page.scale, page.height * page.scale, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
+		this.fonts.forEach(font => {
+			this.ctx.addFont(font);
+		});
 
 		if (process.env.DEBUGGING) {
 			var bg = path.join(process.env.DATA_DIR, 'pages-pre', this.page.number + '.png');
@@ -95,7 +103,7 @@ class Controller {
 		}
 
 		var img = new Image();
-		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
+		img.dataMode = Image.MODE_MIME; // Both are tracked
 		img.src = fs.readFileSync(src);
 
 		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
@@ -118,7 +126,7 @@ class Controller {
 		}
 
 		var img = new Image();
-		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
+		img.dataMode = Image.MODE_MIME; // Both are tracked
 		img.src = fs.readFileSync(src);
 
 		if(img.width / img.height > width / height) {
