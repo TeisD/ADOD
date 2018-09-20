@@ -1659,9 +1659,9 @@ tesseract.js-core@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/tesseract.js-core/-/tesseract.js-core-1.0.2.tgz#1ce33a29dc812357b8356a30ededf8b188043b37"
 
-"tesseract.js@git://github.com/naptha/tesseract.js.git#master":
+"tesseract.js@git+https://github.com/naptha/tesseract.js.git#master":
   version "1.0.10"
-  resolved "git://github.com/naptha/tesseract.js.git#2581b662dc91f68cd5dd1c1f6aa5fe64deacbd8c"
+  resolved "git+https://github.com/naptha/tesseract.js.git#2581b662dc91f68cd5dd1c1f6aa5fe64deacbd8c"
   dependencies:
     file-type "^3.8.0"
     is-url "^1.2.2"
