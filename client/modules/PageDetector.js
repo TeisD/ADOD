@@ -54,7 +54,7 @@ class PageDetector extends EventEmitter {
 		this.camera = new Raspistill({
 			noFileSave: true,
 			width: 2000,
-			time: 1/60,
+			time: 1,
 		});
 		this.pagenumber = 0;
 		this.pagelanguage = 0;
