@@ -22,6 +22,8 @@ class Amazon extends Controller {
 
             // select as much lines as the page size allows
             let lines = _.clone(block.lines);
+            if(!lines.length) continue;
+            
             let selection = [];
             let length = block.layout.hasOwnProperty('amazon') ? block.layout.amazon.length : 0;
             for(let i = 0; i < length; i++) {
