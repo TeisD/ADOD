@@ -54,7 +54,7 @@ class PageDetector extends EventEmitter {
 		this.camera = new Raspistill({
 			noFileSave: true,
 			width: 2000,
-			time: 1,
+			time: 1/60,
 		});
 		this.pagenumber = 0;
 		this.pagelanguage = 0;
@@ -149,12 +149,12 @@ class PageDetector extends EventEmitter {
 	 */
 	findPagenumber(im) {
 		im.convertGrayscale();
-		im.save('pre.jpg');
+		if(process.env.DEBUGGING) im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		im.save('mid.jpg');
+		if(process.env.DEBUGGING) im.save('mid.jpg');
 		im = im.adaptiveThreshold(255, 1, 0, 1001, 20);
 		var _im = im.copy();
-		im.save('mid-thresh.jpg');
+		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
 
 		var contours = im.findContours();
 		var id = 0;
@@ -183,7 +183,7 @@ class PageDetector extends EventEmitter {
 
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50)
-		_im.save('post.jpg');
+		if(process.env.DEBUGGING) _im.save('post.jpg');
 
 		let channels = _im.split();
 
