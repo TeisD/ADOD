@@ -86,28 +86,33 @@ class PageDetector extends EventEmitter {
 	capture() {
 		if(!this.running) return;
 
-		//console.log('Capturing image...');
+		console.log('<PD> Capturing image...');
 		this.camera.takePhoto()
 		.then((photo) => {
+			console.log('<PD> Image captured');
 			return new Promise((resolve, reject) => {
 				cv.readImage(photo, (err, im) => {
+					console.log('<PD> Image read by opencv');
 					if (err) return reject(err);
 					if (im.width() < 1 || im.height() < 1) return reject('Captured image has no size');
 					//console.log('[OK] Captured image');
 					if(!this.running) return Promise.reject();
+					console.log('<PD> Page detection START');
 					im = this.findPagenumber(im);
-
+					console.log('<PD> Page detection END');
 					resolve(im);
 				});
 			});
 		})
 		.then((image) => {
+			console.log('<PD> Image recognition START');
 			return this.tesseract.recognize(image, {
 				lang: 'eng',
 				tessedit_char_whitelist: '0123456789'
 			})
 		})
 		.then((n) => {
+			console.log('<PD> Image recognition END');
 			if(!this.running) return;
 
 			n = parseInt(n.text.trim());
