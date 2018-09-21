@@ -160,15 +160,19 @@ class PageDetector extends EventEmitter {
 		im = im.adaptiveThreshold(255, 1, 0, 1001, 20);
 		var _im = im.copy();
 		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
+		console.log('<PD> Countour START');
 
 		var contours = im.findContours();
 		var id = 0;
 		var difference = +Infinity;
+		console.log('<PD> Countour END');
+
 
 		if(!contours.size()) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
+		console.log('<PD> Countour size: ' + countours.size());
 		for (let i = 0; i < contours.size(); i++) {
 			var d = Math.abs(contours.area(i) - AREA);
 			if(d < difference) {
@@ -189,8 +193,6 @@ class PageDetector extends EventEmitter {
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50)
 		if(process.env.DEBUGGING) _im.save('post.jpg');
-
-		let channels = _im.split();
 
 		let pixel = _im.pixelCol(0)[0];
 
