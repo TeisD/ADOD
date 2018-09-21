@@ -190,8 +190,9 @@ class Controller {
 									return resolve();
 								});
 							});
+						} else {
+							return resolve();
 						}
-						if(error) return resolve();
 					}
 
 					if(typeof hostname === 'undefined') {
