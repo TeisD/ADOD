@@ -206,11 +206,11 @@ callsites@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-0.2.0.tgz#afab96262910a7f33c19a5775825c69f34e350ca"
 
-canvas@^1.6.12:
-  version "1.6.12"
-  resolved "https://registry.yarnpkg.com/canvas/-/canvas-1.6.12.tgz#9ab02cdb6b543ae6705f566e33f9407625da901e"
+canvas@1.6.10:
+  version "1.6.10"
+  resolved "http://registry.npmjs.org/canvas/-/canvas-1.6.10.tgz#aa938354642e7d61479ae5a76373b3233d7bbac8"
   dependencies:
-    nan "^2.10.0"
+    nan "^2.4.0"
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -1060,7 +1060,7 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-nan@*, nan@>=2.0.0, nan@^2.0.9, nan@^2.10.0:
+nan@*, nan@>=2.0.0, nan@^2.0.9, nan@^2.4.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.11.0.tgz#574e360e4d954ab16966ec102c0c049fd961a099"
 

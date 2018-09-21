@@ -9,7 +9,7 @@ class Test extends Controller {
 	}
 
 	draw() {
-        this.page.blocks.forEach(block => {
+        /*this.page.blocks.forEach(block => {
             block.lines.forEach(line => {
                 this.ctx.rect(line.bbox.x0, line.bbox.y0, line.bbox.w, line.bbox.h);
                 let textX = line.bbox.x0;
@@ -25,7 +25,7 @@ class Test extends Controller {
                 this.drawText(line._id, textX, textY + 10, 7);
                 this.ctx.stroke();
             })
-        })
+        })*/
     }
 }
 

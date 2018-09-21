@@ -35,7 +35,7 @@ class Controller {
 	load(page) {
 		this.page = page;
 		//this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
-		this.canvas = new Canvas(page.width * page.scale, page.height * page.scale, 'pdf');
+		this.canvas = new Canvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
 		this.fonts.forEach(font => {
 			this.ctx.addFont(font);
@@ -43,11 +43,10 @@ class Controller {
 
 		if (process.env.DEBUGGING) {
 			var bg = path.join(process.env.DATA_DIR, 'pages-pre', this.page.number + '.png');
-			this.drawImage(bg, 0, 0, this.page.width * this.page.scale, this.page.height * this.page.scale);
+			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
 
-		this.ctx.scale(page.scale, page.scale);
-		this.ctx.translate(this.page.offset.x, this.page.offset.y);
+		//this.ctx.translate(this.page.offset.x, this.page.offset.y);
 	}
 
 	/**
@@ -78,12 +77,26 @@ class Controller {
 	 * Save the image
 	 * If no filename is defined it will be saved as author-pagenumber.pdf in the current working dir
 	 */
-	saveImage(filename) {
+	savePNG(filename) {
 		if (typeof filename === 'undefined') {
-			filename = this.page.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page.number + '.pdf';
+			filename = this.page.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page.number + '.png';
 		}
 		var img = this.getImage();
 		fs.writeFileSync(filename, new Buffer(img, 'base64'), (err) => {
+			if (err) console.error('[ERROR] ' + err);
+		});
+	}
+
+	/**
+	 * Save the image
+	 * If no filename is defined it will be saved as author-pagenumber.pdf in the current working dir
+	 */
+	savePDF(filename) {
+		if (typeof filename === 'undefined') {
+			filename = this.page.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page.number + '.pdf';
+		}
+		var img = this.getBuffer();
+		fs.writeFileSync(filename, img, (err) => {
 			if (err) console.error('[ERROR] ' + err);
 		});
 	}
@@ -106,9 +119,7 @@ class Controller {
 		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
 		img.src = fs.readFileSync(src);
 
-		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
-		this.drawImageProp(img, x * this.page.scale, y * this.page.scale, width * this.page.scale, height * this.page.scale);
-		this.ctx.scale(this.page.scale, this.page.scale);
+		this.drawImageProp(img, x, y, width, height);
 	}
 
 	/**
@@ -139,9 +150,7 @@ class Controller {
 			x += (cw - width) / 2;
 		}
 
-		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
-		this.drawImageProp(img, x * this.page.scale, y * this.page.scale, width * this.page.scale, height * this.page.scale);
-		this.ctx.scale(this.page.scale, this.page.scale);
+		this.drawImageProp(img, x, y, width, height);
 
 	}
 

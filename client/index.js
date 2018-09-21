@@ -15,6 +15,7 @@ const Salone = require('./controllers/Salone');
 const Twitter = require('./controllers/Twitter');
 const Fuorisalone = require('./controllers/Fuorisalone');
 const Amazon = require('./controllers/Amazon');
+const Test = require('./controllers/Test');
 
 dotenv.config();
 
@@ -41,7 +42,7 @@ switch(process.env.CONTROLLER){
 		controller = new Amazon();
 		break;
 	default:
-		controller = new Controller();
+		controller = new Test();
 		break;
 }
 
@@ -182,7 +183,7 @@ function getData(pagenumber) {
 				data = {page: pagenumber};
 				break;
 			default:
-				return reject('Unknown controller')
+				data = {page: pagenumber};
 				break;
 		}
 

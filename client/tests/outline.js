@@ -14,5 +14,5 @@ var pages = Page.loadFolder(path.join(process.env.DATA_DIR, 'pages'));
 pages.forEach(page => {
     controller.load(page);
     controller.draw();
-    controller.saveImage();
+    controller.savePDF();
 });
