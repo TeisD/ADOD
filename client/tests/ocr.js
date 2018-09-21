@@ -22,11 +22,11 @@ cv.readImage(PHOTO, (err, im) => {
     if (im.width() < 1 || im.height() < 1) throw 'Image has no size';
     let image = pageDetector.findPagenumber(im);
 
-    /*let page =  tesseract.recognize(image, {
+    let page =  tesseract.recognize(image, {
         lang: 'eng',
         tessedit_char_whitelist: '0123456789'
-    })*/
+    })
 
-    //console.log(page);
+    console.log(page);
 
 });

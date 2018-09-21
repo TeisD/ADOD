@@ -156,11 +156,11 @@ class PageDetector extends EventEmitter {
 		im.convertGrayscale();
 		if(process.env.DEBUGGING) im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
+		var _im = im.copy();
 		if(process.env.DEBUGGING) im.save('mid.jpg');
 		console.log('<PD> Threshold START');
-		im = im.adaptiveThreshold(255, 1, 0, 1001, 20);
+		im = im.adaptiveThreshold(255, 0, 0, 11, 10);
 		console.log('<PD> Threshold END');
-		var _im = im.copy();
 		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
 		console.log('<PD> Contour START');
 
@@ -193,25 +193,27 @@ class PageDetector extends EventEmitter {
 		}
 
 		var bbox = contours.boundingRect(id);
-		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50)
-		if(process.env.DEBUGGING) _im.save('post.jpg');
+		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50);
 
 		let pixel = _im.pixelCol(0)[0];
-
 		let prevlanguage = this.pagelanguage;
 
-		if(pixel == 255) {
-			this.pagelanguage = 1;
-			if(prevlanguage != this.pagelanguage) {
-				this.pagenumber = 0;
-			}
-		} else {
-			// reset the page number in case the number is the same but the language is different
+		if(pixel < 100) {
 			if(prevlanguage != this.pagelanguage) {
 				this.pagenumber = 0;
 			}
 			this.pagelanguage = 0;
+			_im.bitwiseNot(_im);
+		} else {
+			this.pagelanguage = 1;
+			if(prevlanguage != this.pagelanguage) {
+				this.pagenumber = 0;
+			}
 		}
+
+		_im = _im.threshold(120, 255);
+
+		if(process.env.DEBUGGING) _im.save('post.jpg');
 
 		return _im.toBuffer();
 	}
