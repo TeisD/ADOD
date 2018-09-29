@@ -86,20 +86,20 @@ class PageDetector extends EventEmitter {
 	capture() {
 		if(!this.running) return;
 
-		console.log('<PD> Capturing image...');
+		//console.log('<PD> Capturing image...');
 		this.camera.takePhoto()
 		.then((photo) => {
 			console.log('<PD> Image captured');
 			return new Promise((resolve, reject) => {
 				cv.readImage(photo, (err, im) => {
-					console.log('<PD> Image read by opencv');
+					//console.log('<PD> Image read by opencv');
 					if (err) return reject(err);
 					if (im.width() < 1 || im.height() < 1) return reject('Captured image has no size');
 					//console.log('[OK] Captured image');
 					if(!this.running) return Promise.reject();
-					console.log('<PD> Page detection START');
+					//console.log('<PD> Page detection START');
 					im = this.findPagenumber(im);
-					console.log('<PD> Page detection END');
+					//console.log('<PD> Page detection END');
 					resolve(im);
 				});
 			});
@@ -112,7 +112,7 @@ class PageDetector extends EventEmitter {
 			})
 		})
 		.then((n) => {
-			console.log('<PD> Image recognition END');
+			//console.log('<PD> Image recognition END');
 			if(!this.running) return;
 
 			n = parseInt(n.text.trim());
@@ -154,27 +154,27 @@ class PageDetector extends EventEmitter {
 	 */
 	findPagenumber(im) {
 		im.convertGrayscale();
-		if(process.env.DEBUGGING) im.save('pre.jpg');
+		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		var _im = im.copy();
 		if(process.env.DEBUGGING) im.save('mid.jpg');
-		console.log('<PD> Threshold START');
+		//console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 11, 10);
-		console.log('<PD> Threshold END');
-		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
-		console.log('<PD> Contour START');
+		//console.log('<PD> Threshold END');
+		im.save('thresh.jpg');
+		//console.log('<PD> Contour START');
 
 		var contours = im.findContours();
 		var id = 0;
 		var difference = +Infinity;
-		console.log('<PD> Contour END');
+		//console.log('<PD> Contour END');
 
 
 		if(!contours.size()) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
-		console.log('<PD> Contour size: ' + contours.size());
+		//console.log('<PD> Contour size: ' + contours.size());
 		for (let i = 0; i < contours.size(); i++) {
 			var d = Math.abs(contours.area(i) - AREA);
 			if(d < difference) {
@@ -213,7 +213,7 @@ class PageDetector extends EventEmitter {
 
 		_im = _im.threshold(120, 255);
 
-		if(process.env.DEBUGGING) _im.save('post.jpg');
+		_im.save('post.jpg');
 
 		return _im.toBuffer();
 	}
