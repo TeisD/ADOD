@@ -161,7 +161,7 @@ class PageDetector extends EventEmitter {
 		//console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 11, 10);
 		//console.log('<PD> Threshold END');
-		im.save('thresh.jpg');
+		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
 		//console.log('<PD> Contour START');
 
 		var contours = im.findContours();
@@ -186,6 +186,8 @@ class PageDetector extends EventEmitter {
 		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
+
+		im.save('thresh.jpg');
 
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
