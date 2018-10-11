@@ -159,7 +159,7 @@ class PageDetector extends EventEmitter {
 		var _im = im.copy();
 		if(process.env.DEBUGGING) im.save('mid.jpg');
 		//console.log('<PD> Threshold START');
-		im = im.adaptiveThreshold(255, 0, 0, 21, 10);
+		im = im.adaptiveThreshold(255, 0, 0, 15, 10);
 		//console.log('<PD> Threshold END');
 		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
 		//console.log('<PD> Contour START');
