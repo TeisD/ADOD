@@ -4,6 +4,7 @@
  * 
  * Requires modified version of the amzsear python package
  * Append 'url=search-alias%%3Dstripbooks' to SEARCH_URL in amzSear/amzsear/core/consts.py
+ * Change user agent to anything other than default, eg 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'
  */
 
 const Page = require('../../shared/modules/Page');
