@@ -35,7 +35,10 @@ class Instagram extends Controller {
 		*/
 
 		// first make a random selection, but just the right size
-		let selection = [];
+		let selection = {
+			left: [],
+			right: []
+		};
 
 		for(let i = 0, j = 0; i < areas.length && j < data.length; i++, j++) {
 			let a = areas[i];
@@ -45,30 +48,32 @@ class Instagram extends Controller {
 				i--;
 				continue;
 			};
-			if(this.getSide(d) == "right" && a.x < this.page.width / 2) {
+			if(this.getSide(d) == "right" && a.x < this.page.width / 2 - 100) {
 				i--;
 				continue;
 			};
 
-			selection.push(d);
+			if(this.getSide(d) == "right") selection.right.push(d);
+			if(this.getSide(d) == "left") selection.left.push(d);
 		}
 
 		// sort it alphabetically
-		selection = selection.sort((a,b) => b.keyword.toLowerCase().localeCompare(a.keyword.toLowerCase()));
+		selection.left.sort((a,b) => b.id - a.id);
+		selection.right.sort((a,b) => b.id - a.id);
+		areas.sort((a, b) => b.y - a.y);
 
 		// then add
-		for(let i = 0, j = 0; i < areas.length && j < selection.length; i++, j++) {
+		for(let i = 0, left = 0, right = 0; i < areas.length && left < selection.left.length && right < selection.right.length; i++) {
 			let a = areas[i];
-			let d = selection[j];
-
-			if(this.getSide(d) == "left" && a.x > this.page.width / 2) {
-				i--;
-				continue;
-			};
-			if(this.getSide(d) == "right" && a.x < this.page.width / 2) {
-				i--;
-				continue;
-			};
+			let d = []
+			
+			if(a.x > this.page.width / 2) {
+				d = selection.right[right];
+				right++
+			} else {
+				d = selection.left[left];
+				left++
+			}
 
 			queue.push(
 				this.drawImageFromUrl(
@@ -87,45 +92,33 @@ class Instagram extends Controller {
 		// first the images, then the captions
 		return Promise.all(queue).then(() => {
 			console.log("<Instagram> Captions")
-			for(let i = 0, j = 0; i < areas.length && j < selection.length; i++, j++) {
+			for(let i = 0, left = 0, right = 0; i < areas.length && left < selection.left.length && right < selection.right.length; i++) {
 				let a = areas[i];
-				let d = selection[j];
-	
-				if(this.getSide(d) == "left" && a.x > this.page.width / 2) {
-					i--;
-					continue;
-				};
-				if(this.getSide(d) == "right" && a.x < this.page.width / 2) {
-					i--;
-					continue;
-				};
+				let d = []
+				
+				if(a.x > this.page.width / 2) {
+					d = selection.right[right];
+					right++
+				} else {
+					d = selection.left[left];
+					left++
+				}
 
 				// draw the line
 				let keyword = this.getKeyword(d);
 				if(typeof keyword !== 'undefined') {
 					this.ctx.fillStyle = 'rgba(0, 0, 0, .2)';
 					this.ctx.fillRect(keyword.bbox.x0 - 2, keyword.bbox.y0 - 2, keyword.bbox.w + 4, keyword.bbox.h + 2);
-					
-					/*
-					this.ctx.lineWidth = 0.5;
-					this.ctx.setLineDash([5, 5]);
-					this.ctx.moveTo(keyword.bbox.x0 + keyword.bbox.w + 10, keyword.bbox.y0 + keyword.bbox.h/2);
-					this.ctx.lineTo(a.x - 10, a.y + a.height / 2);
-					this.ctx.stroke();
-					*/
-
-					/*
-					this.drawArrow(
-						keyword.bbox.x0 + keyword.bbox.w + 10,
-						keyword.bbox.y0 + keyword.bbox.h/2,
-						a.x - 20,
-						a.y + a.height / 2
-					)
-					*/
 
 					this.ctx.fillStyle = 'black';
 					this.ctx.lineWidth = 1;
 				}
+
+				/*
+				this.ctx.moveTo(keyword.bbox.x0, keyword.bbox.y0)
+				this.ctx.lineTo(a.x, a.y);
+				this.ctx.stroke();
+				*/
 
 				// caption
 				let caption = d.caption;

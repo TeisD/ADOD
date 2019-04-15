@@ -86,28 +86,33 @@ class PageDetector extends EventEmitter {
 	capture() {
 		if(!this.running) return;
 
-		//console.log('Capturing image...');
+		//console.log('<PD> Capturing image...');
 		this.camera.takePhoto()
 		.then((photo) => {
+			console.log('<PD> Image captured');
 			return new Promise((resolve, reject) => {
 				cv.readImage(photo, (err, im) => {
+					//console.log('<PD> Image read by opencv');
 					if (err) return reject(err);
 					if (im.width() < 1 || im.height() < 1) return reject('Captured image has no size');
 					//console.log('[OK] Captured image');
 					if(!this.running) return Promise.reject();
+					//console.log('<PD> Page detection START');
 					im = this.findPagenumber(im);
-
+					//console.log('<PD> Page detection END');
 					resolve(im);
 				});
 			});
 		})
 		.then((image) => {
+			console.log('<PD> Image recognition START');
 			return this.tesseract.recognize(image, {
 				lang: 'eng',
 				tessedit_char_whitelist: '0123456789'
 			})
 		})
 		.then((n) => {
+			//console.log('<PD> Image recognition END');
 			if(!this.running) return;
 
 			n = parseInt(n.text.trim());
@@ -151,19 +156,25 @@ class PageDetector extends EventEmitter {
 		im.convertGrayscale();
 		im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		im.save('mid.jpg');
-		im = im.adaptiveThreshold(255, 1, 0, 1001, 20);
 		var _im = im.copy();
-		im.save('mid-thresh.jpg');
+		if(process.env.DEBUGGING) im.save('mid.jpg');
+		//console.log('<PD> Threshold START');
+		im = im.adaptiveThreshold(255, 0, 0, 21, 10);
+		//console.log('<PD> Threshold END');
+		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
+		//console.log('<PD> Contour START');
 
 		var contours = im.findContours();
 		var id = 0;
 		var difference = +Infinity;
+		//console.log('<PD> Contour END');
+
 
 		if(!contours.size()) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
+		//console.log('<PD> Contour size: ' + contours.size());
 		for (let i = 0; i < contours.size(); i++) {
 			var d = Math.abs(contours.area(i) - AREA);
 			if(d < difference) {
@@ -176,33 +187,35 @@ class PageDetector extends EventEmitter {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
+		im.save('thresh.jpg');
+
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
 			this.emit('change', STATUS.NEW_PAGE);
 		}
 
 		var bbox = contours.boundingRect(id);
-		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50)
-		_im.save('post.jpg');
-
-		let channels = _im.split();
+		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50);
 
 		let pixel = _im.pixelCol(0)[0];
-
 		let prevlanguage = this.pagelanguage;
 
-		if(pixel == 255) {
-			this.pagelanguage = 1;
-			if(prevlanguage != this.pagelanguage) {
-				this.pagenumber = 0;
-			}
-		} else {
-			// reset the page number in case the number is the same but the language is different
+		if(pixel < 100) {
 			if(prevlanguage != this.pagelanguage) {
 				this.pagenumber = 0;
 			}
 			this.pagelanguage = 0;
+			_im.bitwiseNot(_im);
+		} else {
+			this.pagelanguage = 1;
+			if(prevlanguage != this.pagelanguage) {
+				this.pagenumber = 0;
+			}
 		}
+
+		_im = _im.threshold(120, 255);
+
+		_im.save('post.jpg');
 
 		return _im.toBuffer();
 	}

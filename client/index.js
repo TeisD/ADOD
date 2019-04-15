@@ -15,6 +15,7 @@ const Salone = require('./controllers/Salone');
 const Twitter = require('./controllers/Twitter');
 const Fuorisalone = require('./controllers/Fuorisalone');
 const Amazon = require('./controllers/Amazon');
+const Test = require('./controllers/Test');
 
 dotenv.config();
 
@@ -41,7 +42,7 @@ switch(process.env.CONTROLLER){
 		controller = new Amazon();
 		break;
 	default:
-		controller = new Controller();
+		controller = new Test();
 		break;
 }
 
@@ -120,7 +121,7 @@ pagedetector.on('ready', function(n, language) {
 	})
 	.then((data) => { // resume the pageDetector
 		if(!process.env.DEBUGGING) {
-			let timeout = 15000;
+			let timeout = 20000;
 			if(process.env.CONTROLLER == 'instagram') timeout = 45000
 			setTimeout(function(){
 				lcd.print(LCD.MESSAGE.DONE);
@@ -182,7 +183,7 @@ function getData(pagenumber) {
 				data = {page: pagenumber};
 				break;
 			default:
-				return reject('Unknown controller')
+				data = {page: pagenumber};
 				break;
 		}
 

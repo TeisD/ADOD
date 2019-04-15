@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "git push",
     "update": "git pull",
-    "connect:server": "ssh -i \"shared/config/keys/ec2-20180302.pem\" ubuntu@ec2-52-59-158-179.eu-central-1.compute.amazonaws.com",
+    "connect:server": "ssh -i \"shared/config/keys/ec2-20180302.pem\" ubuntu@ec2-52-29-43-107.eu-central-1.compute.amazonaws.com",
     "connect:gpu": "ssh -i \"shared/config/keys/ec2-us.pem\" ubuntu@ec2-34-227-109-120.compute-1.amazonaws.com",
     "connect:p1": "ssh -t teis@teis.me ssh pi@localhost -p 60122",
     "connect:p2": "ssh -t teis@teis.me ssh pi@localhost -p 60222",

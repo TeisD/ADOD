@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { createCanvas, registerFont, Image } = require('canvas')
-//const Image = Canvas.Image;
+const Canvas = require('canvas')
+const Image = Canvas.Image;
+const Font = Canvas.Font;
 const he = require('he');
 const dotenv = require('dotenv');
 const request = require('request');
@@ -20,8 +21,12 @@ class Controller {
 		this.page,
 		this.canvas,
 		this.ctx;
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
+		this.fonts = [
+			new Font('Space Mono', path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf')),
+			new Font('Wingdings', path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'))
+		]
+		//registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
+		//registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
 	}
 
 	/**
@@ -30,16 +35,18 @@ class Controller {
 	load(page) {
 		this.page = page;
 		//this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
-		this.canvas = createCanvas(page.width * page.scale, page.height * page.scale, 'pdf');
+		this.canvas = new Canvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
+		this.fonts.forEach(font => {
+			this.ctx.addFont(font);
+		});
 
 		if (process.env.DEBUGGING) {
 			var bg = path.join(process.env.DATA_DIR, 'pages-pre', this.page.number + '.png');
-			this.drawImage(bg, 0, 0, this.page.width * this.page.scale, this.page.height * this.page.scale);
+			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
 
-		this.ctx.scale(page.scale, page.scale);
-		this.ctx.translate(this.page.offset.x, this.page.offset.y);
+		//this.ctx.translate(this.page.offset.x, this.page.offset.y);
 	}
 
 	/**
@@ -70,12 +77,26 @@ class Controller {
 	 * Save the image
 	 * If no filename is defined it will be saved as author-pagenumber.pdf in the current working dir
 	 */
-	saveImage(filename) {
+	savePNG(filename) {
 		if (typeof filename === 'undefined') {
-			filename = this.page.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page.number + '.pdf';
+			filename = this.page.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page.number + '.png';
 		}
 		var img = this.getImage();
 		fs.writeFileSync(filename, new Buffer(img, 'base64'), (err) => {
+			if (err) console.error('[ERROR] ' + err);
+		});
+	}
+
+	/**
+	 * Save the image
+	 * If no filename is defined it will be saved as author-pagenumber.pdf in the current working dir
+	 */
+	savePDF(filename) {
+		if (typeof filename === 'undefined') {
+			filename = this.page.author.replace(/[^a-z0-9]/gi, '') + "-" + this.page.number + '.pdf';
+		}
+		var img = this.getBuffer();
+		fs.writeFileSync(filename, img, (err) => {
 			if (err) console.error('[ERROR] ' + err);
 		});
 	}
@@ -98,9 +119,7 @@ class Controller {
 		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
 		img.src = fs.readFileSync(src);
 
-		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
-		this.drawImageProp(img, x * this.page.scale, y * this.page.scale, width * this.page.scale, height * this.page.scale);
-		this.ctx.scale(this.page.scale, this.page.scale);
+		this.drawImageProp(img, x, y, width, height);
 	}
 
 	/**
@@ -131,9 +150,7 @@ class Controller {
 			x += (cw - width) / 2;
 		}
 
-		this.ctx.scale(1/this.page.scale, 1/this.page.scale);
-		this.drawImageProp(img, x * this.page.scale, y * this.page.scale, width * this.page.scale, height * this.page.scale);
-		this.ctx.scale(this.page.scale, this.page.scale);
+		this.drawImageProp(img, x, y, width, height);
 
 	}
 
@@ -160,7 +177,10 @@ class Controller {
 					let callback = (error, response, body) => {
 						if(!error && response.statusCode === 200) {
 							mkdirp(path.dirname(filename), (err) => {
-								if(err) return reject(err);
+								if(err) {
+									console.log('[ERROR] ' + err);
+									return resolve();
+								}
 								fs.writeFile(filename, body, 'binary', (err) => {
 									if(!err) {
 										console.log('<Controller> Image saved');
@@ -170,8 +190,9 @@ class Controller {
 									return resolve();
 								});
 							});
+						} else {
+							return resolve();
 						}
-						return resolve();
 					}
 
 					if(typeof hostname === 'undefined') {
@@ -184,7 +205,6 @@ class Controller {
 							encoding: null
 						}, callback);
 					} else {
-						console.log(hostname + img);
 						request.get({
 							url: hostname + img,
 							encoding: 'binary'
@@ -194,8 +214,7 @@ class Controller {
 				} else if (err) {
 					return resolve();
 				} else {
-					console.log('<Controller> Found local copy');
-					console.log('drawing the local one: ' + filename)
+					console.log('<Controller> Found local copy ' + filename);
 					if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
 					else this.drawImage(filename, x, y, width, height);
 					return resolve();
