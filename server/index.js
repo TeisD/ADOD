@@ -162,6 +162,7 @@ function start() {
 			});
 		} else {
 			response.statusCode = 404;
+			response.end('A ditto, online device.');
 			console.log('404');
 			response.end();
 		}
