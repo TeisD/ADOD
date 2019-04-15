@@ -74,6 +74,10 @@ function start() {
 				let data,
 					r;
 
+				if(typeof body.key === 'undefined') {
+					body.key = '';
+				}
+
 				if (body.key.trim() !== KEY) {
 					r = Promise.reject('401')
 				} else {
