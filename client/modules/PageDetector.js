@@ -154,14 +154,14 @@ class PageDetector extends EventEmitter {
 	 */
 	findPagenumber(im) {
 		im.convertGrayscale();
-		if(process.env.STAGING) im.save('pre.jpg');
+		if(process.env.CALIBRATION_MODE) im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		var _im = im.copy();
-		if(process.env.DEBUGGING) im.save('mid.jpg');
+		if(process.env.CALIBRATION_MODE) im.save('mid.jpg');
 		//console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 21, 10);
 		//console.log('<PD> Threshold END');
-		if(process.env.DEBUGGING) im.save('mid-thresh.jpg');
+		if(process.env.CALIBRATION_MODE) im.save('mid-thresh.jpg');
 		//console.log('<PD> Contour START');
 
 		var contours = im.findContours();
@@ -187,7 +187,7 @@ class PageDetector extends EventEmitter {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
-		if(process.env.STAGING) im.save('thresh.jpg');
+		if(process.env.CALIBRATION_MODE) im.save('thresh.jpg');
 
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
@@ -215,7 +215,7 @@ class PageDetector extends EventEmitter {
 
 		_im = _im.threshold(120, 255);
 
-		if(process.env.STAGING) _im.save('post.jpg');
+		if(process.env.CALIBRATION_MODE) _im.save('post.jpg');
 
 		return _im.toBuffer();
 	}
