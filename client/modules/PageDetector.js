@@ -154,7 +154,7 @@ class PageDetector extends EventEmitter {
 	 */
 	findPagenumber(im) {
 		im.convertGrayscale();
-		im.save('pre.jpg');
+		if(process.env.STAGING) im.save('pre.jpg');
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		var _im = im.copy();
 		if(process.env.DEBUGGING) im.save('mid.jpg');
@@ -187,7 +187,7 @@ class PageDetector extends EventEmitter {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
-		im.save('thresh.jpg');
+		if(process.env.STAGING) im.save('thresh.jpg');
 
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
@@ -215,7 +215,7 @@ class PageDetector extends EventEmitter {
 
 		_im = _im.threshold(120, 255);
 
-		_im.save('post.jpg');
+		if(process.env.STAGING) _im.save('post.jpg');
 
 		return _im.toBuffer();
 	}
