@@ -206,6 +206,7 @@ function getData(pagenumber) {
 						}
 						retry++;
 						console.log('<Index> Server error, retrying');
+						console.log(err);
 						return resolve(getData(pagenumber));
 
 					} else {
