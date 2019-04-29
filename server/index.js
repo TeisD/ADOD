@@ -61,7 +61,7 @@ function start() {
 			console.error('[ERROR] ' + err);
 		});
 
-		console.log('Client connected');
+		console.log(new Date().toISOString() + ' Client connected');
 
 		if (request.method === 'POST') {
 			let body = '';
