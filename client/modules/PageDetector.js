@@ -153,15 +153,16 @@ class PageDetector extends EventEmitter {
 	 * @return The cropped image
 	 */
 	findPagenumber(im) {
+		let timestamp = Math.floor(new Date() / 1000);
 		im.convertGrayscale();
-		if(process.env.CALIBRATION_MODE) im.save('pre.jpg');
+		if(process.env.CALIBRATION_MODE) im.save(`${process.env.CONTROLLER}-${timestamp}-1-in.jpg`);
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
 		var _im = im.copy();
-		if(process.env.CALIBRATION_MODE) im.save('mid.jpg');
+		if(process.env.CALIBRATION_MODE) im.save(`${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`);
 		//console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 21, 10);
 		//console.log('<PD> Threshold END');
-		if(process.env.CALIBRATION_MODE) im.save('mid-thresh.jpg');
+		if(process.env.CALIBRATION_MODE) im.save(`${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`);
 		//console.log('<PD> Contour START');
 
 		var contours = im.findContours();
@@ -186,8 +187,6 @@ class PageDetector extends EventEmitter {
 		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
-
-		if(process.env.CALIBRATION_MODE) im.save('thresh.jpg');
 
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
@@ -215,7 +214,7 @@ class PageDetector extends EventEmitter {
 
 		_im = _im.threshold(120, 255);
 
-		if(process.env.CALIBRATION_MODE) _im.save('post.jpg');
+		if(process.env.CALIBRATION_MODE) _im.save(`${process.env.CONTROLLER}-${timestamp}-4-out.jpg`);
 
 		return _im.toBuffer();
 	}
