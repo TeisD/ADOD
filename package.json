@@ -14,7 +14,12 @@
     "connect:p3": "ssh -t teis@teis.me ssh pi@localhost -p 60322",
     "connect:p4": "ssh -t teis@teis.me ssh pi@localhost -p 60422",
     "connect:p5": "ssh -t teis@teis.me ssh pi@localhost -p 60522",
-    "connect:cups": "sh shared/config/scripts/cups.sh"
+    "connect:cups": "sh shared/config/scripts/cups.sh",
+    "open:p1": "sudo ssh -L 60122:localhost:60122 teis@teis.me -N",
+    "open:p2": "sudo ssh -L 60222:localhost:60222 teis@teis.me -N",
+    "open:p3": "sudo ssh -L 60322:localhost:60322 teis@teis.me -N",
+    "open:p4": "sudo ssh -L 60422:localhost:60422 teis@teis.me -N",
+    "open:p5": "sudo ssh -L 60522:localhost:60522 teis@teis.me -N"
   },
   "author": "Teis S.A. De Greve",
   "license": "ISC",
