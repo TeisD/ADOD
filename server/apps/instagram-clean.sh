@@ -18,7 +18,7 @@ for d in */; do
 
     # calculate number of files to remove
     l=$(( ${#array[@]} - $SIZE ))
-    echo "$d contains $l posts"
+    echo "Found ${#array[@]} posts in $d"
     l=$(( $l > 0 ? $l : 0 ))
     echo "-> removing $l"
 
