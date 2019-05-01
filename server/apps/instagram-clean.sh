@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR=$1
-SIZE=500
+SIZE=301
 
 cd "$DIR"
 
@@ -18,7 +18,7 @@ for d in */; do
 
     # calculate number of files to remove
     l=$(( ${#array[@]} - $SIZE ))
-    l=$(( l > 0 ? l : 0 ))
+    l=$(( $l > 0 ? $l : 0 ))
     
     echo "Removing $l files from $d"
 
