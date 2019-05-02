@@ -8,7 +8,7 @@ cd "$DIR"
 for d in */; do
     array=()
     
-    find "$DIR/$d" -type f -name *.txt -print0 | sort -z >tmpfile
+    find "$DIR/$d" -type f -name "*.txt" -print0 | sort -z >tmpfile
     while IFS=  read -r -d $'\0'; do
         filename=$(basename -- "$REPLY")
         filename="${filename%.*}"
