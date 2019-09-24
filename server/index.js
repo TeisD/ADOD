@@ -185,6 +185,75 @@ function instagram(page) {
 
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
+	var queries = []
+
+	p.keywords.instagram.forEach((ig) => {
+		queries.push(new Promise((resolve, reject) => {
+			let query = ig.keywords.map((k) => {
+				return `'` + k.replace(/\s/g, '.*') + `'`;
+			}).join(' ');
+
+			let count = (ig.hasOwnProperty('all') && ig.all) ? 30 : 1;
+
+			exec(`bash '${INSTAGRAM_SEARCH}' '${INSTAGRAM_SEARCH_PATH}' ${count} ${query}`, (err, stdout, stderr) => {
+				let res = {
+					keywords: ig.keywords,
+					images: stdout.split('\n').filter((i) => {
+						return (i && i.length > 1);
+					}).map((i) => {
+						i = i.split('/');
+						i = i.slice(i.length - 2).join('/');
+						i = i.substr(0, i.lastIndexOf('_UTC') + 4) + '.jpg';
+						return i;
+					}),
+					captions: ig.captions
+				}
+				if (ig.hasOwnProperty('always') && ig.always) res.always = true;
+				resolve(res);
+			})
+		}));
+	});
+
+	return Promise.all(queries).then((data) => {
+		// remove the empty results
+		let response = data.filter((keyword) => {
+			return (keyword.images.length > 0 || keyword.hasOwnProperty('always'));
+		});
+
+		// sort the "all" results internally
+		response.forEach((keyword) => {
+			if (keyword.hasOwnProperty('all') && keyword.all) {
+				keyword.images.sort((a, b) => sort);
+			}
+		});
+
+		// sort the results (put the "always" result on top)
+		response.sort((a, b) => {
+			if (a.hasOwnProperty('always') && a.always) return -1;
+			if (b.hasOwnProperty('always') && b.always) return 1;
+			return sort(a.images[0], b.images[0]);
+		});
+
+		return Promise.resolve(response);
+	});
+
+	/**
+	 * Sort filename by date
+	 */
+	function sort(a, b) {
+		a = a.substring(a.lastIndexOf('/') + 1, a.lastIndexOf('_UTC'));
+		b = b.substring(b.lastIndexOf('/') + 1, b.lastIndexOf('_UTC'));
+		a = moment(a, 'YYYY-MM-DD_HH-mm-ss');
+		b = moment(b, 'YYYY-MM-DD_HH-mm-ss');
+		return b - a;
+	}
+}
+
+function instagramSimple(page) {
+	var p = Page.find(pages, page);
+
+	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
+
 	let queue = []
 
 	p.blocks.forEach(block => {
