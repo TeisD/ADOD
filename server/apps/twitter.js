@@ -1,8 +1,11 @@
 const mysql = require('mysql');
 const Twit = require('twit');
 const moment = require('moment');
+const dotenv = require('dotenv');
 
-const DB = 'ADOD';
+dotenv.config();
+
+const DB = process.env.DB;
 const TABLE = 'twitter';
 const AUTH = require('../../shared/config/keys/mysql.json');
 const CLIENTS = require('../../shared/config/keys/twitter-clients.json');
