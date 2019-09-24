@@ -128,7 +128,7 @@ function run() {
 
     stream.on('tweet', function (tweet) {
       console.log(+new Date);
-      db.query('INSERT INTO '+TABLE+'(id, parent, text, user, user_avatar, created_at, location, type) VALUES (?, ?, ?, ?, ?, ?)', [
+      db.query('INSERT INTO '+TABLE+'(id, parent, text, user, user_avatar, created_at, location, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
         tweet.id,
         (typeof tweet.retweeted_status !== 'undefined') ? tweet.retweeted_status.id : null,
         parseText(tweet),
