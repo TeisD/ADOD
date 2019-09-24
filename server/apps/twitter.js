@@ -138,7 +138,7 @@ function run() {
         parseLocation(tweet),
         query.type,
       ], function(err, results) {
-        if (err) console.error('[ERROR] ' + e);
+        if (err) console.error('[ERROR] ' + err);
       });
     })
   });
