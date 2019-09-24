@@ -20,11 +20,11 @@ const QUERIES = [
     },
     "track": [
       'unlearning',
-      '"design school"',
+      'design school',
       'design education',
       'decolonizing',
       'conviviality',
-      '"safe spaces"',
+      'safe spaces',
       'lifelong learning',
       'alternative pedagogies'
     ]
