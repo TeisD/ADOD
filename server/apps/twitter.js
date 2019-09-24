@@ -2,7 +2,7 @@ const mysql = require('mysql');
 const Twit = require('twit');
 const moment = require('moment');
 
-const DB = 'pdb-2019';
+const DB = 'ADOD';
 const TABLE = 'twitter';
 const AUTH = require('../../shared/config/keys/mysql.json');
 const CLIENTS = require('../../shared/config/keys/twitter-clients.json');
