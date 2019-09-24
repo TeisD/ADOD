@@ -1,3 +1,8 @@
+/*
+ * About port mapping
+ * https://stackoverflow.com/questions/16573668/best-practices-when-running-node-js-with-port-80-ubuntu-linode
+ */
+
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
@@ -11,10 +16,13 @@ const {
 	exec
 } = require('child_process');
 const mysql = require('mysql');
+const dotenv = require('dotenv');
 
-const PORT = 3000;
+dotenv.config();
+
+const PORT = process.env.PORT;
 const KEY = fs.readFileSync(path.join(__dirname, '../shared/config/keys/api-key'), 'utf8').trim();
-const DATA_DIR = path.join(__dirname, '../../mdw-2018-data/');
+const DATA_DIR = process.env.DATA_DIR;
 
 const INSTAGRAM_SEARCH = path.join(__dirname, 'apps/instagram-search.sh');
 const INSTAGRAM_SEARCH_PATH = path.join(DATA_DIR, 'instagram');
@@ -41,7 +49,7 @@ console.log('Initializing...');
 start();
 
 function start() {
-	console.log('[OK] Server ready');
+	console.log('[OK] Server ready. Listening on port ' + PORT);
 	const server = http.createServer((request, response) => {
 		request.on('error', (err) => {
 			console.error('[ERROR] ' + err);
@@ -53,7 +61,7 @@ function start() {
 			console.error('[ERROR] ' + err);
 		});
 
-		console.log('Client connected');
+		console.log(new Date().toISOString() + ' Client connected');
 
 		if (request.method === 'POST') {
 			let body = '';
@@ -65,6 +73,10 @@ function start() {
 
 				let data,
 					r;
+
+				if(typeof body.key === 'undefined') {
+					body.key = '';
+				}
 
 				if (body.key.trim() !== KEY) {
 					r = Promise.reject('401')
@@ -115,6 +127,14 @@ function start() {
 								r = Promise.reject(e);
 							}
 							break;
+						case 'amazon':
+							console.log('-> /amazon');
+							try {
+								r = amazon(body.page);
+							} catch (e) {
+								r = Promise.reject(e);
+							}
+							break;
 						default:
 							r = Promise.reject('404');
 							break;
@@ -146,6 +166,8 @@ function start() {
 			});
 		} else {
 			response.statusCode = 404;
+			response.end('A ditto, online device.');
+			console.log('404');
 			response.end();
 		}
 
@@ -163,67 +185,81 @@ function instagram(page) {
 
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
-	var queries = []
+	let queue = []
 
-	p.keywords.instagram.forEach((ig) => {
-		queries.push(new Promise((resolve, reject) => {
-			let query = ig.keywords.map((k) => {
-				return `'` + k.replace(/\s/g, '.*') + `'`;
-			}).join(' ');
+	p.blocks.forEach(block => {
+		block.lines.forEach(line => {
+			queue.push(getPost(line));
+		})
+	})
 
-			let count = (ig.hasOwnProperty('all') && ig.all) ? 30 : 1;
+	return Promise.all(queue).then(data => {
+		return data.filter(line => line);
+	})
 
-			exec(`bash '${INSTAGRAM_SEARCH}' '${INSTAGRAM_SEARCH_PATH}' ${count} ${query}`, (err, stdout, stderr) => {
-				let res = {
-					keywords: ig.keywords,
-					images: stdout.split('\n').filter((i) => {
-						return (i && i.length > 1);
-					}).map((i) => {
-						i = i.split('/');
-						i = i.slice(i.length - 2).join('/');
-						i = i.substr(0, i.lastIndexOf('_UTC') + 4) + '.jpg';
-						return i;
-					}),
-					captions: ig.captions
+	function getPost(line) {
+		let hashtag = _.sample(line.hashtags);
+
+		return new Promise((resolve, reject) => {
+			if(typeof hashtag == 'undefined') return resolve();
+
+			let dir =  path.join(process.env.DATA_DIR, 'instagram', '#' + hashtag);
+			
+			fs.readdir(dir, (err, files) => {
+				if(err) {
+					console.log('[ERROR] ' + err);
+					return resolve();
 				}
-				if (ig.hasOwnProperty('always') && ig.always) res.always = true;
-				resolve(res);
-			})
-		}));
-	});
 
-	return Promise.all(queries).then((data) => {
-		// remove the empty results
-		let response = data.filter((keyword) => {
-			return (keyword.images.length > 0 || keyword.hasOwnProperty('always'));
+				files = files.filter(f => path.extname(f) == '.txt');
+				
+				let file;
+
+				if(files.length < 300) {
+					// sample random if there are not much
+					file = _.sample(files);
+				} else {
+					// take the most recent
+					file = files[files.length - 1];
+				}
+
+				if(typeof file !== 'string') return resolve();
+
+				fs.readFile(path.join(dir, file), (err, data) => {
+					if(err) return resolve();
+
+					let caption = data.toString();
+					
+					// cut if more than two hashtags
+					let hashindex = caption.search(/#\w*\s*#/);
+					if(hashindex > -1) {
+						caption = caption.substring(0, hashindex);
+					}
+					// take first sentence only if too long
+					caption = caption.trim();
+					let lineindex = caption.substring(1, caption.length - 1).search(/[.?!\n]/);
+					if(caption.length > 40 && lineindex > -1) {
+						caption = caption.substring(0, lineindex + 1);
+					}
+					caption = caption.trim();
+
+					// check if the image exists or is a gallery item
+					let filename = '#' + hashtag + '/' + path.basename(file, '.txt') + '.jpg';
+					fs.access(path.join(process.env.DATA_DIR, 'instagram', filename), err => {
+						if(err && err.code === 'ENOENT') {
+							filename = '#' + hashtag + '/' + path.basename(file, '.txt') + '_1.jpg'
+						}
+
+						resolve({
+							id: line._id,
+							keyword: line.text,
+							image: filename,
+							caption: caption
+						})
+					})
+				})
+			});
 		});
-
-		// sort the "all" results internally
-		response.forEach((keyword) => {
-			if (keyword.hasOwnProperty('all') && keyword.all) {
-				keyword.images.sort((a, b) => sort);
-			}
-		});
-
-		// sort the results (put the "always" result on top)
-		response.sort((a, b) => {
-			if (a.hasOwnProperty('always') && a.always) return -1;
-			if (b.hasOwnProperty('always') && b.always) return 1;
-			return sort(a.images[0], b.images[0]);
-		});
-
-		return Promise.resolve(response);
-	});
-
-	/**
-	 * Sort filename by date
-	 */
-	function sort(a, b) {
-		a = a.substring(a.lastIndexOf('/') + 1, a.lastIndexOf('_UTC'));
-		b = b.substring(b.lastIndexOf('/') + 1, b.lastIndexOf('_UTC'));
-		a = moment(a, 'YYYY-MM-DD_HH-mm-ss');
-		b = moment(b, 'YYYY-MM-DD_HH-mm-ss');
-		return b - a;
 	}
 }
 
@@ -367,4 +403,18 @@ function fuorisalone(page) {
 			});
 		})
 	}
+}
+
+function amazon(page) {
+	if (typeof page === 'undefined') return Promise.reject(404);
+
+	return new Promise((resolve, reject) => {
+		fs.readFile(path.join(process.env.DATA_DIR, 'amazon', page + '.json'), (err, data) => {
+			if (err) {
+				if (err.code === 'ENOENT') return reject('404');
+				return reject(err);
+			}
+			resolve(JSON.parse(data));
+		});
+	});
 }
