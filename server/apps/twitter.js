@@ -85,6 +85,8 @@ function setup() {
     id BIGINT UNSIGNED PRIMARY KEY, \
     parent BIGINT, \
     text TEXT NOT NULL, \
+    user VARCHAR(50) NOT NULL, \
+    user_avatar VARCHAR(250) NOT NULL, \
     created_at DATETIME NOT NULL, \
     location VARCHAR(50), \
     type VARCHAR(10) NOT NULL, \
@@ -126,10 +128,12 @@ function run() {
 
     stream.on('tweet', function (tweet) {
       console.log(+new Date);
-      db.query('INSERT INTO '+TABLE+'(id, parent, text, created_at, location, type) VALUES (?, ?, ?, ?, ?, ?)', [
+      db.query('INSERT INTO '+TABLE+'(id, parent, text, user, user_avatar, created_at, location, type) VALUES (?, ?, ?, ?, ?, ?)', [
         tweet.id,
         (typeof tweet.retweeted_status !== 'undefined') ? tweet.retweeted_status.id : null,
         parseText(tweet),
+        tweet.user.screen_name,
+        tweet.user.profile_image_url_https,
         new Date(moment(tweet.created_at, "ddd MMM DD HH:mm:ss +ZZ YYYY")),
         parseLocation(tweet),
         query.type,
