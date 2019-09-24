@@ -73,7 +73,7 @@ function start() {
 function setup() {
   console.log('[INFO] Running setup script');
   db.query('CREATE DATABASE IF NOT EXISTS '+DB, function(err){
-    if (err) throw error;
+    if (err) throw err;
   });
   db.changeUser({database : DB}, function(err) {
     if (err) throw err;
