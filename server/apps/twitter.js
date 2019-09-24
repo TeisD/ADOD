@@ -2,7 +2,7 @@ const mysql = require('mysql');
 const Twit = require('twit');
 const moment = require('moment');
 
-const DB = 'mdw_2018';
+const DB = 'pdb-2019';
 const TABLE = 'twitter';
 const AUTH = require('../../shared/config/keys/mysql.json');
 const CLIENTS = require('../../shared/config/keys/twitter-clients.json');
@@ -16,24 +16,16 @@ const QUERIES = [
       access_token_secret: CLIENTS[0].access_token_secret
     },
     "track": [
-      'milan design week',
-      'milan design',
-      'milano design week',
-      'salone del mobile',
-      'milan design',
-      'mdw2018',
-      'mdw18',
-      'salone2018',
-      'salone18',
-      'milandesignweek',
-      'salonedelmobile',
-      'designweek',
-      'iSaloniofficial',
-			'fuorisalone',
-			'fuorisalone18',
-			'fuorisalone2018',
+      'unlearning',
+      '"design school"',
+      'design education',
+      'decolonizing',
+      'conviviality',
+      '"safe spaces"',
+      'lifelong learning',
+      'alternative pedagogies'
     ]
-  },
+  }/*,
   {
     "type": "location",
     "client": {
@@ -45,7 +37,7 @@ const QUERIES = [
     "locations": [
       '9,45.35,9.35,45.6'
     ]
-  }
+  }*/
 ];
 
 if (!AUTH.host || !AUTH.user || !AUTH.password) throw 'Authentication file does not contain a valid password.'

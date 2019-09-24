@@ -27,7 +27,7 @@ const DATA_DIR = process.env.DATA_DIR;
 const INSTAGRAM_SEARCH = path.join(__dirname, 'apps/instagram-search.sh');
 const INSTAGRAM_SEARCH_PATH = path.join(DATA_DIR, 'instagram');
 
-const DB = 'mdw_2018';
+const DB = process.env.DB;
 const TWITTER_TABLE = 'twitter';
 const FUORI_TABLE = 'fuorisalone';
 const DB_AUTH = require('../shared/config/keys/mysql.json');
