@@ -367,15 +367,15 @@ function twitter(page) {
 				if (err) return reject(err);
 				// make an additional query if the word is interesting
 				if (count[0]['COUNT(*)'] > 0 && keyword.length > 7) {
-					db.query(`SELECT DISTINCT text, created_at, user, user_avatar FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' ORDER BY created_at LIMIT 1`, [], function (err, text) {
+					db.query(`SELECT DISTINCT text, created_at, user, user_avatar FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' ORDER BY created_at LIMIT 1`, [], function (err, tweet) {
 						if (err) return reject(err);
 						resolve({
 							word: keyword,
 							count: count[0]['COUNT(*)'],
-							text: parseTweet(text[0].text),
-							user: user,
-							avatar: user_avatar,
-							timestamp: created_at
+							text: parseTweet(tweet[0].text),
+							user: tweet[0].user,
+							avatar: tweet[0].user_avatar,
+							timestamp: tweet[0].created_at
 						});
 					});
 				} else {
