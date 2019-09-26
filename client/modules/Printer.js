@@ -13,8 +13,8 @@ class Printer {
 	print(data) {
 		var msg = {
 			"operation-attributes-tag": {
-				"requesting-user-name": "mdw-2018",
-				"job-name": "MDW-2018 Job",
+				"requesting-user-name": "ADOD",
+				"job-name": "ADOD Job",
 				"document-format": "application/pdf"
 			},
 			/*
@@ -49,8 +49,8 @@ class Printer {
 		console.log('<Printer> Starting print');
 		var msg = {
 			"operation-attributes-tag": {
-				"requesting-user-name": "mdw-2018",
-				"job-name": "MDW-2018 Job",
+				"requesting-user-name": "ADOD",
+				"job-name": "ADOD Job",
 				"document-format": "application/pdf"
 			},
 			"data": data

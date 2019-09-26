@@ -14,6 +14,8 @@ const Instagram = require('./controllers/Instagram');
 const Salone = require('./controllers/Salone');
 const Twitter = require('./controllers/Twitter');
 const Fuorisalone = require('./controllers/Fuorisalone');
+const Amazon = require('./controllers/Amazon');
+const Test = require('./controllers/Test');
 
 dotenv.config();
 
@@ -36,8 +38,11 @@ switch(process.env.CONTROLLER){
 	case 'fuorisalone':
 		controller = new Fuorisalone();
 		break;
+	case 'amazon':
+		controller = new Amazon();
+		break;
 	default:
-		controller = new Controller();
+		controller = new Test();
 		break;
 }
 
@@ -50,7 +55,9 @@ lcd.print("Initializing...");
  */
 pagedetector.on('change', (e) => {
 	if(e === PageDetector.STATUS.NO_PAGE) {
-		lcd.print(LCD.MESSAGE.INSERT_PAGE)
+		lcd.clear();
+		lcd.println(process.env.CONTROLLER.toUpperCase(), 1)
+		lcd.println(LCD.MESSAGE.INSERT_PAGE, 2)
 	} else if (e === PageDetector.STATUS.NEW_PAGE) {
 		piezo.beep(Piezo.BEEPS.OK);
 		lcd.print(LCD.MESSAGE.PAGE_DETECTED);
@@ -61,7 +68,12 @@ pagedetector.on('change', (e) => {
 /**
  * Process the detected page
  */
-pagedetector.on('ready', function(n) {
+pagedetector.on('ready', function(n, language) {
+	// hacky language setting
+	if(language == 1) {
+		n = n + 'T';
+	}
+
 	let page = Page.find(pages, n);
 
 	if(typeof page === "undefined") {
@@ -104,13 +116,13 @@ pagedetector.on('ready', function(n) {
 		if(!process.env.DEBUGGING) {
 			return printer.printAndFinish(controller.getBuffer());
 		} else {
-			return printer.save(controller.getBuffer(), '../../mdw-2018-data/responses/'+page.number+'-'+Date.now()+'.pdf');
+			return printer.save(controller.getBuffer(), path.join(process.env.DATA_DIR, '/tests/'+page.number+'-'+Date.now()+'.pdf'));
 		}
 	})
 	.then((data) => { // resume the pageDetector
 		if(!process.env.DEBUGGING) {
-			let timeout = 15000;
-			if(process.env.CONTROLLER == 'twitter') timeout = 30000
+			let timeout = 20000;
+			if(process.env.CONTROLLER == 'instagram') timeout = 45000
 			setTimeout(function(){
 				lcd.print(LCD.MESSAGE.DONE);
 				piezo.beep(Piezo.BEEPS.OK);
@@ -151,73 +163,77 @@ function getData(pagenumber) {
 
 		switch(process.env.CONTROLLER.toLowerCase()){
 			case 'instagram':
-				url = process.env.HOSTNAME + '/instagram';
+				url = 'instagram';
 				data = {page: pagenumber};
 				break;
 			case 'salone':
-				url = process.env.HOSTNAME + '/salone';
+				url = 'salone';
 				data = {page: pagenumber};
 				break;
 			case 'twitter':
-				url = process.env.HOSTNAME + '/twitter';
+				url = 'twitter';
 				data = {page: pagenumber};
 				break;
 			case 'fuorisalone':
-				url = process.env.HOSTNAME + '/fuorisalone';
+				url = 'fuorisalone';
+				data = {page: pagenumber};
+				break;
+			case 'amazon':
+				url = 'amazon';
 				data = {page: pagenumber};
 				break;
 			default:
-				return reject('Unknown controller')
+				data = {page: pagenumber};
+				url = 'pages';
 				break;
 		}
 
 		data.key = process.env.API_KEY;
 
-		///*
-		request.post({
-			url: url,
-			form: data,
-			timeout: 40000
-		}, (err, response, body) => {
-			if(err) {
-				if(retry < parseInt(process.env.MAX_RETRY)) {
-					if(err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
-						lcd.printVar(LCD.MESSAGE.TIMEOUT_RETRY, retry + 1);
-					} else {
-						lcd.printVar(LCD.MESSAGE.SERVER_RETRY, retry + 1);
-					}
-					retry++;
-					console.log('<Index> Server error, retrying');
-					return resolve(getData(pagenumber));
+		if(process.env.OFFLINE) {
+			resolve(fs.readFileSync(path.join(process.env.DATA_DIR, url, pagenumber + '.json')).toString());
+		} else {
+			request.post({
+				url: process.env.HOSTNAME + '/' + url,
+				form: data,
+				timeout: 40000
+			}, (err, response, body) => {
+				if(err) {
+					if(retry < parseInt(process.env.MAX_RETRY)) {
+						if(err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+							lcd.printVar(LCD.MESSAGE.TIMEOUT_RETRY, retry + 1);
+						} else {
+							lcd.printVar(LCD.MESSAGE.SERVER_RETRY, retry + 1);
+						}
+						retry++;
+						console.log('<Index> Server error, retrying');
+						console.log(err);
+						return resolve(getData(pagenumber));
 
-				} else {
-					if(err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
-						lcd.print(LCD.MESSAGE.TIMEOUT_PROCEED);
 					} else {
-						lcd.print(LCD.MESSAGE.SERVER_PROCEED);
+						if(err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+							lcd.print(LCD.MESSAGE.TIMEOUT_PROCEED);
+						} else {
+							lcd.print(LCD.MESSAGE.SERVER_PROCEED);
+						}
+						console.log('<Index> Server error, proceeding');
+						return resolve();
 					}
-					console.log('<Index> Server error, proceeding');
-					return resolve();
 				}
-			}
-			switch(response.statusCode) {
-				case 200:
-					console.log('<Index> Server responded 200');
-					resolve(body);
-					break;
-				case 404:
-					console.log('<Index> Server responded 404');
-					resolve();
-					break;
-				default:
-					reject('Server responded with statuscode: ' + response.statusCode);
-			}
-		});
-		//*/
-
-		// DEBUGGING
-		//resolve(JSON.parse(fs.readFileSync('../../mdw-2018-data/responses/instagram/' + pagenumber + '.json')));
-		//resolve({});
+				switch(response.statusCode) {
+					case 200:
+						console.log('<Index> Server responded 200');
+						resolve(body);
+						break;
+					case 404:
+						console.log('<Index> Server responded 404');
+						resolve();
+						break;
+					default:
+						reject('Server responded with statuscode: ' + response.statusCode);
+				}
+			});
+		}
 	});
 }
 
@@ -226,6 +242,7 @@ let pageCount = 0,
 		iteration = 0;
 
 function test() {
+	console.log("[DEBUG] Starting unit tests")
 	if(pageCount < pages.length) {
 		let page = pages[pageCount];
 		console.log('-----------------------');

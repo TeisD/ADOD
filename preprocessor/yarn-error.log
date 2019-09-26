@@ -1,0 +1,47 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/bin/yarn install
+
+PATH: 
+  /usr/local/opt/php@7.1/sbin:/usr/local/opt/php@7.1/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Applications/Wireshark.app/Contents/MacOS:/usr/local/opt/php@7.1/sbin:/usr/local/opt/php@7.1/bin
+
+Yarn version: 
+  1.12.1
+
+Node version: 
+  10.13.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: getaddrinfo ENOTFOUND registry.yarnpkg.com registry.yarnpkg.com:443
+      at GetAddrInfoReqWrap.onlookup [as oncomplete] (dns.js:57:26)
+
+npm manifest: 
+  {
+    "name": "z33milan",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Teis S.A. De Greve",
+    "license": "ISC",
+    "dependencies": {
+      "jsdom": "^11.7.0",
+      "lodash": "^4.17.5",
+      "minimist": "^1.2.0",
+      "tesseract.js": "^1.0.10",
+      "wordpos": "^1.1.6"
+    },
+    "devDependencies": {
+      "eslint": "^4.18.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

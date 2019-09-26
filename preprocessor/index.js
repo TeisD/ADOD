@@ -3,8 +3,8 @@ const fs = require('fs');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
-const INPUT = path.join(__dirname, '../../mdw-2018-data/pages-pre/');
-const OUTPUT = path.join(__dirname, '../../mdw-2018-data/pages/');
+const INPUT = path.join(__dirname, '../../ADOD-data/pages-pre/');
+const OUTPUT = path.join(__dirname, '../../ADOD-data/pages/');
 
 function main() {
 	if (!fs.existsSync(INPUT)) throw 'The folder does not exist';
