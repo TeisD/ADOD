@@ -18,6 +18,8 @@ class Twitter extends Controller {
 
 	draw(data) {
 
+		this.timestamp("Last updated from Twitter on", 20)
+
 		// create an array of sentences with their start and stop position
 		let sentence = new Sentence(),
 				sentences = [];
@@ -142,7 +144,7 @@ class Twitter extends Controller {
 
 			// metadata
 			let d = new Date(w.timestamp);
-			let metaHeight = this.drawText(`@${w.user} — ${moment(d).format('DD/MM/YYYY HH:MM')};`, x, 5, 7, layout[currentLayout].width - x, 'Agipo', 8);
+			let metaHeight = this.drawText(`@${w.user} — ${moment(d).format('DD/MM/YYYY HH:mm')}`, x, 5, 7, layout[currentLayout].width - x, 'Agipo', 8);
 
 			// tweet
 			let tweetHeight = this.drawText(w.tweet, x, metaHeight + 7, 7, layout[currentLayout].width - x, 'Genath', 8);

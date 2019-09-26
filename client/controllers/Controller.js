@@ -7,6 +7,8 @@ const he = require('he');
 const dotenv = require('dotenv');
 const request = require('request');
 const mkdirp = require('mkdirp');
+const moment = require('moment');
+
 
 dotenv.config();
 
@@ -427,6 +429,17 @@ class Controller {
 			dir = -dir;
 		}
 		this.ctx.stroke();
+	}
+
+	timestamp(message, offset) {
+		if(this.page.layout.fixed && this.page.layout.fixed.extra) {
+
+			console.log(this.page.layout.fixed.extra);
+
+			let bbox = this.page.layout.fixed.extra[0]
+
+			this.drawText(`${message} ${moment().format('DD/MM/YYYY HH:mm:SS')}`, bbox.x, bbox.y + offset, 8, bbox.width, 'Agipo', 8);
+		}
 	}
 
 }

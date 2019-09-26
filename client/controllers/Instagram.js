@@ -19,6 +19,8 @@ class Instagram extends Controller {
 
 	draw(data) {
 
+		this.timestamp("Last updated from Instagram on", 40)
+
 		let areas,
 				queue = [];
 
