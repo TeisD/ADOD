@@ -356,6 +356,8 @@ function twitter(page) {
 		return twitterQuery(keyword);
 	})
 
+	console.log(queries);
+
 	return Promise.all(queries);
 
 	/**
