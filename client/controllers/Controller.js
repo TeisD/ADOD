@@ -189,11 +189,13 @@ class Controller {
 										console.log('<Controller> Image saved');
 										if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
 										if(inCircle) {
-											this.ctx.arc(x, y, width, 0, 2 * Math.PI, true);
+											this.ctx.save();
+											this.ctx.arc(x+width, y+width, width, 0, 2 * Math.PI, true);
 											this.ctx.clip();
-											this.ctx.fill();
+											this.drawImage(filename, x, y, width*2, height*2);
+											this.ctx.closePath();
+											this.ctx.restore();
 										}
-
 										else this.drawImage(filename, x, y, width, height);
 									}
 									return resolve();
