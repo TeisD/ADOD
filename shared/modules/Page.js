@@ -10,7 +10,7 @@ const ROI = {
 	y1: 575
 }
 
-const GRID_SIZE = 20;
+const GRID_SIZE = 5;
 const MAX_ITERATIONS = 100;
 
 class Page {
