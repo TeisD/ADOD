@@ -249,7 +249,7 @@ function test() {
 		console.log('[TEST] Page ' + page.number + ' / Iteration ' + (iteration + 1));
 		pagedetector.emit('ready', page.number);
 		iteration++;
-		if(iteration > 2) {
+		if(iteration > process.env.UNIT_TESTS - 1) {
 			iteration = 0;
 			pageCount++
 		}

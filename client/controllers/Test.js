@@ -10,8 +10,8 @@ class Test extends Controller {
 
 	draw() {
         this.page.blocks.forEach(block => {
-            this.ctx.rect(block.bbox.x0, block.bbox.y0, block.bbox.w, block.bbox.h);
-            this.ctx.stroke();
+            this.ctx.strokeStyle = '#000000';
+            this.ctx.strokeRect(block.bbox.x0, block.bbox.y0, block.bbox.w, block.bbox.h);
 
             /*block.lines.forEach(line => {
                 this.ctx.rect(line.bbox.x0, line.bbox.y0, line.bbox.w, line.bbox.h);
