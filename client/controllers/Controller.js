@@ -23,7 +23,9 @@ class Controller {
 		this.ctx;
 		this.fonts = [
 			new Font('Space Mono', path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf')),
-			new Font('Wingdings', path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'))
+			new Font('Wingdings', path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf')),
+			new Font('Agipo', path.join(__dirname, '../../shared/assets/fonts/Agipo-Regular.ttf')),
+			new Font('Genath', path.join(__dirname, '../../shared/assets/fonts/Genath-Regular.otf'))
 		]
 		//registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
 		//registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
@@ -164,8 +166,9 @@ class Controller {
 	 * @param dirname The dirname where the file could be found
 	 * @param hostname The hostname of the server where the image can be downloaded (optional, leave empty to download from ADOD server)
 	 * @param inContainer Draw the image in a container, rather than by exact dimensions
+	 * @param inCircle Clip the image in a circle
 	 */
-	drawImageFromUrl(img, x, y, width, height, dirname, hostname, inContainer) {
+	drawImageFromUrl(img, x, y, width, height, dirname, hostname, inContainer, inCircle) {
 		console.log('<Controller> Drawing ' + img);
 		var filename = path.join(dirname, img);
 		return new Promise((resolve, reject) => {
@@ -185,6 +188,12 @@ class Controller {
 									if(!err) {
 										console.log('<Controller> Image saved');
 										if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
+										if(inCircle) {
+											this.ctx.arc(x, y, width, 0, 2 * Math.PI, true);
+											this.ctx.clip();
+											this.ctx.fill();
+										}
+
 										else this.drawImage(filename, x, y, width, height);
 									}
 									return resolve();
@@ -216,6 +225,14 @@ class Controller {
 				} else {
 					console.log('<Controller> Found local copy ' + filename);
 					if(inContainer) this.drawImageInContainer(filename, x, y, width, height);
+					if(inCircle) {
+						this.ctx.save();
+						this.ctx.arc(x+width, y+width, width, 0, 2 * Math.PI, true);
+						this.ctx.clip();
+						this.drawImage(filename, x, y, width*2, height*2);
+						this.ctx.closePath();
+						this.ctx.restore();
+					}
 					else this.drawImage(filename, x, y, width, height);
 					return resolve();
 				}
