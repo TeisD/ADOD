@@ -363,7 +363,7 @@ function twitter(page) {
 	 */
 	function twitterQuery(keyword) {
 		return new Promise((resolve, reject) => {
-			db.query(`SELECT COUNT(*) FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%'`, [], function (err, count) {
+			db.query(`SELECT COUNT(*) FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' LIMIT 1000`, [], function (err, count) {
 				if (err) return reject(err);
 				// make an additional query if the word is interesting
 				if (count[0]['COUNT(*)'] > 0 && keyword.length > 7) {
