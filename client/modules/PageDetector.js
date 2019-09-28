@@ -223,8 +223,6 @@ class PageDetector extends EventEmitter {
 		}
 		*/
 
-		_im = _im.threshold(120, 255);
-
 		if(process.env.CALIBRATION_MODE) _im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`);
 
 		return _im.toBuffer();
