@@ -75,6 +75,7 @@ pagedetector.on('ready', function(n, language) {
 		n = n + 'T';
 	}
 	*/
+	console.log('<Index> Detected page ' + n);
 
 	let page = Page.find(pages, n);
 
@@ -84,7 +85,7 @@ pagedetector.on('ready', function(n, language) {
 	};
 
 	lcd.print('Page ' + n);
-	console.log('<Index> Page ' + n);
+	console.log('<Index> Processing page ' + n);
 
 
 	// stop the pagedetector
