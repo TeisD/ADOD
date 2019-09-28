@@ -115,13 +115,15 @@ class PageDetector extends EventEmitter {
 			//console.log('<PD> Image recognition END');
 			if(!this.running) return;
 
+			console.log(`<PD> Tesseract detected: ${n}`);
+
 			n = parseInt(n.text.trim());
 
 			if(!n || isNaN(n) || n < 0 || n > 300) {
 				return Promise.reject(STATUS.NO_PAGE)
 			} else if(n != this.pagenumber) {
 				this.pagenumber = n;
-				this.emit('ready', this.pagenumber, this.pagelanguage);
+				this.emit('ready', this.pagenumber);
 			}
 
 			this.capture();

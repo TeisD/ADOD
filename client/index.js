@@ -68,15 +68,14 @@ pagedetector.on('change', (e) => {
 /**
  * Process the detected page
  */
-pagedetector.on('ready', function(n, language) {
+pagedetector.on('ready', function(n) {
 	// hacky language setting
 	/*
 	if(language == 1) {
 		n = n + 'T';
 	}
 	*/
-	console.log('<Index> Detected page ' + n);
-
+	
 	let page = Page.find(pages, n);
 
 	if(typeof page === "undefined") {
