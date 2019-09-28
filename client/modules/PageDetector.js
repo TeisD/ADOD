@@ -184,6 +184,8 @@ class PageDetector extends EventEmitter {
 			}
 		}
 
+		if(process.env.CALIBRATION_MODE) console.log(`Found contour: ${contours.area(id)} (countour size is ${AREA})`);
+
 		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
