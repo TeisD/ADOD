@@ -127,6 +127,10 @@ class PageDetector extends EventEmitter {
 				n = n - 300;
 			}
 
+			if(n.toString().split('').pop() == 4) {
+				n = n - 3;
+			}
+
 			if(n < 0 || n > 300) {
 				return Promise.reject(STATUS.NO_PAGE)
 			} else if(n != this.pagenumber) {
