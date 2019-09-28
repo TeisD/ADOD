@@ -119,7 +119,15 @@ class PageDetector extends EventEmitter {
 
 			n = parseInt(n.text.trim());
 
-			if(!n || isNaN(n) || n < 0 || n > 300) {
+			if(!n || isNaN(n)) {
+				return Promise.reject(STATUS.NO_PAGE)
+			}
+
+			if(n >= 400 && n <= 499) {
+				n = n - 300;
+			}
+
+			if(n < 0 || n > 300) {
 				return Promise.reject(STATUS.NO_PAGE)
 			} else if(n != this.pagenumber) {
 				this.pagenumber = n;
