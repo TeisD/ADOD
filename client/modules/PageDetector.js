@@ -32,7 +32,7 @@ const CROP = {
 	width: parseInt(process.env.CAM_CROP_WIDTH),
 	height: parseInt(process.env.CAM_CROP_HEIGHT),
 }
-const AREA = 4000;
+const AREA = parseInt(process.env.CAM_THRESH);
 
 const LANGPATH = path.join(__dirname, '../../shared/assets/languages/');
 const COREPATH = path.join(__dirname, '../node_modules/tesseract.js-core/index.js');
@@ -165,6 +165,11 @@ class PageDetector extends EventEmitter {
 		if(process.env.CALIBRATION_MODE) im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`);
 		//console.log('<PD> Contour START');
 
+		// remove noise and erode
+		im.dilate(1.5);
+		im.erode(32);
+		if(process.env.CALIBRATION_MODE) im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`);
+
 		var contours = im.findContours();
 		var id = 0;
 		var difference = +Infinity;
@@ -186,7 +191,7 @@ class PageDetector extends EventEmitter {
 
 		if(process.env.CALIBRATION_MODE) console.log(`Found contour: ${contours.area(id)} (countour size is ${AREA})`);
 
-		if(contours.area(id) > AREA + 1000 || contours.area(id) < AREA - 1000) {
+		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
@@ -216,7 +221,7 @@ class PageDetector extends EventEmitter {
 
 		_im = _im.threshold(120, 255);
 
-		if(process.env.CALIBRATION_MODE) _im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-4-out.jpg`);
+		if(process.env.CALIBRATION_MODE) _im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`);
 
 		return _im.toBuffer();
 	}
