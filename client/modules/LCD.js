@@ -12,7 +12,7 @@ try {
 } catch(e) {}
 
 const MESSAGE = {
-	INSERT_PAGE: "Place page in paper tray",
+	INSERT_PAGE: "Insert essay",
 	UNKNOWN_PAGE: "Unknown page",
 	PAGE_DETECTED: "Detected page!\nRecognizing...",
 	ERROR_RETRY: "Error :(\nRetrying in 5s...",
@@ -67,7 +67,7 @@ class LCD {
 		this.text = text;
 	}
 
-	println(text, line) {
+	println(text, line) {		
 		if(text == this.text) return;
 		this.lcd.println(text, line);
 		this.text = text;
