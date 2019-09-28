@@ -197,7 +197,7 @@ function instagram(page) {
 				return `'` + k.replace(/\s/g, '.*') + `'`;
 			}).join(' ');
 
-			let count = (ig.hasOwnProperty('all') && ig.all) ? 30 : 1;
+			let count = (ig.hasOwnProperty('all') && ig.all) ? 30 : 3;
 
 			exec(`bash '${INSTAGRAM_SEARCH}' '${INSTAGRAM_SEARCH_PATH}' ${count} ${query}`, (err, stdout, stderr) => {
 				let res = {

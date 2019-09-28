@@ -38,37 +38,43 @@ class Instagram extends Controller {
 		for (let a of areas) {
 			let currentPos = 0;
 
-			while(currentPos < a.height - a.width) {
+			while(currentPos <= a.height - Math.min(a.width, a.height)) {
 
 				let mode = Math.random();
+				let captionMode = Math.random();
 
 				let h = Math.min(a.height, a.width);
 
-				if(mode < 0.1) {
+				if(mode < 0.25) {
 					h = a.height - currentPos - 20;
 				}
 
-				queue.push(
-					this.drawImageFromUrl(
-						data[currentImage].images[0],
-						a.x,
-						a.y + currentPos,
-						a.width,
-						h,
-						DATA_DIR
-					)
-				);
+				if(typeof data[currentImage] !== 'undefined') {
 
-				currentPos += h;
+					let i = Math.floor(Math.random() * data[currentImage].images.length) 
 
-				if(data[currentImage].captions.length && h < a.height) {
-				
-					let caption = data[currentImage].captions[Math.floor(Math.random() * data[currentImage].captions.length)]
-					console.log(caption);
+					queue.push(
+						this.drawImageFromUrl(
+							data[currentImage].images[i],
+							a.x,
+							a.y + currentPos,
+							a.width,
+							h,
+							DATA_DIR
+						)
+					);
+
+					currentPos += h;
+
+					if(data[currentImage].captions.length && captionMode > 0.3) {
 					
-					let metaHeight = this.drawText(caption, a.x, a.y + currentPos + 10, 7, a.width, 'Agipo', 8);
-					
-					currentPos += metaHeight + 20;
+						let caption = data[currentImage].captions[Math.floor(Math.random() * data[currentImage].captions.length)]
+						console.log(caption);
+						
+						let metaHeight = this.drawText(caption, a.x, a.y + currentPos + 10, 7, a.width, 'Agipo', 8);
+						
+						currentPos += metaHeight + 20;
+					}
 				}
 
 				currentImage++;
