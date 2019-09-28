@@ -41,12 +41,15 @@ class Instagram extends Controller {
 			while(currentPos <= a.height - Math.min(a.width, a.height)) {
 
 				let mode = Math.random();
-				let captionMode = Math.random();
 
-				let h = Math.min(a.height, a.width);
+				let h = a.width;
 
-				if(mode < 0.25) {
-					h = a.height - currentPos - 20;
+				if(a.height < a.width && mode < 0.5) {
+					h = a.height - currentPos - 30;
+				}
+
+				if(mode > 0.75) {
+					h = a.height - currentPos - 30;
 				}
 
 				if(typeof data[currentImage] !== 'undefined') {
@@ -66,7 +69,7 @@ class Instagram extends Controller {
 
 					currentPos += h;
 
-					if(data[currentImage].captions.length && captionMode > 0.3) {
+					if(data[currentImage].captions.length) {
 					
 						let caption = data[currentImage].captions[Math.floor(Math.random() * data[currentImage].captions.length)]
 						console.log(caption);
@@ -74,6 +77,8 @@ class Instagram extends Controller {
 						let metaHeight = this.drawText(caption, a.x, a.y + currentPos + 10, 7, a.width, 'Agipo', 8);
 						
 						currentPos += metaHeight + 20;
+					} else {
+						currentPos += 10;
 					}
 				}
 
