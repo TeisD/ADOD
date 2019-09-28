@@ -176,7 +176,7 @@ class PageDetector extends EventEmitter {
 		var _im = im.copy();
 
 		// remove noise and erode
-		im.dilate(1.5);
+		im.dilate(3);
 		im.erode(32);
 		if(process.env.CALIBRATION_MODE) im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`);
 
