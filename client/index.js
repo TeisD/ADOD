@@ -123,8 +123,8 @@ pagedetector.on('ready', function(n) {
 	})
 	.then((data) => { // resume the pageDetector
 		if(!process.env.DEBUGGING) {
-			let timeout = 30000;
-			if(process.env.CONTROLLER == 'instagram') timeout = 45000
+			let timeout = 25000;
+			if(process.env.CONTROLLER == 'instagram') timeout = 40000
 			setTimeout(function(){
 				lcd.print(LCD.MESSAGE.DONE);
 				piezo.beep(Piezo.BEEPS.OK);
