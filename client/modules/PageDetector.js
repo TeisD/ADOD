@@ -32,7 +32,7 @@ const CROP = {
 	width: parseInt(process.env.CAM_CROP_WIDTH),
 	height: parseInt(process.env.CAM_CROP_HEIGHT),
 }
-const AREA = 36100;
+const AREA = 4000;
 
 const LANGPATH = path.join(__dirname, '../../shared/assets/languages/');
 const COREPATH = path.join(__dirname, '../node_modules/tesseract.js-core/index.js');
@@ -186,7 +186,7 @@ class PageDetector extends EventEmitter {
 
 		if(process.env.CALIBRATION_MODE) console.log(`Found contour: ${contours.area(id)} (countour size is ${AREA})`);
 
-		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
+		if(contours.area(id) > AREA + 1000 || contours.area(id) < AREA - 1000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
