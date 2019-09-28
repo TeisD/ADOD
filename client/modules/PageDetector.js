@@ -159,13 +159,13 @@ class PageDetector extends EventEmitter {
 		im.convertGrayscale();
 		if(process.env.CALIBRATION_MODE) im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`);
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		var _im = im.copy();
 		if(process.env.CALIBRATION_MODE) im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`);
 		//console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 21, 10);
 		//console.log('<PD> Threshold END');
 		if(process.env.CALIBRATION_MODE) im.save(`calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`);
 		//console.log('<PD> Contour START');
+		var _im = im.copy();
 
 		// remove noise and erode
 		im.dilate(1.5);
