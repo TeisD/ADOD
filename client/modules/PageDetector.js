@@ -115,7 +115,7 @@ class PageDetector extends EventEmitter {
 			//console.log('<PD> Image recognition END');
 			if(!this.running) return;
 
-			console.log(`<PD> Tesseract detected: ${n}`);
+			console.log(`<PD> Tesseract detected: ${n.text}`);
 
 			n = parseInt(n.text.trim());
 
