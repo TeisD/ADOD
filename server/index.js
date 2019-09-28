@@ -135,6 +135,9 @@ function start() {
 								r = Promise.reject(e);
 							}
 							break;
+						case 'pages':
+							console.log('-> /pages (test)');
+							r = Promise.resolve();
 						default:
 							r = Promise.reject('404');
 							break;
