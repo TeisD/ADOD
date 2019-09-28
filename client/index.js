@@ -70,9 +70,11 @@ pagedetector.on('change', (e) => {
  */
 pagedetector.on('ready', function(n, language) {
 	// hacky language setting
+	/*
 	if(language == 1) {
 		n = n + 'T';
 	}
+	*/
 
 	let page = Page.find(pages, n);
 

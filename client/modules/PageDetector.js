@@ -203,6 +203,7 @@ class PageDetector extends EventEmitter {
 		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50);
 
+		/*
 		let pixel = _im.pixelCol(0)[0];
 		let prevlanguage = this.pagelanguage;
 
@@ -218,6 +219,7 @@ class PageDetector extends EventEmitter {
 				this.pagenumber = 0;
 			}
 		}
+		*/
 
 		_im = _im.threshold(120, 255);
 
