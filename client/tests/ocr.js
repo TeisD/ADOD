@@ -6,8 +6,6 @@ const dotenv = require('dotenv');
 const path = require('path');
 const cv = require('opencv');
 const fs = require('fs');
-const Raspistill = require('node-raspistill').Raspistill;
-const EventEmitter = require('events');
 
 dotenv.config();
 
@@ -43,24 +41,18 @@ const COREPATH = path.join(__dirname, '../node_modules/tesseract.js-core/index.j
  * @emit 'ready' When the pagenumber has been read
  * @emit 'error' When an error occurs
  */
-class PageDetector extends EventEmitter {
+class PageDetector {
 
 	constructor() {
-		super();
 		this.tesseract = Tesseract.create({
 			langPath: LANGPATH,
 			corePath: COREPATH,
 		});
-		this.camera = new Raspistill({
-			noFileSave: true,
-			width: 2000,
-			time: 1,
-		});
-		this.angle = 90;
 		this.pagenumber = 0;
 		this.pagelanguage = 0;
 		this.running = false;
-		this.status = null;
+        this.status = null;
+        this.angle = 90;
 	}
 
 	/*
@@ -88,19 +80,24 @@ class PageDetector extends EventEmitter {
 		if(!this.running) return;
 
 		//console.log('<PD> Capturing image...');
-		this.camera.takePhoto()
-		.then((photo) => {
+		const p = new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                resolve(path.join(process.env.DATA_DIR, 'calibration/test.jpg'));
+            }, 1000);
+        });
+
+		p.then((photo) => {
 			console.log('<PD> Image captured');
 			return new Promise((resolve, reject) => {
 				cv.readImage(photo, (err, im) => {
-					//console.log('<PD> Image read by opencv');
+					console.log('<PD> Image read by opencv');
 					if (err) return reject(err);
 					if (im.width() < 1 || im.height() < 1) return reject('Captured image has no size');
-					//console.log('[OK] Captured image');
+					console.log('[OK] Captured image');
 					if(!this.running) return Promise.reject();
-					//console.log('<PD> Page detection START');
+					console.log('<PD> Page detection START');
 					im = this.findPagenumber(im);
-					//console.log('<PD> Page detection END');
+					console.log('<PD> Page detection END');
 					resolve(im);
 				});
 			});
@@ -109,7 +106,7 @@ class PageDetector extends EventEmitter {
 			console.log('<PD> Image recognition START');
 			return this.tesseract.recognize(image, {
 				lang: 'eng',
-				tessedit_char_whitelist: '1234567'
+                tessedit_char_whitelist: '123456',
 			})
 		})
 		.then((n) => {
@@ -118,40 +115,27 @@ class PageDetector extends EventEmitter {
 
 			console.log(`<PD> Tesseract detected: ${n.text}`);
 
-			n = parseInt(n.text.trim());
-
+            n = parseInt(n.text.trim());
+            
 			if(!n || isNaN(n)) {
-				this.angle = -this.angle; // try again with a different orientation
-				return Promise.reject(STATUS.NO_PAGE);
+                this.angle = -this.angle;
+				return Promise.reject(STATUS.NO_PAGE)
 			}
 
 			if(n < 1 || n > 7) {
 				return Promise.reject(STATUS.NO_PAGE)
 			} else if(n != this.pagenumber) {
 				this.pagenumber = n;
-				this.emit('ready', this.pagenumber);
-			}
+            }
+            
+            console.log(`<PD> Page: ${n}`);
 
 			this.capture();
 		})
 		.catch((err) => {
-			if(!this.running) return;
-
-			if(err === this.status) {
-				return this.capture();
-			};
-
-			if(err === STATUS.NO_PAGE) {
-				this.status = err
-				this.emit('change', STATUS.NO_PAGE);
-			} else {
-				this.status = STATUS.ERROR;
-				this.emit('error', err);
-			}
-
-			this.pagenumber = 0;
-			this.pagelanguage = null;
-			this.capture();
+            console.log(err);
+            this.pagenumber = 0;
+            this.capture();
 		});
 	}
 
@@ -163,26 +147,24 @@ class PageDetector extends EventEmitter {
 	findPagenumber(im) {
 		let timestamp = Math.floor(new Date() / 1000);
 		im.convertGrayscale();
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`);
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`));
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`);
-		//console.log('<PD> Threshold START');
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`));
+		console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 25, 20);
-		//console.log('<PD> Threshold END');
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`);
-		//console.log('<PD> Contour START');
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`));
+		console.log('<PD> Contour START');
 		var _im = im.copy();
 
 		// remove noise and erode
 		im.dilate(2.5);
 		im.erode(20);
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`);
-
+        if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`));
+    
 		var contours = im.findContours();
 		var id = 0;
 		var difference = +Infinity;
 		//console.log('<PD> Contour END');
-
 
 		if(!contours.size()) {
 			return Promise.reject(STATUS.NO_PAGE);
@@ -205,14 +187,13 @@ class PageDetector extends EventEmitter {
 
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
-			this.emit('change', STATUS.NEW_PAGE);
 		}
 
 		var bbox = contours.boundingRect(id);
-		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50);
-		_im.rotate(this.angle);
+        _im = _im.crop(bbox.x + 75, bbox.y + 75, bbox.width - 150, bbox.height - 150);
+        _im.rotate(this.angle)
 
-		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`);
+		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
 
 		return _im.toBuffer();
 	}
@@ -223,4 +204,5 @@ class PageDetector extends EventEmitter {
 
 }
 
-module.exports = PageDetector;
+const pageDetector = new PageDetector();
+pageDetector.start();
