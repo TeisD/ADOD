@@ -163,20 +163,20 @@ class PageDetector extends EventEmitter {
 	findPagenumber(im) {
 		let timestamp = Math.floor(new Date() / 1000);
 		im.convertGrayscale();
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`);
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`));
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`);
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`));
 		//console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 25, 20);
 		//console.log('<PD> Threshold END');
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`);
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`));
 		//console.log('<PD> Contour START');
 		var _im = im.copy();
 
 		// remove noise and erode
 		im.dilate(2.5);
 		im.erode(20);
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`);
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`));
 
 		var contours = im.findContours();
 		var id = 0;
@@ -212,7 +212,7 @@ class PageDetector extends EventEmitter {
 		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50);
 		_im.rotate(this.angle);
 
-		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`);
+		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
 
 		return _im.toBuffer();
 	}
