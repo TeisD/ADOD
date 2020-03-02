@@ -17,7 +17,13 @@ class Test extends Controller {
             } else {
                 this.ctx.strokeStyle = "#000000"
             }
-            this.ctx.strokeRect(block.bbox.x0, block.bbox.y0, block.bbox.x1 - block.bbox.x0, block.bbox.y1 - block.bbox.y0);
+            this.ctx.strokeRect(block.bbox.x0, block.bbox.y0, block.bbox.w, block.bbox.h);
+            
+            if(typeof block.lines !== 'undefined') {
+                block.lines.forEach(line => {
+                    this.ctx.strokeRect(line.bbox.x0, line.bbox.y0, line.bbox.w, line.bbox.h);
+                });
+            }
         })
 
         if(typeof this.page.layout == 'undefined') return;

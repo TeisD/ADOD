@@ -46,7 +46,7 @@ class Controller {
 		});
 
 		if (process.env.DEBUGGING) {
-			var bg = path.join(process.env.DATA_DIR, 'pages-pre', this.page.number + '.png');
+			var bg = path.join(process.env.DATA_DIR, 'pages', this.page.number + '.png');
 			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
 
