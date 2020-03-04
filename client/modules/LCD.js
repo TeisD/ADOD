@@ -9,7 +9,9 @@ var LCDi2C = class {
 
 try {
 	LCDi2C = require('lcdi2c');
-} catch(e) {}
+} catch(e) {
+	console.error('lcdi2c could not be initialized')
+}
 
 const MESSAGE = {
 	INSERT_PAGE: "Insert essay",
