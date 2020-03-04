@@ -116,6 +116,7 @@ pagedetector.on('ready', function(n) {
 		lcd.print(LCD.MESSAGE.PRINTING)
 		piezo.beep(Piezo.BEEPS.OK);
 		if(!process.env.DEBUGGING) {
+			printer.save(controller.getBuffer(), path.join(process.env.DATA_DIR, '/prints/'+page.number+'-'+Date.now()+'.pdf'));
 			return printer.printAndFinish(controller.getBuffer());
 		} else {
 			return printer.save(controller.getBuffer(), path.join(process.env.DATA_DIR, '/tests/'+page.number+'-'+Date.now()+'.pdf'));
