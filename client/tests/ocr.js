@@ -52,7 +52,8 @@ class PageDetector {
 		this.pagelanguage = 0;
 		this.running = false;
         this.status = null;
-        this.angle = 90;
+		this.angle = 90;
+		this.try = 1
 	}
 
 	/*
@@ -70,6 +71,7 @@ class PageDetector {
 		this.running = false;
 		this.pagenumber = 0;
 		this.pagelanguage = 0;
+		this.try = 1;
 		this.status = null;
 	}
 
@@ -82,7 +84,7 @@ class PageDetector {
 		//console.log('<PD> Capturing image...');
 		const p = new Promise(function(resolve, reject) {
             setTimeout(function() {
-                resolve(path.join(process.env.DATA_DIR, 'calibration/test.jpg'));
+                resolve(path.join(process.env.DATA_DIR, 'calibration/5-2.jpg'));
             }, 1000);
         });
 
@@ -109,33 +111,38 @@ class PageDetector {
                 tessedit_char_whitelist: '123456',
 			})
 		})
-		.then((n) => {
+		.then((tess) => {
 			//console.log('<PD> Image recognition END');
 			if(!this.running) return;
 
-			console.log(`<PD> Tesseract detected: ${n.text}`);
+			var symbol = tess.symbols.sort((a, b) => a.confidence > b.confidence)[0]
 
-            n = parseInt(n.text.trim());
-            
-			if(!n || isNaN(n)) {
-                this.angle = -this.angle;
-				return Promise.reject(STATUS.NO_PAGE)
+			var n = parseInt(symbol.text);
+						
+			if(!n || isNaN(n) || symbol.confidence < process.env.CAM_CONFIDENCE) {
+;				if(this.try < 2) {
+					this.try++;
+					this.angle = -this.angle;
+					this.capture();
+					return Promise.resolve();
+				} else {
+					this.try = 1
+					return Promise.reject(STATUS.NO_PAGE)
+				}
 			}
 
-			if(n < 1 || n > 7) {
-				return Promise.reject(STATUS.NO_PAGE)
-			} else if(n != this.pagenumber) {
+			if(n != this.pagenumber) {
+				console.log(`<PD> Page: ${n}`);
 				this.pagenumber = n;
-            }
+				this.try = 1;
+			}
             
-            console.log(`<PD> Page: ${n}`);
 
-			this.capture();
 		})
 		.catch((err) => {
             console.log(err);
-            this.pagenumber = 0;
-            this.capture();
+			this.pagenumber = 0;
+			this.stop();
 		});
 	}
 
@@ -147,19 +154,19 @@ class PageDetector {
 	findPagenumber(im) {
 		let timestamp = Math.floor(new Date() / 1000);
 		im.convertGrayscale();
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`));
+		im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`));
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`));
+		im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`));
 		console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 25, 20);
-		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`));
+		im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`));
 		console.log('<PD> Contour START');
 		var _im = im.copy();
 
 		// remove noise and erode
 		im.dilate(2.5);
 		im.erode(20);
-        if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`));
+        im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`));
     
 		var contours = im.findContours();
 		var id = 0;
@@ -179,9 +186,9 @@ class PageDetector {
 			}
 		}
 
-		if(process.env.CALIBRATION_MODE) console.log(`Found contour: ${contours.area(id)} (countour size is ${AREA})`);
+		console.log(`Found contour: ${contours.area(id)} (countour size is ${AREA})`);
 
-		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
+		if(contours.area(id) > AREA + 5000 || contours.area(id) < AREA - 5000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
@@ -193,7 +200,7 @@ class PageDetector {
         _im = _im.crop(bbox.x + 75, bbox.y + 75, bbox.width - 150, bbox.height - 150);
         _im.rotate(this.angle)
 
-		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
+		_im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
 
 		return _im.toBuffer();
 	}

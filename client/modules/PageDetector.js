@@ -61,6 +61,7 @@ class PageDetector extends EventEmitter {
 		this.pagelanguage = 0;
 		this.running = false;
 		this.status = null;
+		this.try = 1;
 	}
 
 	/*
@@ -79,6 +80,7 @@ class PageDetector extends EventEmitter {
 		this.pagenumber = 0;
 		this.pagelanguage = 0;
 		this.status = null;
+		this.try = 1;
 	}
 
 	/*
@@ -112,23 +114,29 @@ class PageDetector extends EventEmitter {
 				tessedit_char_whitelist: '1234567'
 			})
 		})
-		.then((n) => {
-			//console.log('<PD> Image recognition END');
+		.then((tess) => {
 			if(!this.running) return;
 
-			console.log(`<PD> Tesseract detected: ${n.text}`);
+			var symbol = tess.symbols.sort((a, b) => a.confidence > b.confidence)[0]
 
-			n = parseInt(n.text.trim());
-
-			if(!n || isNaN(n)) {
-				this.angle = -this.angle; // try again with a different orientation
-				return Promise.reject(STATUS.NO_PAGE);
+			var n = parseInt(symbol.text);
+						
+			if(!n || isNaN(n) || symbol.confidence < process.env.CAM_CONFIDENCE) {
+;				if(this.try < 2) {
+					this.try++;
+					this.angle = -this.angle;
+					this.capture();
+					return Promise.resolve();
+				} else {
+					this.try = 1
+					return Promise.reject(STATUS.NO_PAGE)
+				}
 			}
 
-			if(n < 1 || n > 7) {
-				return Promise.reject(STATUS.NO_PAGE)
-			} else if(n != this.pagenumber) {
+			if(n != this.pagenumber) {
+				console.log(`<PD> Page: ${n}`);
 				this.pagenumber = n;
+				this.try = 1;
 				this.emit('ready', this.pagenumber);
 			}
 
