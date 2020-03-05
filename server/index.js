@@ -373,7 +373,7 @@ function twitter(page) {
 		const table = getTableName(k.text)
 
 		return new Promise((resolve, reject) => {
-			db.query(`SELECT text, user, user_name, created_at FROM ${table} ORDER BY timestamp DESC LIMIT 5`, [], function (err, response) {
+			db.query(`SELECT text, user, user_name, created_at FROM \`${table}\` ORDER BY timestamp DESC LIMIT 5`, [], function (err, response) {
 				if (err) return reject(err);
 				
 				resolve({
