@@ -154,7 +154,7 @@ function run() {
 
       console.log('[' + new Date().toUTCString() + '] ' + keyword)
 
-      db.query('INSERT INTO `'+getTableName(keyword)+'` (id, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE', [
+      db.query('INSERT INTO `'+getTableName(keyword)+'` (id, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE timestamp=CURRENT_TIMESTAMP', [
         tweet.id,
         text,
         tweet.user.screen_name,
