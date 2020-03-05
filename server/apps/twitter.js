@@ -22,10 +22,13 @@ pages.forEach((page) => {
             keyword: keyword,
             tag: tag
           });
+          console.log(getTableName(keyword));
         })
       });
     })
 });
+
+return;
 
 const DB = process.env.DB;
 const AUTH = require('../../shared/config/keys/mysql.json');
@@ -91,8 +94,8 @@ function setup() {
     if (err) throw err;
   });
   keywords.forEach(k => {
-    const table = k.id
-    db.query('CREATE TABLE IF NOT EXISTS `'+table+'` ( \
+    const table = getTableName(k.keyword);
+    db.query('CREATE TABLE IF NOT EXISTS '+table+' ( \
       id BIGINT UNSIGNED PRIMARY KEY, \
       parent BIGINT, \
       text TEXT NOT NULL, \
@@ -103,7 +106,7 @@ function setup() {
       timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', function(err) {
       if (err) throw err;
     });
-    db.query('ALTER TABLE `'+table+'` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci', function(err) {
+    db.query('ALTER TABLE '+table+' CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci', function(err) {
       if (err) throw err;
     });
   })
@@ -149,11 +152,10 @@ function run() {
 
       const text = parseText(tweet);
       const keyword = findKeyword(text);
-      const id = keywords.find(k => k.keyword == keyword).id;
 
       if(typeof keyword === 'undefined') return;
 
-      db.query('INSERT INTO `'+keyword+'`(id, parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+      db.query('INSERT INTO '+getTableName(keyword)+'(id, parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
         tweet.id,
         (typeof tweet.retweeted_status !== 'undefined') ? tweet.retweeted_status.id : null,
         text,
@@ -212,4 +214,14 @@ function toRegEx(q) {
     q = new RegExp(q, "gim");
   }
   return q;
+}
+
+function getTableName(keyword) {
+  const extra = keyword.indexOf('(');
+  if(extra != -1) {
+    keyword = keyword.substring(0, extra);
+  }
+  keyword = keyword.trim();
+  keyword = keyword.replace(/\s/g, "_");
+  return keyword;
 }
