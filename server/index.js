@@ -267,7 +267,11 @@ function instagramSimple(page) {
 	})
 
 	return Promise.all(queue).then(data => {
-		return data.filter(line => line);
+		return data.filter(k => k).sort((a, b) => {
+			a = a.image.substring(a.image.indexOf('/'));
+			b = b.image.substring(b.image.indexOf('/'));
+			return b.localeCompare(a);
+		});
 	})
 
 	function getPost(line) {
