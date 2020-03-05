@@ -155,7 +155,7 @@ function run() {
 
       console.log('[' + new Date().toUTCString() + '] ' + keyword)
 
-      db.query('INSERT INTO `'+getTableName(keyword)+'` (parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', [
+      db.query('INSERT INTO `'+getTableName(keyword)+'` (parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?)', [
         tweet.id,
         text,
         tweet.user.screen_name,
