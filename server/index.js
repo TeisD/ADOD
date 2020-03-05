@@ -356,10 +356,12 @@ function twitter(page) {
 
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
-	if (typeof p.blocks.lines === 'undefined') return Promise.reject('Page "' + page + '" does not contain Twitter data');
+	if (typeof p.blocks === 'undefined') return Promise.reject('Page "' + page + '" does not contain data');
 
-	let queries = p.blocks.lines.forEach((line) => {
-		return twitterQuery(line);
+	let queries = p.blocks.forEach(block => {
+		block.lines.forEach((line) => {
+			return twitterQuery(line);
+		});
 	})
 
 	return Promise.all(queries);
