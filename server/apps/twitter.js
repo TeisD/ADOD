@@ -153,7 +153,9 @@ function run() {
 
       if(typeof keyword === 'undefined') return;
 
-      db.query('INSERT INTO `'+getTableName(keyword)+'` (id, parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+      console.log('[' + new Date().toUTCString() + '] ' + keyword)
+
+      db.query('INSERT INTO `'+getTableName(keyword)+'` (id, parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', [
         tweet.id,
         (typeof tweet.retweeted_status !== 'undefined') ? tweet.retweeted_status.id : null,
         text,
