@@ -27,7 +27,8 @@ class Controller {
 			new Font('Space Mono', path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf')),
 			new Font('Wingdings', path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf')),
 			new Font('Agipo', path.join(__dirname, '../../shared/assets/fonts/Agipo-Regular.ttf')),
-			new Font('Genath', path.join(__dirname, '../../shared/assets/fonts/Genath-Regular.otf'))
+			new Font('Genath', path.join(__dirname, '../../shared/assets/fonts/Genath-Regular.otf')),
+			new Font('Work Sans', path.join(__dirname, '../../shared/assets/fonts/WorkSans-Light.ttf'))
 		]
 		//registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
 		//registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
@@ -205,6 +206,13 @@ class Controller {
 							});
 						} else {
 							console.log('[ERROR] ' + response.statusCode);
+							this.ctx.beginPath();
+							this.ctx.moveTo(x, y);
+							this.ctx.lineTo(x + width, y + height);
+							this.ctx.moveTo(x + width, y);
+							this.ctx.lineTo(x, y + height);
+							this.ctx.rect(x, y, width, height);
+							this.ctx.stroke();
 							return resolve();
 						}
 					}
@@ -302,18 +310,33 @@ class Controller {
 		console.log('<Controller> Done drawing image');
 	}
 
-	drawText(text, x, y, size, width, font, lineheight, stroke) {
+	/**
+	 * 
+	 * @param {string} text The text to draw
+	 * @param {number} x The x coordinate to start from
+	 * @param {number} y The y coordinate to start from
+	 * @param {number} size The font size in pixels
+	 * @param {number} width The width of the text box
+	 * @param {string} font The font
+	 * @param {number} lineheight (optional) The lineheight of the text
+	 * @param {boolean} stroke (optional) Put the text in a stroke
+	 * @param {number} indent (optional) The indentation for the first line
+	 */
+	drawText(text, x, y, size, width, font, lineheight, stroke, indent) {
+		let w = 0;
 		if (typeof font === 'undefined') {
 			this.ctx.font = `bold ${size}pt Arial`;
 		} else {
 			this.ctx._setFont('normal', 'normal', size, 'px', font);
 		}
 		if (typeof lineheight === 'undefined') lineheight = size;
+		if (typeof indent === 'undefined') indent = 0;
 		let lines = [],
 			line = '';
 		if(typeof width !== 'undefined'){
 			he.decode(text).split(/\s/).forEach((word) => {
-				let w = this.ctx.measureText(line + ' ' + word).width;
+				w = this.ctx.measureText(line + ' ' + word).width;
+				if(lines.length < 2) w += indent;
 				if (w > width + 10) {
 					lines.push(line);
 					line = '';
@@ -325,22 +348,74 @@ class Controller {
 			lines.push(text);
 		}
 
-		if (typeof stroke !== 'undefined') {
-			this.ctx.strokeStyle = "#ffffff";
-			this.ctx.lineWidth = stroke;
-			this.ctx.lineJoin = 'round';
-			lines.forEach((line, i) => {
-				this.ctx.strokeText(line, x, y + i * lineheight);
-			});
+		if (stroke) {
+			this.roundRect(x - 2, y - size - 1, w + (0.75 * size), 1.5 * size, 0.75 * size, false, true);
+			w += size
 		}
 
-
 		lines.forEach((line, i) => {
-			this.ctx.fillText(line, x, y + i * lineheight);
+			this.ctx.fillText(line, i == 0 ? x + indent : x, y + i * lineheight);
 		});
 
-		return lines.length*lineheight;
+		return {
+			x: w,
+			height: lines.length*lineheight
+		}
 	}
+
+	/**
+	 * Draws a rounded rectangle using the current state of the canvas.
+	 * If you omit the last three params, it will draw a rectangle
+	 * outline with a 5 pixel border radius
+	 * @param {CanvasRenderingContext2D} ctx
+	 * @param {Number} x The top left x coordinate
+	 * @param {Number} y The top left y coordinate
+	 * @param {Number} width The width of the rectangle
+	 * @param {Number} height The height of the rectangle
+	 * @param {Number} [radius = 5] The corner radius; It can also be an object 
+	 *                 to specify different radii for corners
+	 * @param {Number} [radius.tl = 0] Top left
+	 * @param {Number} [radius.tr = 0] Top right
+	 * @param {Number} [radius.br = 0] Bottom right
+	 * @param {Number} [radius.bl = 0] Bottom left
+	 * @param {Boolean} [fill = false] Whether to fill the rectangle.
+	 * @param {Boolean} [stroke = true] Whether to stroke the rectangle.
+	 */
+	roundRect(x, y, width, height, radius, fill, stroke) {
+		if (typeof stroke === 'undefined') {
+			stroke = true;
+		}
+		if (typeof radius === 'undefined') {
+			radius = 5;
+		}
+		if (typeof radius === 'number') {
+			radius = {tl: radius, tr: radius, br: radius, bl: radius};
+		} else {
+			var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+			for (var side in defaultRadius) {
+				radius[side] = radius[side] || defaultRadius[side];
+			}
+		}
+		this.ctx.beginPath();
+		this.ctx.moveTo(x + radius.tl, y);
+		this.ctx.lineTo(x + width - radius.tr, y);
+		this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+		this.ctx.lineTo(x + width, y + height - radius.br);
+		this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+		this.ctx.lineTo(x + radius.bl, y + height);
+		this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+		this.ctx.lineTo(x, y + radius.tl);
+		this.ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+		this.ctx.closePath();
+		if (fill) {
+			this.ctx.fill();
+		}
+		if (stroke) {
+			this.ctx.stroke();
+		}
+	
+	}
+	
 
 	drawArrow(fromx, fromy, tox, toy) {
 		this.ctx.strokeStyle = "#000000";

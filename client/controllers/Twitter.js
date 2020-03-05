@@ -2,13 +2,6 @@ const _ = require('lodash');
 const Controller = require('./Controller');
 const fs = require('fs');
 const path = require('path');
-const moment = require('moment');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const DATA_DIR = path.join(process.env.DATA_DIR, 'twitter');
-
 
 class Twitter extends Controller {
 
@@ -17,8 +10,6 @@ class Twitter extends Controller {
 	}
 
 	draw(data) {
-
-		this.timestamp("Last updated from Twitter on", 20)
 
 		// create an array of sentences with their start and stop position
 		let sentence = new Sentence(),
@@ -44,8 +35,8 @@ class Twitter extends Controller {
 		})
 
 		// take 1 - 3 highest/lowest
-		let highcount = 2 + Math.floor(Math.random() * 2),
-				lowcount = 2 + Math.floor(Math.random() * 2),
+		let highcount = 1 + Math.floor(Math.random() * 2),
+				lowcount = 1 + Math.floor(Math.random() * 2),
 				high = sentences.splice(0, highcount),
 				low = sentences.splice(sentences.length - 1 - highcount, highcount);
 
@@ -87,83 +78,138 @@ class Twitter extends Controller {
 					text: word.text,
 					bbox: word.bbox,
 					linebox: line.bbox,
-					tweet: match[0].text, 
-					user: match[0].user,
-					avatar: match[0].avatar,
-					timestamp: match[0].timestamp
+					tweet: match[0].text
 				})
 			})
 		})
 		// remove duplicates
 		twitterwords = _.uniqBy(twitterwords, 'tweet');
 		// shuffle the matches
-		twitterwords = _.orderBy(twitterwords, ['timestamp'], ['desc']);		// take 3 - 6 items
-		
+		twitterwords = _.shuffle(twitterwords);		// take 3 - 6 items
 		// find some whitespace to put them
-		//this.page.layoutGrid();
-
-		let layout = this.page.layout.fixed.text;
-		
+		this.page.layoutGrid();
 		// and finally add some of them to the page
-		let addedCount = 1,
-			addedLimit = 3 + Math.floor(Math.random() * 3),
-			currentLayout = 0,
-			currentPos = 0;
+		let addedCount = 0,
+				addedLimit = 3 + Math.floor(Math.random() * 3);
 
-		const RADIUS = 15;
+		twitterwords.forEach((w) => {
+			if(addedCount > addedLimit) return;
 
-		let queue = [];
-
-		for (let w of twitterwords) {
-			// note reference
-			this.drawText(`${addedCount}.`, w.linebox.x0 - 8, w.linebox.y0 + 8, 6, 6, 'Agipo', 8);
+			let direction = (w.bbox.x0 < this.page.width / 2) ? 1 : -1,
+					boundary = (direction > 0) ? this.page.width/2 - 150 : this.page.width/2 + 150,
+					x = (direction > 0) ? w.linebox.x1 : w.linebox.x0,
+					y = w.linebox.y0;
+			// find a good spot for the text (move 50px at a time, don't cross the boundary)
+			// maybe the current position is free?
+			let currentbox = this.page.getLayoutBox(x, y),
+					startbox = currentbox;
+			// if it's not let's move!
+			if (typeof currentbox === 'undefined') return;
+			if(!currentbox.free) {
+				// move to the side, don't cross the boundary, and keep a minimum width of 150 px
+				while((direction > 0) ? (currentbox.x < boundary) : (currentbox.x > boundary)) {
+					currentbox = (direction > 0)
+						? this.page.getLayoutBoxRight(currentbox)
+						: this.page.getLayoutBoxLeft(currentbox);
+					if (typeof currentbox === 'undefined') return;
+					if (currentbox.free) break;
+				}
+			}
+			let sw = (Math.random() > 0.5);
+			function getLayoutBoxAbove(b) {
+				if(sw) return this.page.getLayoutBoxAbove(b);
+				return this.page.getLayoutBoxBelow(b);
+			}
+			function getLayoutBoxBelow(b) {
+				if(sw) return this.page.getLayoutBoxBelow(b);
+				return this.page.getLayoutBoxAbove(b);
+			}
+			// are we good? if not, return to start and go 2 up
+			if(!currentbox.free) {
+				let currentlinebox = startbox;
+				for(let i = 0; i < 2; i++) {
+					currentlinebox = getLayoutBoxAbove.call(this, currentlinebox);
+					if (typeof currentlinebox === 'undefined') return;
+					currentbox = currentlinebox;
+					while((direction > 0) ? (currentbox.x < boundary) : (currentbox.x > boundary)) {
+						currentbox = (direction > 0)
+							? this.page.getLayoutBoxRight(currentbox)
+							: this.page.getLayoutBoxLeft(currentbox);
+						if (typeof currentbox === 'undefined') return;
+						if (currentbox.free) break;
+					}
+					if (typeof currentbox === 'undefined') return;
+					if (currentbox.free) break;
+				}
+			}
+			// are we good? if not return to start and go 2 down
+			if(!currentbox.free) {
+				let currentlinebox = startbox;
+				for(let i = 0; i < 2; i++) {
+					currentlinebox = getLayoutBoxBelow.call(this, currentlinebox);
+					if (typeof currentlinebox === 'undefined') return;
+					currentbox = currentlinebox;
+					while((direction > 0) ? (currentbox.x < boundary) : (currentbox.x > boundary)) {
+						currentbox = (direction > 0)
+							? this.page.getLayoutBoxRight(currentbox)
+							: this.page.getLayoutBoxLeft(currentbox);
+						if (typeof currentbox === 'undefined') return;
+						if (currentbox.free) break;
+					}
+					if (typeof currentbox === 'undefined') return;
+					if (currentbox.free) break;
+				}
+			}
+			// this is never gonna work, skip the word
+			if (typeof currentbox === 'undefined') return;
+			if(!currentbox.free) return;
+			// hoodary we have a place to put the text
 
 			this.ctx.save();
-			this.ctx.translate(layout[currentLayout].x, layout[currentLayout].y + currentPos);
+			this.ctx.translate((direction > 0) ? currentbox.x + 15 : currentbox.x - 145, currentbox.y + 10);
+			let r = Math.random()*2;
+			r *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+			this.ctx.rotate(r * Math.PI / 180);
 			this.ctx.fillStyle = "#000000";
-
-			// note number
-			this.drawText(`${addedCount}.`, 0, 15, 7, 10, 'Agipo', 8);
-			
-			// profile picture
-			queue.push(
-				this.drawImageFromUrl(
-					w.avatar,
-					layout[currentLayout].x + RADIUS,
-					layout[currentLayout].y + currentPos,
-					RADIUS,
-					RADIUS,
-					path.join(DATA_DIR),
-					'',
-					false,
-					true
-				)
-			);
-
-			let x = RADIUS*2 + 20;
-
-			// metadata
-			let d = new Date(w.timestamp);
-			let metaHeight = this.drawText(`@${w.user} — ${moment(d).format('DD/MM/YYYY HH:mm')}`, x, 5, 7, layout[currentLayout].width - x, 'Agipo', 8);
-
-			// tweet
-			let tweetHeight = this.drawText(w.tweet, x, metaHeight + 7, 7, layout[currentLayout].width - x, 'Genath', 8);
-
-			currentPos += Math.max(metaHeight + tweetHeight, RADIUS*2) + 10;
-
+			let textheight = this.drawText(w.tweet, 0, 0, 6, 170, 'Arial', 8, 10);
 			this.ctx.restore();
-
-			// if the current layout is full, move to the next
-			if(currentPos > layout[currentLayout].height - 10) {
-				currentLayout++;
-				currentPos = 0;
+			if(direction > 0) {
+				this.drawArrow(
+					w.linebox.x1,
+					(w.linebox.y0 + w.linebox.y1) / 2,
+					currentbox.x + 10,
+					currentbox.y + 10
+				);
+			} else {
+				this.drawArrow(
+					w.linebox.x0,
+					(w.linebox.y0 + w.linebox.y1) / 2,
+					currentbox.x + currentbox.size - 10,
+					currentbox.y + 10
+				);
 			}
 
-			// if we reached the last layout, return
-			if(currentLayout > layout.length - 1) break;
+			// mark the boxes we're using as full (5)
+			this.page.setBoxState(currentbox, false);
+			let boxtomarkleft = currentbox,
+					boxtomarkright = currentbox,
+					linestart = currentbox;
+
+			for(let j = 0; j < Math.ceil(textheight / 50); j++) {
+				// occupy 5 to each edge
+				for(let i = 0; i < 5; i++) {
+					boxtomarkright = this.page.getLayoutBoxRight(boxtomarkright);
+					boxtomarkleft = this.page.getLayoutBoxLeft(boxtomarkleft);
+					if(typeof boxtomarkleft !== 'undefined') this.page.setBoxState(boxtomarkleft, false);
+					if(typeof boxtomarkright !== 'undefined') this.page.setBoxState(boxtomarkright, false);
+				}
+				linestart = this.page.getLayoutBoxBelow(linestart);
+				boxtomarkleft = linestart;
+				boxtomarkright = linestart;
+			}
 
 			addedCount++;
-		};
+		});
 
 		// draw the other things on top of the text
 		/*highmark.forEach((keyword) => {
@@ -230,10 +276,6 @@ class Twitter extends Controller {
 					l.bbox.y1 - l.bbox.y0
 				);
 			}
-		});
-
-		return Promise.all(queue).then(() => {
-			console.log('patat');
 		});
 
 	}

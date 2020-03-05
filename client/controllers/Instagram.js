@@ -32,22 +32,29 @@ class Instagram extends Controller {
 		const GRID_SIZE = 100;
 
 		let currentImage = 0;
+		let forceShift = false;
+		let prevShift = 0;
 
 		for (let a of areas) {
 			let currentPos = 0;
 
 			while(currentPos <= a.height - Math.min(a.width, a.height)) {
 
-				let mode = Math.random();
+				let sizeMode = Math.random();
+				let shiftMode = Math.random();
 
-				let h = a.width;
+				let size = a.width;
+				let shift = 0;
 
-				if(a.height < a.width && mode < 0.5) {
-					h = a.height - currentPos - 30;
-				}
-
-				if(mode > 0.75) {
-					h = a.height - currentPos - 30;
+				if(sizeMode < 0.75) {
+					size = a.width * 0.8
+					if(forceShift) {
+						shift = prevShift > 0 ? 0 : a.width * 0.2
+					} else {
+						shift = shiftMode > 0.5 ? 0 : a.width * 0.2
+					}
+				} else {
+					size = a.width
 				}
 
 				if(typeof data[currentImage] !== 'undefined') {
@@ -55,25 +62,69 @@ class Instagram extends Controller {
 					queue.push(
 						this.drawImageFromUrl(
 							data[currentImage].image,
-							a.x,
+							a.x + shift,
 							a.y + currentPos,
-							a.width,
-							h,
+							size,
+							size,
 							DATA_DIR
 						)
 					);
 
-					currentPos += h;
+					// draw the fig. x marker for the image
 
-					if(data[currentImage].caption) {
-					
-						let caption = data[currentImage].caption
-						
-						let metaHeight = this.drawText(caption, a.x, a.y + currentPos + 10, 7, a.width, 'Agipo', 8);
-						
-						currentPos += metaHeight + 20;
+					currentPos += size;
+
+					let id = data[currentImage].id;
+					let x = a.x + shift - 5;
+					let y = a.y + currentPos + 20;
+
+					if(sizeMode < 0.75) {
+						if(!forceShift) y -= size;
+
+						if(shift) {
+							x = a.x + 20;
+						}
+						else {
+							x += size + 20;
+						}
 					} else {
-						currentPos += 10;
+						y += 5;
+					}
+
+					let w = this.drawText("fig. " + (currentImage + 1), x, y, 14, a.width - shift, 'Work Sans', 16, true).x;
+								
+					// draw the fig. x marker for the keyword
+
+					let keypos = this.page.blocks[0].lines.find(line => line._id == id);
+
+					if(typeof keypos !== 'undefined') {
+						x = keypos.bbox.x0 - 55;
+						y = keypos.bbox.y0 + 21;
+						this.drawText("fig. " + (currentImage + 1), x, y, 14, a.width - shift, 'Work Sans', 16, true);
+					}
+
+
+					// draw the caption
+
+					let caption = data[currentImage].caption
+
+					if(data[currentImage].caption && data[currentImage].caption.length) {
+
+						x = a.x + shift - 5;
+						y = a.y + currentPos + 25;
+
+						if(sizeMode >= 0.75) {
+							x = x + w;
+						}
+						
+						let metaHeight = this.drawText(caption, x, y, 14, sizeMode >= 0.75 ? a.width - 50 : a.width - shift, 'Work Sans', 16, false).height;
+						
+						currentPos += metaHeight + 50;
+					} else {
+						if(sizeMode < 0.75) currentPos -= size * 0.2; // overlap the image
+						else currentPos += 60;
+						forceShift != forceShift;
+						prevShift = shift;
 					}
 				}
 
