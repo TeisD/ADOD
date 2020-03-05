@@ -92,7 +92,7 @@ function setup() {
   });
   keywords.forEach(k => {
     const table = k.id
-    db.query('CREATE TABLE IF NOT EXISTS '+table+' ( \
+    db.query('CREATE TABLE IF NOT EXISTS `'+table+'` ( \
       id BIGINT UNSIGNED PRIMARY KEY, \
       parent BIGINT, \
       text TEXT NOT NULL, \
@@ -103,7 +103,7 @@ function setup() {
       timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', function(err) {
       if (err) throw err;
     });
-    db.query('ALTER TABLE '+table+' CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci', function(err) {
+    db.query('ALTER TABLE `'+table+'` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci', function(err) {
       if (err) throw err;
     });
   })
@@ -153,7 +153,7 @@ function run() {
 
       if(typeof keyword === 'undefined') return;
 
-      db.query('INSERT INTO '+keyword+'(id, parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+      db.query('INSERT INTO `'+keyword+'`(id, parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
         tweet.id,
         (typeof tweet.retweeted_status !== 'undefined') ? tweet.retweeted_status.id : null,
         text,
