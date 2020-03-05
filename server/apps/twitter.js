@@ -94,7 +94,7 @@ function setup() {
     const table = getTableName(k.keyword);
     console.log("creating table " + table);
     db.query('CREATE TABLE IF NOT EXISTS `'+table+'` ( \
-      id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT, \
+      id BIGINT UNSIGNED PRIMARY KEY, \
       parent BIGINT, \
       text TEXT NOT NULL, \
       user VARCHAR(50) NOT NULL, \
@@ -155,8 +155,9 @@ function run() {
 
       console.log('[' + new Date().toUTCString() + '] ' + keyword)
 
-      db.query('INSERT INTO `'+getTableName(keyword)+'` (parent, text, user, user_name, user_avatar, created_at) VALUES (?, ?, ?, ?, ?, ?)', [
+      db.query('INSERT INTO `'+getTableName(keyword)+'` (id, parent, text, user, user_name, user_avatar, created_at) ON DUPLICATE KEY UPDATE VALUES (?, ?, ?, ?, ?, ?, ?)', [
         tweet.id,
+        (typeof tweet.retweeted_status !== 'undefined') ? tweet.retweeted_status.id : null,
         text,
         tweet.user.screen_name,
         tweet.user.name,
