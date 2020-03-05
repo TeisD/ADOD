@@ -91,7 +91,7 @@ function start() {
 							}
 							break;
 						case 'image':
-							console.log('-> image');
+							console.log('-> /image');
 							try {
 								r = image(body.image).then((data) => {
 									response.writeHead(200, {
@@ -337,6 +337,7 @@ function image(image) {
 	if (typeof image === 'undefined') return Promise.reject(404);
 
 	return new Promise((resolve, reject) => {
+		console.log(path.join(DATA_DIR, 'instagram', image));
 		fs.readFile(path.join(DATA_DIR, 'instagram', image), (err, data) => {
 			if (err) {
 				if (err.code === 'ENOENT') return reject('404');
