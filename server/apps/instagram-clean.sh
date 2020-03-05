@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR=$1
-SIZE=100
+SIZE=10
 
 cd "$DIR"
 
