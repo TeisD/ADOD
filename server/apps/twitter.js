@@ -15,8 +15,10 @@ pages.forEach((page) => {
     page.blocks.forEach((block) => {
       block.lines.forEach((line) => {
         const keyword = line.text;
+        const id = line._id;
         line.twitter.forEach((tag) => {
           keywords.push({
+            id: id,
             keyword: keyword,
             tag: tag
           });
@@ -89,7 +91,7 @@ function setup() {
     if (err) throw err;
   });
   keywords.forEach(k => {
-    const table = k.keyword
+    const table = k.id
     db.query('CREATE TABLE IF NOT EXISTS '+table+' ( \
       id BIGINT UNSIGNED PRIMARY KEY, \
       parent BIGINT, \
@@ -147,6 +149,7 @@ function run() {
 
       const text = parseText(tweet);
       const keyword = findKeyword(text);
+      const id = keywords.find(k => k.keyword == keyword).id;
 
       if(typeof keyword === 'undefined') return;
 
