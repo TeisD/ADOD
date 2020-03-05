@@ -356,8 +356,8 @@ function twitter(page) {
 
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
-	let queries = p.keywords.twitter.map((keyword) => {
-		return twitterQuery(keyword);
+	let queries = p.blocks.lines.map((line) => {
+		return twitterQuery(line);
 	})
 
 	return Promise.all(queries);
@@ -365,31 +365,33 @@ function twitter(page) {
 	/**
 	 * Execute query as a promise
 	 */
-	function twitterQuery(keyword) {
+	function twitterQuery(k) {
+		const table = getTableName(k.text)
+
 		return new Promise((resolve, reject) => {
-			db.query(`SELECT COUNT(*) FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' LIMIT 1000`, [], function (err, count) {
+			db.query(`SELECT text, user, user_name, created_at FROM ${table} ORDER BY timestamp DESC LIMIT 5`, [], function (err, response) {
 				if (err) return reject(err);
-				// make an additional query if the word is interesting
-				if (count[0]['COUNT(*)'] > 0 && keyword.length > 7) {
-					db.query(`SELECT DISTINCT text, created_at, user, user_avatar FROM ${TWITTER_TABLE} WHERE type = 'hashtag' AND text LIKE '%${keyword}%' ORDER BY created_at LIMIT 1`, [], function (err, tweet) {
-						if (err) return reject(err);
-						resolve({
-							word: keyword,
-							count: count[0]['COUNT(*)'],
-							text: parseTweet(tweet[0].text),
-							user: tweet[0].user,
-							avatar: tweet[0].user_avatar,
-							timestamp: tweet[0].created_at
-						});
-					});
-				} else {
-					resolve({
-						word: keyword,
-						count: count[0]['COUNT(*)'],
-					});
-				}
+				
+				resolve({
+					id: k._id,
+					word: k.text,
+					tweets: response
+				});
 			});
 		})
+	}
+
+	/**
+	 * Get the table named based on keyword
+	 */
+	function getTableName(keyword) {
+		const extra = keyword.indexOf('(');
+		if(extra != -1) {
+			keyword = keyword.substring(0, extra);
+		}
+		keyword = keyword.trim();
+		keyword = keyword.replace(/\s/g, "_");
+		return keyword;
 	}
 
 	/**
