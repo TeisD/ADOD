@@ -314,7 +314,7 @@ function instagramSimple(page) {
 					caption = caption.trim();
 
 					// check if the image exists or is a gallery item
-					let filename = '#' + hashtag + '/' + path.basename(file, '.txt') + '.jpg';
+					let filename = hashtag + '/' + path.basename(file, '.txt') + '.jpg';
 					fs.access(path.join(process.env.DATA_DIR, 'instagram', filename), err => {
 						if(err && err.code === 'ENOENT') {
 							filename = hashtag + '/' + path.basename(file, '.txt') + '_1.jpg'
@@ -337,7 +337,6 @@ function image(image) {
 	if (typeof image === 'undefined') return Promise.reject(404);
 
 	return new Promise((resolve, reject) => {
-		console.log(path.join(DATA_DIR, 'instagram', image));
 		fs.readFile(path.join(DATA_DIR, 'instagram', image), (err, data) => {
 			if (err) {
 				if (err.code === 'ENOENT') return reject('404');

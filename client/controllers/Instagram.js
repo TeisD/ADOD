@@ -19,10 +19,8 @@ class Instagram extends Controller {
 
 	draw(data) {
 
-		this.timestamp("Last updated from Instagram on", 40)
-
 		let areas,
-				queue = [];
+			queue = [];
 
 		if(typeof _.get(this.page, 'layout.fixed.images') !== 'undefined') {
 			areas = this.page.layout.fixed.images
@@ -54,11 +52,9 @@ class Instagram extends Controller {
 
 				if(typeof data[currentImage] !== 'undefined') {
 
-					let i = Math.floor(Math.random() * data[currentImage].images.length) 
-
 					queue.push(
 						this.drawImageFromUrl(
-							data[currentImage].images[i],
+							data[currentImage].image,
 							a.x,
 							a.y + currentPos,
 							a.width,
@@ -69,10 +65,9 @@ class Instagram extends Controller {
 
 					currentPos += h;
 
-					if(data[currentImage].captions.length) {
+					if(data[currentImage].caption) {
 					
-						let caption = data[currentImage].captions[Math.floor(Math.random() * data[currentImage].captions.length)]
-						console.log(caption);
+						let caption = data[currentImage].caption
 						
 						let metaHeight = this.drawText(caption, a.x, a.y + currentPos + 10, 7, a.width, 'Agipo', 8);
 						

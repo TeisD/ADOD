@@ -204,6 +204,7 @@ class Controller {
 								});
 							});
 						} else {
+							console.log('[ERROR] ' + response.statusCode);
 							return resolve();
 						}
 					}
