@@ -142,14 +142,10 @@ function start() {
 						case 'z33':
 							console.log('-> /z33 (instagram + twitter)');
 							try {
-								r = instagramSimple(body.page).then(instagramData => {
-									twitter(body.page).then(twitterData => {
-										return Promise.resolve({
-											twitter: twitterData,
-											instagram: instagramData
-										})
-									})
-								});
+								r = Promise.all([
+									instagramSimple(body.page),
+									twitter(body.page)
+								]);
 							} catch (e) {
 								r = Promise.reject(e);
 							}
