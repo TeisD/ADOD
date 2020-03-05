@@ -22,13 +22,10 @@ pages.forEach((page) => {
             keyword: keyword,
             tag: tag
           });
-          console.log(getTableName(keyword));
         })
       });
     })
 });
-
-return;
 
 const DB = process.env.DB;
 const AUTH = require('../../shared/config/keys/mysql.json');
@@ -95,6 +92,7 @@ function setup() {
   });
   keywords.forEach(k => {
     const table = getTableName(k.keyword);
+    console.log("creating table " + table);
     db.query('CREATE TABLE IF NOT EXISTS '+table+' ( \
       id BIGINT UNSIGNED PRIMARY KEY, \
       parent BIGINT, \
