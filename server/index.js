@@ -358,10 +358,11 @@ function twitter(page) {
 
 	if (typeof p.blocks === 'undefined') return Promise.reject('Page "' + page + '" does not contain data');
 
-	let queries = p.blocks.forEach(block => {
+	let queries = [];
+
+	p.blocks.forEach(block => {
 		block.lines.forEach((line) => {
-			console.log(line);
-			return twitterQuery(line);
+			queries.push(twitterQuery(line));
 		});
 	})
 
@@ -372,13 +373,11 @@ function twitter(page) {
 	 */
 	function twitterQuery(k) {
 		const table = getTableName(k.text);
-		console.log(table);
 
 		return new Promise((resolve, reject) => {
 			db.query(`SELECT text, user, user_name, created_at FROM \`${table}\` ORDER BY timestamp DESC LIMIT 5`, [], function (err, response) {
 				if (err) return reject(err);
 
-				console.log(response);
 				
 				resolve({
 					id: k._id,
