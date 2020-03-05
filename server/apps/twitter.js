@@ -88,7 +88,7 @@ function setup() {
   db.query('ALTER DATABASE '+DB+' CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci', function(err) {
     if (err) throw err;
   });
-  keywords.forEach(keyword => {
+  keywords.forEach(k => {
     const table = k.keyword
     db.query('CREATE TABLE IF NOT EXISTS '+table+' ( \
       id BIGINT UNSIGNED PRIMARY KEY, \
