@@ -356,9 +356,9 @@ function twitter(page) {
 
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
-	console.log(p);
+	if (typeof p.blocks.lines === 'undefined') return Promise.reject('Page "' + page + '" does not contain Twitter data');
 
-	let queries = p.blocks.lines.map((line) => {
+	let queries = p.blocks.lines.forEach((line) => {
 		return twitterQuery(line);
 	})
 
