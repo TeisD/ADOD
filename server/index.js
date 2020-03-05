@@ -308,7 +308,7 @@ function instagramSimple(page) {
 					// take first sentence only if too long
 					caption = caption.trim();
 					let lineindex = caption.substring(1, caption.length - 1).search(/[.?!\n]/);
-					if(caption.length > 100 && lineindex > -1) {
+					if(caption.length > 500 && lineindex > -1) {
 						caption = caption.substring(0, lineindex + 1);
 					}
 					caption = caption.trim();
