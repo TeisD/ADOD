@@ -85,7 +85,7 @@ function start() {
 						case 'instagram':
 							console.log('-> /instagram');
 							try {
-								r = instagram(body.page);
+								r = instagramSimple(body.page);
 							} catch (e) {
 								r = Promise.reject(e);
 							}
@@ -271,12 +271,12 @@ function instagramSimple(page) {
 	})
 
 	function getPost(line) {
-		let hashtag = _.sample(line.hashtags);
+		let hashtag = _.sample(line.instagram);
 
 		return new Promise((resolve, reject) => {
 			if(typeof hashtag == 'undefined') return resolve();
 
-			let dir =  path.join(process.env.DATA_DIR, 'instagram', '#' + hashtag);
+			let dir =  path.join(process.env.DATA_DIR, 'instagram', hashtag);
 			
 			fs.readdir(dir, (err, files) => {
 				if(err) {
@@ -286,15 +286,8 @@ function instagramSimple(page) {
 
 				files = files.filter(f => path.extname(f) == '.txt');
 				
-				let file;
-
-				if(files.length < 300) {
-					// sample random if there are not much
-					file = _.sample(files);
-				} else {
-					// take the most recent
-					file = files[files.length - 1];
-				}
+				// take the most recent file
+				let file = files[files.length - 1];
 
 				if(typeof file !== 'string') return resolve();
 
@@ -311,7 +304,7 @@ function instagramSimple(page) {
 					// take first sentence only if too long
 					caption = caption.trim();
 					let lineindex = caption.substring(1, caption.length - 1).search(/[.?!\n]/);
-					if(caption.length > 40 && lineindex > -1) {
+					if(caption.length > 100 && lineindex > -1) {
 						caption = caption.substring(0, lineindex + 1);
 					}
 					caption = caption.trim();
@@ -320,7 +313,7 @@ function instagramSimple(page) {
 					let filename = '#' + hashtag + '/' + path.basename(file, '.txt') + '.jpg';
 					fs.access(path.join(process.env.DATA_DIR, 'instagram', filename), err => {
 						if(err && err.code === 'ENOENT') {
-							filename = '#' + hashtag + '/' + path.basename(file, '.txt') + '_1.jpg'
+							filename = hashtag + '/' + path.basename(file, '.txt') + '_1.jpg'
 						}
 
 						resolve({
