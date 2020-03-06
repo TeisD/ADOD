@@ -32,8 +32,6 @@ class Controller {
 		*/
 		registerFont(path.join(__dirname, '../../shared/assets/fonts/WorkSans-Light.ttf'), {family: 'WorkSans'});
 		registerFont(path.join(__dirname, '../../shared/assets/fonts/NotoEmoji-Regular.ttf'), {family: 'WorkSans'});
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/Apple Color Emoji.ttf'), {family: 'WorkSans'});
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/Segoe UI Emoji.ttf'), {family: 'WorkSans'});
 	}
 
 	/**
@@ -368,6 +366,7 @@ class Controller {
 
 		if(!dry) {
 			lines.forEach((line, i) => {
+				this.ctx.fillText("❤️", 100, 100);
 				this.ctx.fillText(line, i == 0 ? x + indent : x, y + i * lineheight);
 				if (stroke && line != "") {
 					this.roundRect(x + indent - 5, y + i * lineheight - size - 3 , w + (0.75 * size), 1.5 * size + 3, 0.75 * size, false, true);
