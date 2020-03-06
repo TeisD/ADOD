@@ -55,13 +55,16 @@ class Controller {
 			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
 
+		this.ctx.translate(this.page.width/2, this.page.height/2);
+
 		if(rotate) {
-			this.ctx.translate(this.page.width/2, this.page.height/2);
 			this.ctx.rotate(180 * Math.PI / 180);
-			this.ctx.translate(-this.page.width/2, -this.page.height/2)
 		}
 
 		this.ctx.scale(.5, .5);
+
+		this.ctx.translate(-this.page.width/2, -this.page.height/2)
+
 
 		//this.ctx.translate(this.page.offset.x, this.page.offset.y);
 	}
@@ -376,7 +379,6 @@ class Controller {
 
 		if(!dry) {
 			lines.forEach((line, i) => {
-				this.ctx.fillText("❤️", 100, 100);
 				this.ctx.fillText(line, i == 0 ? x + indent : x, y + i * lineheight);
 				if (stroke && line != "") {
 					this.roundRect(x + indent - 5, y + i * lineheight - size - 3 , w + (0.75 * size), 1.5 * size + 3, 0.75 * size, false, true);
