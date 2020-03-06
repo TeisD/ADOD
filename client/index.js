@@ -207,7 +207,7 @@ function getData(pagenumber) {
 			request.post({
 				url: process.env.HOSTNAME + '/' + url,
 				form: data,
-				timeout: 40000
+				timeout: 5000
 			}, (err, response, body) => {
 				if(err) {
 					if(retry < parseInt(process.env.MAX_RETRY)) {
