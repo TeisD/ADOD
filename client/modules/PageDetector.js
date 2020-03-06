@@ -128,6 +128,7 @@ class PageDetector extends EventEmitter {
 				if(this.prevSymbol == null) {
 					if(process.env.CALIBRATION_MODE) console.log('<PD> Trying other orientation')
 					this.prevSymbol = symbol;
+					this.prevSymbol.angle = this.angle;
 					this.angle = -this.angle;
 					this.capture();
 					return Promise.resolve();
@@ -135,6 +136,7 @@ class PageDetector extends EventEmitter {
 				} else {
 					if(symbol.confidence < symbol.prevSymbol) {
 						n = parseInt(this.prevSymbol.text)
+						angle = this.prevSymbol.angle;
 					}
 				}		
 			}
