@@ -61,6 +61,8 @@ class Controller {
 			this.ctx.translate(-this.page.width/2, -this.page.height/2)
 		}
 
+		this.ctx.scale(.5, .5);
+
 		//this.ctx.translate(this.page.offset.x, this.page.offset.y);
 	}
 
