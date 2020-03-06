@@ -37,7 +37,9 @@ class Controller {
 	/**
 	 * Load the page
 	 */
-	load(page) {
+	load(page, rotate) {
+		if (typeof rotate === 'undefined') rotate = false;
+
 		this.page = page;
 		this.canvas = createCanvas(page.width, page.height, 'pdf');
 		// this.canvas = new Canvas(page.width, page.height, 'pdf');
@@ -51,6 +53,12 @@ class Controller {
 		if (process.env.DEBUGGING) {
 			var bg = path.join(process.env.DATA_DIR, 'pages', this.page.number + '.png');
 			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
+		}
+
+		if(rotate) {
+			this.ctx.translate(this.page.width/2, this.page.height/2);
+			this.ctx.rotate(180 * Math.PI / 180);
+			this.ctx.translate(-this.page.width/2, -this.page.height/2)
 		}
 
 		//this.ctx.translate(this.page.offset.x, this.page.offset.y);

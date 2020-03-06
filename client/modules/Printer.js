@@ -17,18 +17,9 @@ class Printer {
 				"job-name": "ADOD Job",
 				"document-format": "application/pdf"
 			},
-			/*
 			"job-attributes-tag": {
-				"media-col": {
-					"media-left-margin": 423,
-					"media-right-margin": 423,
-					"media-size": {
-						'x-dimension': 20990,
-						'y-dimension': 29704
-					}
-				}
+				"print-scaling": "fit"
 			},
-			*/
 			"data": data
 		};
 		this.printer.execute("Print-Job", msg, function(err, res){

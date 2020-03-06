@@ -72,14 +72,8 @@ pagedetector.on('change', (e) => {
 /**
  * Process the detected page
  */
-pagedetector.on('ready', function(n) {
-	// hacky language setting
-	/*
-	if(language == 1) {
-		n = n + 'T';
-	}
-	*/
-	
+pagedetector.on('ready', function(n, a) {
+
 	let page = Page.find(pages, n);
 
 	if(typeof page === "undefined") {
@@ -105,14 +99,12 @@ pagedetector.on('ready', function(n) {
 		if(typeof data === 'undefined') {
 			lcd.print(LCD.MESSAGE.NO_DATA);
 			controller.load(page);
-			return new Promise((res, rej) => {
-				setTimeout(res, 3000)
-			});
 		} else {
 			data = JSON.parse(data);
 			console.log('<Index> Received ' + data.length + ' links');
 			lcd.print(LCD.MESSAGE.DRAWING);
-			controller.load(page);
+			let rotate = a < 0 ? true : false
+			controller.load(page, rotate);
 			return controller.draw(data);
 		}
 	})

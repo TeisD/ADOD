@@ -10,9 +10,9 @@ class Test extends Controller {
         this.twitter = new Twitter();
     }
     
-    load(page) {
-        this.instagram.load(page);
-        this.twitter.load(page);
+    load(page, rotate) {
+        this.instagram.load(page, rotate);
+        this.twitter.load(page, rotate);
     }
 
 	draw(data) {

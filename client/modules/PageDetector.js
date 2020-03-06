@@ -139,7 +139,7 @@ class PageDetector extends EventEmitter {
 				console.log(`<PD> Page: ${n}`);
 				this.pagenumber = n;
 				this.try = 1;
-				this.emit('ready', this.pagenumber);
+				this.emit('ready', this.pagenumber, this.angle);
 			}
 
 			this.capture();
