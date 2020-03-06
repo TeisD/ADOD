@@ -142,7 +142,7 @@ class PageDetector extends EventEmitter {
 			this.prevSymbol = null;
 
 			// if it's still not a number, then it's not a page	
-			if(!n || isNaN(n) {
+			if(!n || isNaN(n)) {
 				return Promise.reject(STATUS.NO_PAGE)
 			}
 
