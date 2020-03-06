@@ -111,14 +111,14 @@ class PageDetector extends EventEmitter {
 			console.log('<PD> Image recognition START');
 			return this.tesseract.recognize(image, {
 				lang: 'eng',
-				tessedit_char_whitelist: '1234567'
+				tessedit_char_whitelist: '123456'
 			})
 		})
 		.then((tess) => {
 			if(!this.running) return;
 
 			var symbol = tess.symbols.sort((a, b) => a.confidence > b.confidence)[0]
-			if(process.env.CALIBRATION_MODE) console.log(symbol);
+			if(process.env.CALIBRATION_MODE) console.log(symbol.text + " - " + symbol.confidence);
 
 			var n = parseInt(symbol.text);
 						
@@ -219,7 +219,7 @@ class PageDetector extends EventEmitter {
 		}
 
 		var bbox = contours.boundingRect(id);
-		_im = _im.crop(bbox.x + 25, bbox.y + 25, bbox.width - 50, bbox.height - 50);
+		_im = _im.crop(bbox.x + 75, bbox.y + 75, bbox.width - 150, bbox.height - 150);
 		_im.rotate(this.angle);
 
 		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
