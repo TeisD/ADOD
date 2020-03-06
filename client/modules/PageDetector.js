@@ -123,6 +123,7 @@ class PageDetector extends EventEmitter {
 						
 			if(!n || isNaN(n) || symbol.confidence < process.env.CAM_CONFIDENCE) {
 ;				if(this.try < 2) {
+					if(process.env.DEBUGGING) console.log('<PD> Trying other orientation')
 					this.try++;
 					this.angle = -this.angle;
 					this.capture();
