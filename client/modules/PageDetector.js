@@ -118,13 +118,13 @@ class PageDetector extends EventEmitter {
 			if(!this.running) return;
 
 			var symbol = tess.symbols.sort((a, b) => a.confidence > b.confidence)[0]
-			if(process.env.DEBUGGING) console.log(symbol);
+			if(process.env.CALIBRATION_MODE) console.log(symbol);
 
 			var n = parseInt(symbol.text);
 						
 			if(!n || isNaN(n) || symbol.confidence < process.env.CAM_CONFIDENCE) {
 ;				if(this.try < 2) {
-					if(process.env.DEBUGGING) console.log('<PD> Trying other orientation')
+					if(process.env.CALIBRATION_MODE) console.log('<PD> Trying other orientation')
 					this.try++;
 					this.angle = -this.angle;
 					this.capture();
