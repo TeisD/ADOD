@@ -4,12 +4,12 @@ const BEEPS = {
 	OK: {
 		frequency: 3000,
 		length: 100,
-		delay: 50,
+		delay: 100,
 		times: 2
 	},
 	ERROR: {
 		frequency: 500,
-		length: 500,
+		length: 300,
 		delay: 1000,
 		times: 2
 	}
