@@ -219,7 +219,7 @@ class PageDetector extends EventEmitter {
 		}
 
 		var bbox = contours.boundingRect(id);
-		_im = _im.crop(bbox.x + 75, bbox.y + 75, bbox.width - 150, bbox.height - 150);
+		_im = _im.crop(bbox.x + 60, bbox.y + 60, bbox.width - 120, bbox.height - 120);
 		_im.rotate(this.angle);
 
 		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
