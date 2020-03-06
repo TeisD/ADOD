@@ -61,8 +61,7 @@ class PageDetector extends EventEmitter {
 		this.pagelanguage = 0;
 		this.running = false;
 		this.status = null;
-		this.try = 1;
-		this.confidence = process.env.CAM_CONFIDENCE;
+		this.prevSymbol = null;
 	}
 
 	/*
@@ -122,27 +121,37 @@ class PageDetector extends EventEmitter {
 			if(process.env.CALIBRATION_MODE) console.log(symbol.text + " - " + symbol.confidence);
 
 			var n = parseInt(symbol.text);
-						
-			if(!n || isNaN(n) || symbol.confidence < this.confidence) {
-;				if(this.try < 4) {
+
+			// check if we need to retry
+			if(!n || isNaN(n) || symbol.confidence < process.env.CAM_CONFIDENCE) {
+				// if it's the first run, retry
+				if(this.prevSymbol == null) {
 					if(process.env.CALIBRATION_MODE) console.log('<PD> Trying other orientation')
+					this.prevSymbol = symbol;
 					this.angle = -this.angle;
-					if (this.try == 2) this.confidence = process.env.CAM_CONFIDENCE - 20;
-					this.try++;
 					this.capture();
 					return Promise.resolve();
+				// in other cases, take the best guess
 				} else {
-					this.try = 1
-					this.confidence = process.env.CAM_CONFIDENCE;
-					return Promise.reject(STATUS.NO_PAGE)
-				}
+					if(symbol.confidence < symbol.prevSymbol) {
+						n = parseInt(this.prevSymbol.text)
+					}
+				}		
 			}
 
+			this.prevSymbol = null;
+
+			// if it's still not a number, then it's not a page	
+			if(!n || isNaN(n) {
+				return Promise.reject(STATUS.NO_PAGE)
+			}
+
+			// we might be in another run that started of before the pageDetecter was paused
+			// so, check if it's a new page
 			if(n != this.pagenumber) {
 				console.log(`<PD> Page: ${n}`);
 				this.pagenumber = n;
 				this.try = 1;
-				this.confidence = process.env.CAM_CONFIDENCE
 				this.emit('ready', this.pagenumber, this.angle);
 			}
 
