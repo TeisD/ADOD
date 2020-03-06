@@ -77,7 +77,10 @@ class Controller {
 	 * @return A pdf buffer
 	 */
 	getBuffer() {
+		this.ctx.save();
+		this.ctx.scale(-2, -2);
 		return this.canvas.toBuffer();
+		this.ctx.restore();
 	}
 
 	/**
