@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const Canvas = require('canvas')
-const Image = Canvas.Image;
-const Font = Canvas.Font;
+const { createCanvas, registerFont, Image } = require('canvas');
 const he = require('he');
 const dotenv = require('dotenv');
 const request = require('request');
@@ -23,6 +21,7 @@ class Controller {
 		this.page,
 		this.canvas,
 		this.ctx;
+		/*
 		this.fonts = [
 			new Font('Space Mono', path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf')),
 			new Font('Wingdings', path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf')),
@@ -30,8 +29,11 @@ class Controller {
 			new Font('Genath', path.join(__dirname, '../../shared/assets/fonts/Genath-Regular.otf')),
 			new Font('Work Sans', path.join(__dirname, '../../shared/assets/fonts/WorkSans-Light.ttf'))
 		]
-		//registerFont(path.join(__dirname, '../../shared/assets/fonts/SpaceMono-Regular.ttf'), {family: 'SpaceMono'});
-		//registerFont(path.join(__dirname, '../../shared/assets/fonts/Wingdings.ttf'), {family: 'Wingdings'});
+		*/
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/WorkSans-Light.ttf'), {family: 'WorkSans'});
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/NotoEmoji-Regular.ttf'), {family: 'WorkSans'});
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/Apple Color Emoji.ttf'), {family: 'WorkSans'});
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/Segoe UI Emoji.ttf'), {family: 'WorkSans'});
 	}
 
 	/**
@@ -39,12 +41,14 @@ class Controller {
 	 */
 	load(page) {
 		this.page = page;
-		//this.canvas = Canvas.createCanvas(page.width, page.height, 'pdf');
-		this.canvas = new Canvas(page.width, page.height, 'pdf');
+		this.canvas = createCanvas(page.width, page.height, 'pdf');
+		// this.canvas = new Canvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
+		/*
 		this.fonts.forEach(font => {
 			this.ctx.addFont(font);
 		});
+		*/
 
 		if (process.env.DEBUGGING) {
 			var bg = path.join(process.env.DATA_DIR, 'pages', this.page.number + '.png');
@@ -328,7 +332,8 @@ class Controller {
 		if (typeof font === 'undefined') {
 			this.ctx.font = `bold ${size}pt Arial`;
 		} else {
-			this.ctx._setFont('normal', 'normal', size, 'px', font);
+			// this.ctx._setFont('normal', 'normal', size, 'px', font);
+			this.ctx.font = `bold ${size}pt ${font}`; 
 		}
 		if (typeof lineheight === 'undefined') lineheight = size;
 		if (typeof indent === 'undefined') indent = 0;
@@ -365,7 +370,7 @@ class Controller {
 			lines.forEach((line, i) => {
 				this.ctx.fillText(line, i == 0 ? x + indent : x, y + i * lineheight);
 				if (stroke && line != "") {
-					this.roundRect(x + indent - 5, y + i * lineheight - size - 1 , w + (0.75 * size), 1.5 * size, 0.75 * size, false, true);
+					this.roundRect(x + indent - 5, y + i * lineheight - size - 3 , w + (0.75 * size), 1.5 * size + 3, 0.75 * size, false, true);
 					w += size
 				}
 			});

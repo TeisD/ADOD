@@ -28,11 +28,11 @@ class Twitter extends Controller {
 
 					let tweet = tweets.tweets[i];
 
-					let text = this.drawText(" ● " + tweet.text, x, currentPos, 20, w, "Work Sans", 26, false, indent, true);
+					let text = this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent, true);
 
 					if(currentPos + text.height < y + h) {
-						this.drawText(" ● " + tweet.text, x, currentPos, 20, w, "Work Sans", 26, false, indent);
-						let tag = this.drawText(`defined ${moment(tweet.created_at).fromNow()} by @${tweet.user}`, x, currentPos + text.height - 26, 14, w, "Work Sans", 26, true, text.x)
+						this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent);
+						let tag = this.drawText(`defined ${moment(tweet.created_at).fromNow()} by @${tweet.user}`, x, currentPos + text.height - 26, 12, w, "WorkSans", 26, true, text.x)
 						if (tag.lines > 1) {
 							indent = tag.x;
 						} else {

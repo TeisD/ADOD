@@ -91,7 +91,7 @@ class Instagram extends Controller {
 						y += 5;
 					}
 
-					let w = this.drawText("fig. " + (currentImage + 1), x, y, 14, a.width - shift, 'Work Sans', 16, true).x;
+					let w = this.drawText("fig. " + (currentImage + 1), x, y, 12, a.width - shift, 'WorkSans', 16, true).x;
 								
 					// draw the fig. x marker for the keyword
 
@@ -100,7 +100,7 @@ class Instagram extends Controller {
 					if(typeof keypos !== 'undefined') {
 						x = keypos.bbox.x0 - 60;
 						y = keypos.bbox.y0 + 21;
-						this.drawText("fig. " + (currentImage + 1), x, y, 14, a.width - shift, 'Work Sans', 16, true);
+						this.drawText("fig. " + (currentImage + 1), x, y, 12, a.width - shift, 'WorkSans', 16, true);
 					}
 
 
@@ -117,7 +117,7 @@ class Instagram extends Controller {
 							x = x + w + 4;
 						}
 						
-						let metaHeight = this.drawText(caption, x, y, 14, sizeMode >= 0.75 ? a.width - 50 : a.width - shift, 'Work Sans', 16, false).height;
+						let metaHeight = this.drawText(caption, x, y, 12, sizeMode >= 0.75 ? a.width - 50 : a.width - shift, 'WorkSans', 16, false).height;
 						
 						currentPos += metaHeight + 50;
 					} else {
