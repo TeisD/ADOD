@@ -17,9 +17,11 @@ class Printer {
 				"job-name": "ADOD Job",
 				"document-format": "application/pdf"
 			},
+			/*
 			"job-attributes-tag": {
 				"print-scaling": "fit"
 			},
+			*/
 			"data": data
 		};
 		this.printer.execute("Print-Job", msg, function(err, res){

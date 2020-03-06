@@ -55,15 +55,16 @@ class Controller {
 			this.drawImage(bg, 0, 0, this.page.width, this.page.height);
 		}
 
-		this.ctx.translate(this.page.width/2, this.page.height/2);
-
 		if(rotate) {
+			this.ctx.translate(this.page.width/2, this.page.height/2);
 			this.ctx.rotate(180 * Math.PI / 180);
+			this.ctx.translate(-this.page.width/2, -this.page.height/2)
 		}
 
-		this.ctx.scale(.5, .5);
+		this.ctx.translate(0, this.page.height);
+		this.ctx.scale(.75, .75);
+		this.ctx.translate(0, -this.page.height)
 
-		this.ctx.translate(-this.page.width/2, -this.page.height/2)
 
 
 		//this.ctx.translate(this.page.offset.x, this.page.offset.y);
