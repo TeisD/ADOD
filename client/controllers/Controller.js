@@ -41,7 +41,7 @@ class Controller {
 		if (typeof rotate === 'undefined') rotate = false;
 
 		this.page = page;
-		this.canvas = createCanvas(page.width, page.height, 'pdf');
+		this.canvas = createCanvas(595, 841, 'pdf');
 		// this.canvas = new Canvas(page.width, page.height, 'pdf');
 		this.ctx = this.canvas.getContext('2d');
 		/*
@@ -49,6 +49,8 @@ class Controller {
 			this.ctx.addFont(font);
 		});
 		*/
+
+		this.ctx.scale(this.canvas.width / this.page.width, this.canvas.height / this.page.height)
 
 		if (process.env.DEBUGGING) {
 			var bg = path.join(process.env.DATA_DIR, 'pages', this.page.number + '.png');
@@ -60,12 +62,6 @@ class Controller {
 			this.ctx.rotate(180 * Math.PI / 180);
 			this.ctx.translate(-this.page.width/2, -this.page.height/2)
 		}
-
-		this.ctx.translate(0, this.page.height);
-		this.ctx.scale(.5, .5);
-		this.ctx.translate(0, -this.page.height)
-
-
 
 		//this.ctx.translate(this.page.offset.x, this.page.offset.y);
 	}
