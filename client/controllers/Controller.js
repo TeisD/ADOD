@@ -31,7 +31,7 @@ class Controller {
 		]
 		*/
 		registerFont(path.join(__dirname, '../../shared/assets/fonts/WorkSans-Light.ttf'), {family: 'WorkSans'});
-		registerFont(path.join(__dirname, '../../shared/assets/fonts/NotoEmoji-Regular.ttf'), {family: 'WorkSans'});
+		registerFont(path.join(__dirname, '../../shared/assets/fonts/Segoe UI Emoji.ttf'), {family: 'WorkSans'});
 	}
 
 	/**
