@@ -14,7 +14,7 @@ try {
 }
 
 const MESSAGE = {
-	INSERT_PAGE: "Insert essay",
+	INSERT_PAGE: "Insert page",
 	UNKNOWN_PAGE: "Unknown page",
 	PAGE_DETECTED: "Detected page!\nRecognizing...",
 	ERROR_RETRY: "Error :(\nRetrying in 5s...",
