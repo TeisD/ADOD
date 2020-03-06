@@ -118,6 +118,7 @@ class PageDetector extends EventEmitter {
 			if(!this.running) return;
 
 			var symbol = tess.symbols.sort((a, b) => a.confidence > b.confidence)[0]
+			if(process.env.DEBUGGING) console.log(symbol);
 
 			var n = parseInt(symbol.text);
 						
