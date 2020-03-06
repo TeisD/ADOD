@@ -62,6 +62,7 @@ class PageDetector extends EventEmitter {
 		this.running = false;
 		this.status = null;
 		this.try = 1;
+		this.confidence = process.env.CAM_CONFIDENCE;
 	}
 
 	/*
@@ -122,15 +123,17 @@ class PageDetector extends EventEmitter {
 
 			var n = parseInt(symbol.text);
 						
-			if(!n || isNaN(n) || symbol.confidence < process.env.CAM_CONFIDENCE) {
-;				if(this.try < 2) {
+			if(!n || isNaN(n) || symbol.confidence < this.confidence) {
+;				if(this.try < 4) {
 					if(process.env.CALIBRATION_MODE) console.log('<PD> Trying other orientation')
-					this.try++;
 					this.angle = -this.angle;
+					if (this.try == 2) this.confidence = process.env.CAM_CONFIDENCE - 20;
+					this.try++;
 					this.capture();
 					return Promise.resolve();
 				} else {
 					this.try = 1
+					this.confidence = process.env.CAM_CONFIDENCE;
 					return Promise.reject(STATUS.NO_PAGE)
 				}
 			}
@@ -139,6 +142,7 @@ class PageDetector extends EventEmitter {
 				console.log(`<PD> Page: ${n}`);
 				this.pagenumber = n;
 				this.try = 1;
+				this.confidence = process.env.CAM_CONFIDENCE
 				this.emit('ready', this.pagenumber, this.angle);
 			}
 
