@@ -15,6 +15,7 @@ const Salone = require('./controllers/Salone');
 const Twitter = require('./controllers/Twitter');
 const Fuorisalone = require('./controllers/Fuorisalone');
 const Amazon = require('./controllers/Amazon');
+const Z33 = require('./controllers/Z33');
 const Test = require('./controllers/Test');
 
 dotenv.config();
@@ -40,6 +41,9 @@ switch(process.env.CONTROLLER){
 		break;
 	case 'amazon':
 		controller = new Amazon();
+		break;
+	case 'z33':
+		controller = new Z33();
 		break;
 	default:
 		controller = new Test();
@@ -183,6 +187,10 @@ function getData(pagenumber) {
 				break;
 			case 'amazon':
 				url = 'amazon';
+				data = {page: pagenumber};
+				break;
+			case 'z33':
+				url = 'z33';
 				data = {page: pagenumber};
 				break;
 			default:

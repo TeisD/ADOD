@@ -321,8 +321,9 @@ class Controller {
 	 * @param {number} lineheight (optional) The lineheight of the text
 	 * @param {boolean} stroke (optional) Put the text in a stroke
 	 * @param {number} indent (optional) The indentation for the first line
+	 * @param {boolean} dry (optional) Do a dry run
 	 */
-	drawText(text, x, y, size, width, font, lineheight, stroke, indent) {
+	drawText(text, x, y, size, width, font, lineheight, stroke, indent, dry) {
 		let w = 0;
 		if (typeof font === 'undefined') {
 			this.ctx.font = `bold ${size}pt Arial`;
@@ -331,34 +332,48 @@ class Controller {
 		}
 		if (typeof lineheight === 'undefined') lineheight = size;
 		if (typeof indent === 'undefined') indent = 0;
+		if (typeof dry === 'undefined') dry = false;
+		if (stroke) x += 10;
 		let lines = [],
 			line = '';
 		if(typeof width !== 'undefined'){
-			he.decode(text).split(/\s/).forEach((word) => {
-				w = this.ctx.measureText(line + ' ' + word).width;
-				if(lines.length < 2) w += indent;
-				if (w > width + 10) {
-					lines.push(line);
-					line = '';
+			if(stroke) {
+				w = this.ctx.measureText(text).width;
+				if(w + indent > width) {
+					lines.push(''); // push an empty line
+					indent = 0;
 				}
-				line += ' ' + word;
-			});
+				line += text;
+			} else {
+				he.decode(text).split(/\s/).forEach((word) => {
+					w = this.ctx.measureText(line + ' ' + word).width;
+					if(!lines.length) w += indent;
+					if (w > width + 10) {
+						lines.push(line);
+						line = '';
+						w = this.ctx.measureText(word + ' ').width;
+					}
+					line += ' ' + word;
+				});
+			}
 			lines.push(line);
 		} else {
 			lines.push(text);
 		}
 
-		if (stroke) {
-			this.roundRect(x - 2, y - size - 1, w + (0.75 * size), 1.5 * size, 0.75 * size, false, true);
-			w += size
+		if(!dry) {
+			lines.forEach((line, i) => {
+				this.ctx.fillText(line, i == 0 ? x + indent : x, y + i * lineheight);
+				if (stroke && line != "") {
+					this.roundRect(x + indent - 5, y + i * lineheight - size - 1 , w + (0.75 * size), 1.5 * size, 0.75 * size, false, true);
+					w += size
+				}
+			});
 		}
-
-		lines.forEach((line, i) => {
-			this.ctx.fillText(line, i == 0 ? x + indent : x, y + i * lineheight);
-		});
 
 		return {
 			x: w,
+			lines: lines.length,
 			height: lines.length*lineheight
 		}
 	}

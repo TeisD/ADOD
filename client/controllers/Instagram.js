@@ -98,7 +98,7 @@ class Instagram extends Controller {
 					let keypos = this.page.blocks[0].lines.find(line => line._id == id);
 
 					if(typeof keypos !== 'undefined') {
-						x = keypos.bbox.x0 - 55;
+						x = keypos.bbox.x0 - 60;
 						y = keypos.bbox.y0 + 21;
 						this.drawText("fig. " + (currentImage + 1), x, y, 14, a.width - shift, 'Work Sans', 16, true);
 					}
@@ -111,10 +111,10 @@ class Instagram extends Controller {
 					if(data[currentImage].caption && data[currentImage].caption.length) {
 
 						x = a.x + shift - 5;
-						y = a.y + currentPos + 25;
+						y = a.y + currentPos + 24;
 
 						if(sizeMode >= 0.75) {
-							x = x + w;
+							x = x + w + 4;
 						}
 						
 						let metaHeight = this.drawText(caption, x, y, 14, sizeMode >= 0.75 ? a.width - 50 : a.width - shift, 'Work Sans', 16, false).height;
