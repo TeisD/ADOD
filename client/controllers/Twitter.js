@@ -24,25 +24,28 @@ class Twitter extends Controller {
 				let indent = line.bbox.w;
 				let i = 0;
 
-				while(currentPos < y + h - 40 && i < tweets.tweets.length) {
+				if(tweets.length) {
 
-					let tweet = tweets.tweets[i];
+					while(currentPos < y + h - 40 && i < tweets.tweets.length) {
 
-					let text = this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent, true);
+						let tweet = tweets.tweets[i];
 
-					if(currentPos + text.height < y + h) {
-						this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent);
-						let tag = this.drawText(`defined ${moment(tweet.created_at).fromNow()} by @${tweet.user}`, x, currentPos + text.height - 26, 12, w, "WorkSans", 26, true, text.x)
-						if (tag.lines > 1) {
-							indent = tag.x;
-						} else {
-							indent = 0;
+						let text = this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent, true);
+
+						if(currentPos + text.height < y + h) {
+							this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent);
+							let tag = this.drawText(`defined ${moment(tweet.created_at).fromNow()} by @${tweet.user}`, x, currentPos + text.height - 26, 12, w, "WorkSans", 26, true, text.x)
+							if (tag.lines > 1) {
+								indent = tag.x;
+							} else {
+								indent = 0;
+							}
 						}
+
+						currentPos += text.height;
+
+						i++;
 					}
-
-					currentPos += text.height;
-
-					i++;
 				}
 			})
 		});
