@@ -60,8 +60,8 @@ lcd.print("Initializing...");
 pagedetector.on('change', (e) => {
 	if(e === PageDetector.STATUS.NO_PAGE) {
 		lcd.clear();
-		lcd.println(process.env.CONTROLLER.toUpperCase(), 1)
-		lcd.println(LCD.MESSAGE.INSERT_PAGE, 2)
+		//lcd.println(process.env.CONTROLLER.toUpperCase(), 1)
+		lcd.println(LCD.MESSAGE.INSERT_PAGE, 1)
 	} else if (e === PageDetector.STATUS.NEW_PAGE) {
 		piezo.beep(Piezo.BEEPS.OK);
 		lcd.print(LCD.MESSAGE.PAGE_DETECTED);
