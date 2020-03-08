@@ -96,15 +96,15 @@ pagedetector.on('ready', function(n, a) {
 	getData(n)
 	.then((data) => { // draw the data
 		piezo.beep(Piezo.BEEPS.OK);
+
+		controller.load(page, a < 0 ? true : false);
+
 		if(typeof data === 'undefined') {
 			lcd.print(LCD.MESSAGE.NO_DATA);
-			controller.load(page);
 		} else {
 			data = JSON.parse(data);
 			console.log('<Index> Received ' + data.length + ' links');
 			lcd.print(LCD.MESSAGE.DRAWING);
-			let rotate = a < 0 ? true : false
-			controller.load(page, rotate);
 			return controller.draw(data);
 		}
 	})
