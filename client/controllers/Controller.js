@@ -127,6 +127,7 @@ class Controller {
 	 * @param height The height of the image
 	 */
 	drawImage(src, x, y, width, height) {
+
 		if (!fs.existsSync(src)) {
 			console.log('<Controller> File does not exist');
 			return;
@@ -136,7 +137,22 @@ class Controller {
 		img.dataMode = Image.MODE_MIME | Image.MODE_IMAGE; // Both are tracked
 		img.src = fs.readFileSync(src);
 
-		this.drawImageProp(img, x, y, width, height);
+		/*
+		this.ctx.save();
+		//this.ctx.translate(x, y);
+		//this.ctx.scale(width / img.width, height / img.height);
+		console.log(width / img.width);
+		console.log(height / img.height);
+		this.drawImage(img, 0, 0, 1000, 1000);
+		this.ctx.rect(0, 0, 100, 100);
+		this.ctx.restore();
+		*/
+
+		this.ctx.save();
+		this.ctx.translate(x, y)
+		this.ctx.scale(width / img.width, height / img.height);
+		this.drawImageProp(img, 0, 0, img.width, img.height);
+		this.ctx.restore();
 	}
 
 	/**
