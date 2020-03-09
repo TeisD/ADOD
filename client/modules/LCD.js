@@ -26,7 +26,7 @@ const MESSAGE = {
 	NO_DATA: "No links found",
 	SEARCHING: "Searching for\nlinks",
 	DRAWING: "Preparing to\nprint",
-	PRINTING: "Printing page"
+	PRINTING: "Printing page\nPlease wait..."
 }
 
 class LCD {
