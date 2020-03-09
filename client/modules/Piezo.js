@@ -3,7 +3,7 @@ const rpio = require('rpio');
 const BEEPS = {
 	OK: {
 		frequency: 3000,
-		length: 10,
+		length: 100,
 		delay: 100,
 		times: 1
 	},
@@ -21,7 +21,7 @@ class Piezo {
 		this.pin = pin;
 		this.clockDivider = 16;
 		this.clockFreq = 1.2e6;
-		this.dutyCycle = 1;
+		this.dutyCycle = 1.2;
 
 		rpio.open(this.pin, rpio.PWM);
 		rpio.pwmSetData(this.pin, 0);
