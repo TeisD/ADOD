@@ -2,7 +2,7 @@ const rpio = require('rpio');
 
 const BEEPS = {
 	OK: {
-		frequency: 1200,
+		frequency: 4000,
 		length: 10,
 		delay: 100,
 		times: 1
