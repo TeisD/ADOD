@@ -30,8 +30,6 @@ class Twitter extends Controller {
 
 						let tweet = tweets.tweets[i];
 
-						console.log(tweet);
-
 						let text = this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent, true);
 
 						if(currentPos + text.height < y + h) {
