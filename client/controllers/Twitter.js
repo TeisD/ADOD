@@ -24,9 +24,7 @@ class Twitter extends Controller {
 				let indent = line.bbox.w;
 				let i = 0;
 
-				console.log(tweets);
-
-				if(typeof tweets.tweets !== 'undefined') {
+				if(typeof tweets !== 'undefined' && typeof tweets.tweets !== 'undefined') {
 
 					while(currentPos < y + h - 40 && i < tweets.tweets.length) {
 
