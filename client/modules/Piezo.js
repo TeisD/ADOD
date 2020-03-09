@@ -5,7 +5,7 @@ const BEEPS = {
 		frequency: 3000,
 		length: 100,
 		delay: 100,
-		times: 1
+		times: 2
 	},
 	ERROR: {
 		frequency: 500,
