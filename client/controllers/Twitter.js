@@ -24,11 +24,15 @@ class Twitter extends Controller {
 				let indent = line.bbox.w;
 				let i = 0;
 
-				if(tweets.length) {
+				console.log(tweets);
+
+				if(typeof tweets.tweets !== 'undefined') {
 
 					while(currentPos < y + h - 40 && i < tweets.tweets.length) {
 
 						let tweet = tweets.tweets[i];
+
+						console.log(tweet);
 
 						let text = this.drawText(" ● " + tweet.text, x, currentPos, 16, w, "WorkSans", 26, false, indent, true);
 
