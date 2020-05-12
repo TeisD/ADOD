@@ -228,12 +228,17 @@ class PageDetector extends EventEmitter {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
+		var bbox = contours.boundingRect(id);
+
+		if(bbox.width < 50 || bbox.width > 500 || bbox.height < 50 || bbox.height > 500) {
+			return Promise.reject(STATUS.NO_PAGE);
+		}
+
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
 			this.emit('change', STATUS.NEW_PAGE);
 		}
 
-		var bbox = contours.boundingRect(id);
 		_im = _im.crop(bbox.x + 60, bbox.y + 60, bbox.width - 120, bbox.height - 120);
 		_im.rotate(this.angle);
 
