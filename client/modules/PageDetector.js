@@ -230,9 +230,7 @@ class PageDetector extends EventEmitter {
 
 		var bbox = contours.boundingRect(id);
 
-		console.log(`W:${bbox.width} H:${bbox.height}`);
-
-		if(bbox.width < 50 || bbox.width > 500 || bbox.height < 50 || bbox.height > 500) {
+		if(bbox.width < 130 || bbox.width > 270 || bbox.height < 200 || bbox.height > 340) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
