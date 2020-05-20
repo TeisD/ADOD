@@ -84,7 +84,7 @@ class PageDetector {
 		//console.log('<PD> Capturing image...');
 		const p = new Promise(function(resolve, reject) {
             setTimeout(function() {
-                resolve(path.join(process.env.DATA_DIR, 'calibration/5-2.jpg'));
+                resolve(path.join(process.env.DATA_DIR, 'calibration/tests/w-page.jpg'));
             }, 1000);
         });
 
@@ -154,24 +154,26 @@ class PageDetector {
 	findPagenumber(im) {
 		let timestamp = Math.floor(new Date() / 1000);
 		im.convertGrayscale();
-		im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`));
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-1-in.jpg`));
 		im = im.crop(CROP.left, CROP.top, CROP.width, CROP.height);
-		im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`));
-		console.log('<PD> Threshold START');
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-2-cropped.jpg`));
+		//console.log('<PD> Threshold START');
 		im = im.adaptiveThreshold(255, 0, 0, 25, 20);
-		im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`));
-		console.log('<PD> Contour START');
+		//console.log('<PD> Threshold END');
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-3-threshold.jpg`));
+		//console.log('<PD> Contour START');
 		var _im = im.copy();
 
 		// remove noise and erode
 		im.dilate(2.5);
 		im.erode(20);
-        im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`));
-    
+		if(process.env.CALIBRATION_MODE) im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-4-erode.jpg`));
+
 		var contours = im.findContours();
 		var id = 0;
 		var difference = +Infinity;
 		//console.log('<PD> Contour END');
+
 
 		if(!contours.size()) {
 			return Promise.reject(STATUS.NO_PAGE);
@@ -186,21 +188,31 @@ class PageDetector {
 			}
 		}
 
-		console.log(`Found contour: ${contours.area(id)} (countour size is ${AREA})`);
+		if(process.env.CALIBRATION_MODE) console.log(`Found contour: ${contours.area(id)} (countour size is ${AREA})`);
 
-		if(contours.area(id) > AREA + 5000 || contours.area(id) < AREA - 5000) {
+		if(contours.area(id) > AREA + 10000 || contours.area(id) < AREA - 10000) {
+			return Promise.reject(STATUS.NO_PAGE);
+		}
+
+		var bbox = contours.boundingRect(id);
+
+		if(bbox.width < 130 || bbox.width > 270 || bbox.height < 200 || bbox.height > 340) {
+			return Promise.reject(STATUS.NO_PAGE);
+		}
+
+		_im = _im.crop(bbox.x + 60, bbox.y + 60, bbox.width - 120, bbox.height - 120);
+		
+		if (_im.size().width * _im.size().height < 8000) {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
 		}
+		
+		_im.rotate(this.angle);
 
-		var bbox = contours.boundingRect(id);
-        _im = _im.crop(bbox.x + 75, bbox.y + 75, bbox.width - 150, bbox.height - 150);
-        _im.rotate(this.angle)
-
-		_im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
+		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
 
 		return _im.toBuffer();
 	}

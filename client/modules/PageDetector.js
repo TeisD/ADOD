@@ -234,12 +234,17 @@ class PageDetector extends EventEmitter {
 			return Promise.reject(STATUS.NO_PAGE);
 		}
 
+		_im = _im.crop(bbox.x + 60, bbox.y + 60, bbox.width - 120, bbox.height - 120);
+		
+		if (_im.size().width * _im.size().height < 8000) {
+			return Promise.reject(STATUS.NO_PAGE);
+		}
+
 		if(this.status !== STATUS.NEW_PAGE) {
 			this.status = STATUS.NEW_PAGE;
 			this.emit('change', STATUS.NEW_PAGE);
 		}
-
-		_im = _im.crop(bbox.x + 60, bbox.y + 60, bbox.width - 120, bbox.height - 120);
+		
 		_im.rotate(this.angle);
 
 		if(process.env.CALIBRATION_MODE) _im.save(path.join(process.env.DATA_DIR, `calibration/${process.env.CONTROLLER}-${timestamp}-5-out.jpg`));
