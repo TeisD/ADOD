@@ -5,4 +5,4 @@
 #
 
 # fetch images & remove the lock file
-/usr/bin/tmux new -d -s instagram /home/ubuntu/.local/bin/instaloader --fast-update --count=1 --no-videos --no-video-thumbnails --post-filter="not is_video" --dirname-pattern=/home/ubuntu/ADOD-data/instagram/{target} +"/home/ubuntu/ADOD-data/instagram/hashtags.txt"
+/usr/bin/tmux new -d -s instagram /home/ubuntu/.local/bin/instaloader --fast-update --count=1 --no-videos --no-video-thumbnails --post-filter="not is_video" --dirname-pattern=/home/ubuntu/ADOD-data/instagram/{target} +$@
