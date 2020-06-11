@@ -143,8 +143,8 @@ function start() {
 							console.log('-> /z33 (instagram + twitter)');
 							try {
 								r = Promise.all([
-									instagramSimple(body.page),
-									twitter(body.page)
+									instagramSimple(body.page, body.iteration),
+									twitter(body.page, body.iteration)
 								]);
 							} catch (e) {
 								r = Promise.reject(e);
@@ -264,10 +264,12 @@ function instagram(page) {
 	}
 }
 
-function instagramSimple(page) {
+function instagramSimple(page, iteration) {
 	var p = Page.find(pages, page);
 
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
+
+	if (typeof iteration === 'undefined') iteration = 1;
 
 	let queue = []
 
@@ -302,7 +304,7 @@ function instagramSimple(page) {
 				files = files.filter(f => path.extname(f) == '.txt');
 				
 				// take the most recent file
-				let file = files[files.length - 1];
+				let file = files[files.length - iteration];
 
 				if(typeof file !== 'string') return resolve();
 
@@ -359,12 +361,14 @@ function image(image) {
 }
 
 
-function twitter(page) {
+function twitter(page, iteration) {
 	var p = Page.find(pages, page);
 
 	if (typeof p === 'undefined') return Promise.reject('Page "' + page + '" not found');
 
 	if (typeof p.blocks === 'undefined') return Promise.reject('Page "' + page + '" does not contain data');
+
+	if (typeof iteration === 'undefined') iteration = 1;
 
 	let queries = [];
 
@@ -383,14 +387,14 @@ function twitter(page) {
 		const table = getTableName(k.text);
 
 		return new Promise((resolve, reject) => {
-			db.query(`SELECT text, user, user_name, created_at FROM \`${table}\` ORDER BY timestamp DESC LIMIT 5`, [], function (err, response) {
+			db.query(`SELECT text, user, user_name, created_at FROM \`${table}\` ORDER BY timestamp DESC LIMIT ${2 + iteration*3}`, [], function (err, response) {
 				if (err) return reject(err);
 
 				
 				resolve({
 					id: k._id,
 					word: k.text,
-					tweets: response
+					tweets: _.takeRight(response,5)
 				});
 			});
 		})

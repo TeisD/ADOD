@@ -193,6 +193,7 @@ function getData(pagenumber) {
 		}
 
 		data.key = process.env.API_KEY;
+		data.iteration = iteration;
 
 		if(process.env.OFFLINE) {
 			resolve(fs.readFileSync(path.join(process.env.DATA_DIR, url, pagenumber + '.json')).toString());
