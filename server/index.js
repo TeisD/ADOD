@@ -387,7 +387,7 @@ function twitter(page, iteration) {
 		const table = getTableName(k.text);
 
 		return new Promise((resolve, reject) => {
-			db.query(`SELECT text, user, user_name, created_at FROM \`${table}\` ORDER BY timestamp DESC LIMIT ${5 + iteration}`, [], function (err, response) {
+			db.query(`SELECT text, user, user_name, created_at FROM \`${table}\` ORDER BY timestamp DESC LIMIT ${5 + parseInt(iteration)}`, [], function (err, response) {
 				if (err) return reject(err);
 
 				
