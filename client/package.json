@@ -17,7 +17,7 @@
     "mkdirp": "^0.5.1",
     "moment": "^2.24.0",
     "node-raspistill": "0.0.14",
-    "opencv": "^6.0.0",
+    "opencv": "^7.0.0",
     "pdfkit": "^0.11.0",
     "request": "^2.83.0",
     "rpio": "^0.9.21",
